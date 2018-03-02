@@ -1,0 +1,7 @@
+spring:
+  datasource:
+    data: classpath:some_offenders.sql,classpath:some_offender_identifiers.sql,classpath:some_offender_bookings.sql
+  jpa:
+    hibernate:
+      ddl-auto: create
+
