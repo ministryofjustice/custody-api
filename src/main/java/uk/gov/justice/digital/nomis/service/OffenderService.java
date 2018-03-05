@@ -59,7 +59,7 @@ public class OffenderService {
                         .build()
         ).collect(Collectors.toList());
 
-        Page<Offender> offenderPage = new PageImpl<>(offenderList, pageable, offendersPage.getTotalPages());
+        Page<Offender> offenderPage = new PageImpl<>(offenderList, pageable, offendersPage.getTotalElements());
 
         return offenderPage;
     }
