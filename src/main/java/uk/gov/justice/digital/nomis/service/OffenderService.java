@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.gov.justice.digital.nomis.api.Booking;
 import uk.gov.justice.digital.nomis.api.Identifier;
 import uk.gov.justice.digital.nomis.api.Offender;
+import uk.gov.justice.digital.nomis.api.OffenderAlias;
 import uk.gov.justice.digital.nomis.jpa.entity.OffenderBooking;
 import uk.gov.justice.digital.nomis.jpa.entity.OffenderIdentifier;
 import uk.gov.justice.digital.nomis.jpa.repository.OffenderIdentifierRepository;
@@ -37,31 +38,60 @@ public class OffenderService {
     @Transactional
     public Page<Offender> getOffenders(Pageable pageable) {
 
-        Page<uk.gov.justice.digital.nomis.jpa.entity.Offender> offendersPage = offenderRepository.findAll(pageable);
+//        Page<uk.gov.justice.digital.nomis.jpa.entity.Offender> offendersPage = offenderRepository.findAll(pageable);
+        Page<uk.gov.justice.digital.nomis.jpa.entity.Offender> rootOffendersRawPage = offenderRepository.findAllRootOffenders(pageable);
 
-        List<uk.gov.justice.digital.nomis.jpa.entity.Offender> offenders = offendersPage.getContent();
+        List<uk.gov.justice.digital.nomis.jpa.entity.Offender> rootOffenders = rootOffendersRawPage.getContent();
 
-        List<Long> offenderIds = offenderIdsOf(offenders);
+        List<Long> rootOffenderIds = offenderIdsOf(rootOffenders);
 
-        List<OffenderIdentifier> offenderIdentifiers = offenderIdentifierRepository.findByOffenderIdIn(offenderIds);
+        List<uk.gov.justice.digital.nomis.jpa.entity.Offender> aliasOffendersForPage = offenderRepository.findOffenderAliases(rootOffenderIds);
 
-        Map<Long, List<OffenderIdentifier>> offenderIdentifiersMap = offenderIdentifiers.stream().collect(Collectors.groupingBy(OffenderIdentifier::getOffenderId));
+        List<Long> aliasOffenderIds = offenderIdsOf(aliasOffendersForPage);
 
-        List<Offender> offenderList = offenders.stream().map(
+        Map<Long, List<uk.gov.justice.digital.nomis.jpa.entity.Offender>> offenderAliasMap =
+                aliasOffendersForPage
+                        .stream()
+                        .collect(Collectors.groupingBy(uk.gov.justice.digital.nomis.jpa.entity.Offender::getRootOffenderId));
+
+        Map<Long, List<OffenderIdentifier>> rootOffenderIdentifiersMap = offenderIdentifierRepository.findByOffenderIdIn(rootOffenderIds)
+                .stream()
+                .collect(Collectors.groupingBy(OffenderIdentifier::getOffenderId));
+
+        Map<Long, List<OffenderIdentifier>> aliasOffenderIdentifiersMap = offenderIdentifierRepository.findByOffenderIdIn(aliasOffenderIds)
+                .stream()
+                .collect(Collectors.groupingBy(OffenderIdentifier::getOffenderId));
+
+        List<Offender> offenderList = rootOffenders.stream().map(
                 offender -> Offender.builder()
                         .dateOfBirth(offender.getBirthDate().toLocalDateTime().toLocalDate())
                         .firstName(offender.getFirstName())
                         .middleNames(combinedMiddlenamesOf(offender))
                         .surname(offender.getLastName())
                         .bookings(bookingsOf(offender.getOffenderBookings()))
-                        .identifiers(identifiersOf(offenderIdentifiersMap.get(offender.getOffenderId())))
+                        .identifiers(identifiersOf(rootOffenderIdentifiersMap.get(offender.getOffenderId())))
                         .offenderId(offender.getOffenderId())
+                        .aliases(aliasesOf(offenderAliasMap.get(offender.getOffenderId()), aliasOffenderIdentifiersMap))
+                        .nomsId(offender.getOffenderIdDisplay())
                         .build()
         ).collect(Collectors.toList());
 
-        Page<Offender> offenderPage = new PageImpl<>(offenderList, pageable, offendersPage.getTotalElements());
+        return new PageImpl<>(offenderList, pageable, rootOffendersRawPage.getTotalElements());
+    }
 
-        return offenderPage;
+    private List<OffenderAlias> aliasesOf(List<uk.gov.justice.digital.nomis.jpa.entity.Offender> offenderList, Map<Long, List<OffenderIdentifier>> aliasOffenderIdentifiersMap) {
+        return Optional.ofNullable(offenderList).map(offenders -> offenders
+                .stream()
+                .map(offender -> OffenderAlias.builder()
+                        .offenderId(offender.getOffenderId())
+                        .firstName(offender.getFirstName())
+                        .middleNames(combinedMiddlenamesOf(offender))
+                        .surname(offender.getLastName())
+                        .dateOfBirth(offender.getBirthDate().toLocalDateTime().toLocalDate())
+                        .identifiers(identifiersOf(aliasOffenderIdentifiersMap.get(offender.getOffenderId())))
+                        .nomsId(offender.getOffenderIdDisplay())
+                        .build())
+                .collect(Collectors.toList())).orElse(Collections.emptyList());
     }
 
     private List<Long> offenderIdsOf(List<uk.gov.justice.digital.nomis.jpa.entity.Offender> offenders) {

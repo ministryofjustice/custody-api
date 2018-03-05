@@ -57,7 +57,7 @@ public class Offender {
     @Column(name = "OFFENDER_ID_DISPLAY")
     private String offenderIdDisplay;
     @Column(name = "ROOT_OFFENDER_ID")
-    private Integer rootOffenderId;
+    private Long rootOffenderId;
     @Column(name = "CASELOAD_TYPE")
     private String caseloadType;
     @Column(name = "MODIFY_USER_ID")
@@ -67,7 +67,7 @@ public class Offender {
     @Column(name = "ALIAS_NAME_TYPE")
     private String aliasNameType;
     @Column(name = "PARENT_OFFENDER_ID")
-    private Integer parentOffenderId;
+    private Long parentOffenderId;
     @Column(name = "UNIQUE_OBLIGATION_FLAG")
     private String uniqueObligationFlag;
     @Column(name = "SUSPENDED_FLAG")
@@ -89,7 +89,7 @@ public class Offender {
     @Column(name = "TITLE")
     private String title;
     @Column(name = "AGE")
-    private Integer age;
+    private Long age;
     @Column(name = "CREATE_USER_ID")
     private String createUserId;
     @Column(name = "LAST_NAME_ALPHA_KEY")
