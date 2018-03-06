@@ -112,8 +112,8 @@ public class Offender {
     private String auditClientWorkstationName;
     @Column(name = "AUDIT_ADDITIONAL_INFO")
     private String auditAdditionalInfo;
-    @Column(name = "SINGLE_OFFENDER_IDENTITY_ID")
-    private String singleOffenderIdentityId;
+    //@Column(name = "SINGLE_OFFENDER_IDENTITY_ID")
+    //private String singleOffenderIdentityId;
     @Column(name = "ALIAS_OFFENDER_ID")
     private Long aliasOffenderId;
     @OneToMany
