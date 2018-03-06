@@ -20,16 +20,17 @@ https://circleci.com/gh/noms-digital-studio/new-nomis-api
 
 This makes the JAR executable by including a manifest. 
 
-### Start the application default profile
-Without additional configuration this mode uses an in memory H2 (empty) database
+### Start the application dev profile
+This profile starts the application additional configuration this mode uses an in memory H2 (empty) database and is
+populated with a sample data set
 
 ```
-java -jar build/libs/new-nomis-api.jar
+SPRING_PROFILES_ACTIVE=dev java -jar build/libs/new-nomis-api.jar
 ```
 
 ### Start the application with Nomis Oracle db
 ```
-SPRING_DATASOURCE_URL=jdbc:oracle:thin:@<VM Oracle IP address>:1521:DNDA java -jar build/libs/new-nomis-api.jar
+SPRING_PROFILES_ACTIVE=oracle SPRING_DATASOURCE_URL=jdbc:oracle:thin:@<VM Oracle IP address>:1521:<sid> java -jar build/libs/new-nomis-api.jar
 ```
 
 ### Additional configuration

@@ -28,12 +28,5 @@ public class OffenderController {
     public PagedResources<Resource<Offender>> getOffenders(Pageable pageable, PagedResourcesAssembler<Offender> assembler) {
         Page<Offender> offenders = offenderService.getOffenders(pageable);
         return assembler.toResource(offenders);
-
-//        PagedResources<Resource<Offender>> userPagedResources =
-//                assembler.toResource(
-//                        offenders,
-//                        linkTo(methodOn(OffenderController.class).getOffenders(pageable, assembler)).withSelfRel());
-//
-//        return userPagedResources;
     }
 }
