@@ -1,0 +1,82 @@
+# Java Gradle CircleCI 2.0 configuration file
+#
+# Check https://circleci.com/docs/2.0/language-java/ for more details
+#
+version: 2
+jobs:
+  build:
+    docker:
+      # specify the version you desire here
+      - image: circleci/openjdk:8-jdk
+
+      # Specify service dependencies here if necessary
+      # CircleCI maintains a library of pre-built images
+      # documented at https://circleci.com/docs/2.0/circleci-images/
+      # - image: circleci/postgres:9.4
+
+    working_directory: ~/repo
+
+    environment:
+      # Customize the JVM maximum heap limit
+      JVM_OPTS: -Xmx3200m
+      TERM: dumb
+
+    steps:
+      - run:
+          name: Generate Build version
+          command: |
+            echo "export BUILD_VERSION=$(date +%Y%m%d%H%M)-$CIRCLE_BUILD_NUM" >> $BASH_ENV
+
+      - checkout
+
+      # Download and cache dependencies
+      - restore_cache:
+          keys:
+          - v1-dependencies-{{ checksum "build.gradle" }}
+          # fallback to using the latest cache if no exact match is found
+          - v1-dependencies-
+
+      - run: gradle dependencies
+
+      - save_cache:
+          paths:
+            - ~/.m2
+          key: v1-dependencies-{{ checksum "build.gradle" }}
+
+      # run tests!
+      - run: gradle test
+
+      - store_test_results:
+          path: build/test-results
+
+      - store_artifacts:
+          path: build/reports/tests
+
+      # Assemble
+      - run: gradle assemble
+
+      - store_artifacts:
+          path: build/libs
+
+      - setup_remote_docker
+
+      - deploy:
+          name: Push to Docker Hub
+          command: |
+            if [ "${CIRCLE_BRANCH}" == "master" ]; then
+              ./scripts/publishDockerImage.sh newnomisapi "${BUILD_VERSION}" "${CIRCLE_BUILD_NUM}" "${CIRCLE_BUILD_URL}" "${CIRCLE_SHA1}" "${DOCKER_EMAIL}" "${DOCKER_USERNAME}" "${DOCKER_PASSWORD}"
+            fi
+
+      - deploy:
+          name: Install elastic beanstalk CLI
+          command: |
+            if [ "${CIRCLE_BRANCH}" == "master" ]; then
+              ./scripts/installElasticBeanstalk.sh
+            fi
+
+      - deploy:
+          name: Deploy to Elastic Beanstalk Staging
+          command: |
+            if [ "${CIRCLE_BRANCH}" == "master" ]; then
+              ./scripts/deployElasticBeanstalk.sh "${BUILD_VERSION}"
+            fi
