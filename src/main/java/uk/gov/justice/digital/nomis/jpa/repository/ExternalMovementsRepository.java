@@ -8,5 +8,4 @@ import uk.gov.justice.digital.nomis.jpa.entity.OffenderExternalMovement;
 
 @Repository
 public interface ExternalMovementsRepository extends JpaRepository<OffenderExternalMovement, OffenderExternalMovement.Pk> {
-    Page<OffenderExternalMovement> findAllByOrderByMovementTimeDescIdMovementSeqDesc(Pageable pageable);
 }

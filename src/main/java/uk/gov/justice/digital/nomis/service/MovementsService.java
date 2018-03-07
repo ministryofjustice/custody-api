@@ -28,7 +28,7 @@ public class MovementsService {
 
     @Transactional
     public Page<ExternalMovement> getMovements(Pageable pageable) {
-        Page<OffenderExternalMovement> externalMovements = externalMovementsRepository.findAllByOrderByMovementTimeDescIdMovementSeqDesc(pageable);
+        Page<OffenderExternalMovement> externalMovements = externalMovementsRepository.findAll(pageable);
 
         List<ExternalMovement> movementList = externalMovements.getContent().stream().map(
                 em -> {
