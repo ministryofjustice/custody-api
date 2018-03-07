@@ -37,8 +37,6 @@ public class OffenderService {
 
     @Transactional
     public Page<Offender> getOffenders(Pageable pageable) {
-
-//        Page<uk.gov.justice.digital.nomis.jpa.entity.Offender> offendersPage = offenderRepository.findAll(pageable);
         Page<uk.gov.justice.digital.nomis.jpa.entity.Offender> rootOffendersRawPage = offenderRepository.findAllRootOffenders(pageable);
 
         List<uk.gov.justice.digital.nomis.jpa.entity.Offender> rootOffenders = rootOffendersRawPage.getContent();

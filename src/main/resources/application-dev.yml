@@ -1,6 +1,10 @@
 spring:
   datasource:
-    data: classpath:some_offenders.sql,classpath:some_offender_identifiers.sql,classpath:some_offender_bookings.sql
+    data: 'classpath:some_offenders.sql,
+    classpath:some_offender_identifiers.sql,
+    classpath:some_offender_bookings.sql,
+    classpath:some_movement_reasons.sql,
+    classpath:some_offender_external_movements.sql'
   jpa:
     hibernate:
       ddl-auto: create
