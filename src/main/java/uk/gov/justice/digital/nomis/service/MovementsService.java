@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.gov.justice.digital.nomis.api.ExternalMovement;
 import uk.gov.justice.digital.nomis.jpa.entity.MovementReason;
 import uk.gov.justice.digital.nomis.jpa.entity.OffenderExternalMovement;
+import uk.gov.justice.digital.nomis.jpa.filters.MovementsFilter;
 import uk.gov.justice.digital.nomis.jpa.repository.ExternalMovementsRepository;
 
 import java.sql.Timestamp;
@@ -27,8 +28,8 @@ public class MovementsService {
     }
 
     @Transactional
-    public Page<ExternalMovement> getMovements(Pageable pageable) {
-        Page<OffenderExternalMovement> externalMovements = externalMovementsRepository.findAll(pageable);
+    public Page<ExternalMovement> getMovements(Pageable pageable, MovementsFilter movementsFilter) {
+        Page<OffenderExternalMovement> externalMovements = externalMovementsRepository.findAll(movementsFilter, pageable);
 
         List<ExternalMovement> movementList = externalMovements.getContent().stream().map(
                 em -> {
