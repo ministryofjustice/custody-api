@@ -83,14 +83,6 @@ public class OffenderChargesService {
                     .build());
         }
 
-        if (offenceResult1 != null) {
-            resultBuilder.put("1", Result.builder()
-                    .code(offenceResult1.getResultCode())
-                    .description(offenceResult1.getDescription())
-                    .indicator(oc.getResultCode1Indicator())
-                    .build());
-        }
-
         return resultBuilder.build();
     }
 
