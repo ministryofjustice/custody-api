@@ -4,7 +4,14 @@ spring:
     classpath:some_offender_identifiers.sql,
     classpath:some_offender_bookings.sql,
     classpath:some_movement_reasons.sql,
-    classpath:some_offender_external_movements.sql'
+    classpath:some_offender_external_movements.sql,
+    classpath:some_ho_codes.sql,
+    classpath:some_statutes.sql,
+    classpath:some_offences.sql,
+    classpath:some_offender_cases.sql,
+    classpath:some_offender_charges.sql,
+    classpath:some_orders.sql'
+
   jpa:
     hibernate:
       ddl-auto: create
