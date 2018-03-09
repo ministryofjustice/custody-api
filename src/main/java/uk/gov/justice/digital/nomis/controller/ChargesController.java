@@ -53,7 +53,7 @@ public class ChargesController {
 
     @RequestMapping(path = "/offenders/offenderId/{offenderId}/charges", method = RequestMethod.GET)
     @ApiResponses({
-            @ApiResponse(code = 404, message = "Offender not found"),
+            @ApiResponse(code = 404, message = "Offender or booking not found"),
             @ApiResponse(code = 200, message = "OK")})
     public ResponseEntity<List<Charge>> getOffenderCharges(@PathVariable("offenderId") Long offenderId,
                                                            @RequestParam("bookingId") Optional<Long> maybeBookingId) {
