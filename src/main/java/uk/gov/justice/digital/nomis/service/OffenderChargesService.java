@@ -15,6 +15,7 @@ import uk.gov.justice.digital.nomis.api.Order;
 import uk.gov.justice.digital.nomis.api.Result;
 import uk.gov.justice.digital.nomis.jpa.entity.HoCode;
 import uk.gov.justice.digital.nomis.jpa.entity.OffenceResultCode;
+import uk.gov.justice.digital.nomis.jpa.entity.Offender;
 import uk.gov.justice.digital.nomis.jpa.entity.OffenderBooking;
 import uk.gov.justice.digital.nomis.jpa.entity.OffenderCase;
 import uk.gov.justice.digital.nomis.jpa.entity.OffenderCharge;
@@ -215,13 +216,20 @@ public class OffenderChargesService {
     }
 
     public Optional<List<Charge>> chargesForOffenderIdAndBookingId(Long offenderId, Long bookingId) {
-        Optional<List<OffenderCharge>> maybeOffenderCharges = Optional.ofNullable(offenderRepository.findOne(offenderId))
-                .map(offender -> offender.getOffenderBookings().stream()
-                        .filter(ob -> ob.getOffenderBookId().equals(bookingId))
-                        .map(OffenderBooking::getOffenderCharges).
-                                flatMap(Collection::stream).
-                                collect(Collectors.toList()));
+        Optional<Offender> maybeOffender = Optional.ofNullable(offenderRepository.findOne(offenderId));
 
-        return maybeOffenderCharges.map(offenderCharges -> offenderCharges.stream().map(this::chargeOf).collect(Collectors.toList()));
+        if (!maybeOffender.isPresent()) {
+            return Optional.empty();
+        }
+
+        Optional<OffenderBooking> maybeOffenderBooking = maybeOffender.get().getOffenderBookings()
+                .stream()
+                .filter(ob -> ob.getOffenderBookId().equals(bookingId))
+                .findFirst();
+
+        Optional<List<Charge>> maybeCharges = maybeOffenderBooking.map(ob -> ob.getOffenderCharges()
+                .stream().map(this::chargeOf).collect(Collectors.toList()));
+
+        return maybeCharges;
     }
 }

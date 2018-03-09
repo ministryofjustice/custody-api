@@ -16,12 +16,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.justice.digital.nomis.api.Charge;
 import uk.gov.justice.digital.nomis.service.OffenderChargesService;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
@@ -53,23 +55,14 @@ public class ChargesController {
     @ApiResponses({
             @ApiResponse(code = 404, message = "Offender not found"),
             @ApiResponse(code = 200, message = "OK")})
-    public ResponseEntity<List<Charge>> getOffenderCharges(@PathVariable("offenderId") Long offenderId) {
-
-        return offenderChargesService.chargesForOffenderId(offenderId).map(
-                charges -> new ResponseEntity<>(charges, HttpStatus.OK)).orElse(new ResponseEntity<>(NOT_FOUND));
-
-    }
-
-    @RequestMapping(path = "/offenders/offenderId/{offenderId}/charges/booking/{bookingId}", method = RequestMethod.GET)
-    @ApiResponses({
-            @ApiResponse(code = 404, message = "Offender or booking not found"),
-            @ApiResponse(code = 200, message = "OK")})
     public ResponseEntity<List<Charge>> getOffenderCharges(@PathVariable("offenderId") Long offenderId,
-                                                           @PathVariable("bookingId") Long bookingId) {
+                                                           @RequestParam("bookingId") Optional<Long> maybeBookingId) {
 
-        return offenderChargesService.chargesForOffenderIdAndBookingId(offenderId, bookingId).map(
-                charges -> new ResponseEntity<>(charges, HttpStatus.OK)).orElse(new ResponseEntity<>(NOT_FOUND));
+        return maybeBookingId
+                .map(bookingId -> offenderChargesService.chargesForOffenderIdAndBookingId(offenderId, bookingId))
+                .orElse(offenderChargesService.chargesForOffenderId(offenderId))
+                .map(charges -> new ResponseEntity<>(charges, HttpStatus.OK))
+                .orElse(new ResponseEntity<>(NOT_FOUND));
 
     }
-
 }
