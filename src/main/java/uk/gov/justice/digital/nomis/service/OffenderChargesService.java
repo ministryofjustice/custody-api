@@ -217,7 +217,7 @@ public class OffenderChargesService {
     public Optional<List<Charge>> chargesForOffenderIdAndBookingId(Long offenderId, Long bookingId) {
         Optional<List<OffenderCharge>> maybeOffenderCharges = Optional.ofNullable(offenderRepository.findOne(offenderId))
                 .map(offender -> offender.getOffenderBookings().stream()
-                        .filter(ob -> ob.getOffenderBookId() == bookingId)
+                        .filter(ob -> ob.getOffenderBookId().equals(bookingId))
                         .map(OffenderBooking::getOffenderCharges).
                                 flatMap(Collection::stream).
                                 collect(Collectors.toList()));
