@@ -137,4 +137,8 @@ public class OffenderBooking {
     @JoinColumn(name = "OFFENDER_BOOK_ID")
     private List<OffenderExternalMovement> offenderExternalMovements;
 
+    @OneToMany
+    @JoinColumn(name = "OFFENDER_BOOK_ID")
+    private List<OffenderCharge> offenderCharges;
+
 }

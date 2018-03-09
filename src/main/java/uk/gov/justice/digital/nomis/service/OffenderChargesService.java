@@ -15,11 +15,14 @@ import uk.gov.justice.digital.nomis.api.Order;
 import uk.gov.justice.digital.nomis.api.Result;
 import uk.gov.justice.digital.nomis.jpa.entity.HoCode;
 import uk.gov.justice.digital.nomis.jpa.entity.OffenceResultCode;
+import uk.gov.justice.digital.nomis.jpa.entity.OffenderBooking;
 import uk.gov.justice.digital.nomis.jpa.entity.OffenderCase;
 import uk.gov.justice.digital.nomis.jpa.entity.OffenderCharge;
 import uk.gov.justice.digital.nomis.jpa.entity.Statute;
 import uk.gov.justice.digital.nomis.jpa.repository.OffenderChargesRepository;
+import uk.gov.justice.digital.nomis.jpa.repository.OffenderRepository;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -29,10 +32,13 @@ import java.util.stream.Collectors;
 public class OffenderChargesService {
 
     private final OffenderChargesRepository offenderChargesRepository;
+    private final OffenderRepository offenderRepository;
 
     @Autowired
-    public OffenderChargesService(OffenderChargesRepository offenderChargesRepository) {
+    public OffenderChargesService(final OffenderChargesRepository offenderChargesRepository,
+                                  final OffenderRepository offenderRepository) {
         this.offenderChargesRepository = offenderChargesRepository;
+        this.offenderRepository = offenderRepository;
     }
 
     @Transactional
@@ -40,29 +46,34 @@ public class OffenderChargesService {
 
         Page<OffenderCharge> offenderCharges = offenderChargesRepository.findAll(pageable);
 
-        List<Charge> chargesList = offenderCharges.getContent().stream().map(
-                oc -> Charge.builder()
-                        .bookingId(oc.getOffenderBookId())
-                        .offenderCase(caseOf(oc.getOffenderCase()))
-                        .chargeId(oc.getOffenderChargeId())
-                        .chargeSequence(oc.getChargeSeq())
-                        .chargeStatus(oc.getChargeStatus())
-                        .cjitOffenceCodes(cjitOffenceCodesMapOf(oc))
-                        .lidsOffenceNumber(oc.getLidsOffenceNumber())
-                        .mostSeriousCharge(ynToBoolean(oc.getMostSeriousFlag()))
-                        .numberOfOffences(oc.getNoOfOffences())
-                        .offence(offenceOf(oc))
-                        .offenceDate(Optional.ofNullable(oc.getOffenceDate()).map(d -> d.toLocalDateTime().toLocalDate()).orElse(null))
-                        .offenceRangeDate(Optional.ofNullable(oc.getOffenceRangeDate()).map(d -> d.toLocalDateTime().toLocalDate()).orElse(null))
-                        .order(orderOf(oc))
-                        .pleaCode(oc.getPleaCode())
-                        .propertyValue(oc.getPropertyValue())
-                        .totalPropertyValue(oc.getTotalPropertyValue())
-                        .result(resultMapOf(oc))
-                        .build()
-        ).collect(Collectors.toList());
+        List<Charge> chargesList = offenderCharges.getContent()
+                .stream()
+                .map(this::chargeOf)
+                .collect(Collectors.toList());
 
         return new PageImpl<>(chargesList, pageable, offenderCharges.getTotalElements());
+    }
+
+    private Charge chargeOf(OffenderCharge oc) {
+        return Charge.builder()
+                .bookingId(oc.getOffenderBookId())
+                .offenderCase(caseOf(oc.getOffenderCase()))
+                .chargeId(oc.getOffenderChargeId())
+                .chargeSequence(oc.getChargeSeq())
+                .chargeStatus(oc.getChargeStatus())
+                .cjitOffenceCodes(cjitOffenceCodesMapOf(oc))
+                .lidsOffenceNumber(oc.getLidsOffenceNumber())
+                .mostSeriousCharge(ynToBoolean(oc.getMostSeriousFlag()))
+                .numberOfOffences(oc.getNoOfOffences())
+                .offence(offenceOf(oc))
+                .offenceDate(Optional.ofNullable(oc.getOffenceDate()).map(d -> d.toLocalDateTime().toLocalDate()).orElse(null))
+                .offenceRangeDate(Optional.ofNullable(oc.getOffenceRangeDate()).map(d -> d.toLocalDateTime().toLocalDate()).orElse(null))
+                .order(orderOf(oc))
+                .pleaCode(oc.getPleaCode())
+                .propertyValue(oc.getPropertyValue())
+                .totalPropertyValue(oc.getTotalPropertyValue())
+                .result(resultMapOf(oc))
+                .build();
     }
 
     private Map<String, Result> resultMapOf(OffenderCharge oc) {
@@ -192,4 +203,25 @@ public class OffenderChargesService {
         return Optional.ofNullable(yn).map("Y"::equalsIgnoreCase).orElse(null);
     }
 
+    public Optional<List<Charge>> chargesForOffenderId(Long offenderId) {
+
+        Optional<List<OffenderCharge>> maybeOffenderCharges = Optional.ofNullable(offenderRepository.findOne(offenderId))
+                .map(offender -> offender.getOffenderBookings().stream()
+                        .map(OffenderBooking::getOffenderCharges).
+                                flatMap(Collection::stream).
+                                collect(Collectors.toList()));
+
+        return maybeOffenderCharges.map(offenderCharges -> offenderCharges.stream().map(this::chargeOf).collect(Collectors.toList()));
+    }
+
+    public Optional<List<Charge>> chargesForOffenderIdAndBookingId(Long offenderId, Long bookingId) {
+        Optional<List<OffenderCharge>> maybeOffenderCharges = Optional.ofNullable(offenderRepository.findOne(offenderId))
+                .map(offender -> offender.getOffenderBookings().stream()
+                        .filter(ob -> ob.getOffenderBookId() == bookingId)
+                        .map(OffenderBooking::getOffenderCharges).
+                                flatMap(Collection::stream).
+                                collect(Collectors.toList()));
+
+        return maybeOffenderCharges.map(offenderCharges -> offenderCharges.stream().map(this::chargeOf).collect(Collectors.toList()));
+    }
 }
