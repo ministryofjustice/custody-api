@@ -27,12 +27,10 @@ import java.util.stream.Stream;
 public class OffenderService {
 
     private final OffenderRepository offenderRepository;
-    private final OffenderIdentifierRepository offenderIdentifierRepository;
 
     @Autowired
-    public OffenderService(OffenderRepository offenderRepository, OffenderIdentifierRepository offenderIdentifierRepository) {
+    public OffenderService(OffenderRepository offenderRepository) {
         this.offenderRepository = offenderRepository;
-        this.offenderIdentifierRepository = offenderIdentifierRepository;
     }
 
     @Transactional
@@ -41,25 +39,6 @@ public class OffenderService {
 
         List<uk.gov.justice.digital.nomis.jpa.entity.Offender> rootOffenders = rootOffendersRawPage.getContent();
 
-        List<Long> rootOffenderIds = offenderIdsOf(rootOffenders);
-
-        List<uk.gov.justice.digital.nomis.jpa.entity.Offender> aliasOffendersForPage = offenderRepository.findOffenderAliases(rootOffenderIds);
-
-        List<Long> aliasOffenderIds = offenderIdsOf(aliasOffendersForPage);
-
-        Map<Long, List<uk.gov.justice.digital.nomis.jpa.entity.Offender>> offenderAliasMap =
-                aliasOffendersForPage
-                        .stream()
-                        .collect(Collectors.groupingBy(uk.gov.justice.digital.nomis.jpa.entity.Offender::getRootOffenderId));
-
-        Map<Long, List<OffenderIdentifier>> rootOffenderIdentifiersMap = offenderIdentifierRepository.findByOffenderIdIn(rootOffenderIds)
-                .stream()
-                .collect(Collectors.groupingBy(OffenderIdentifier::getOffenderId));
-
-        Map<Long, List<OffenderIdentifier>> aliasOffenderIdentifiersMap = offenderIdentifierRepository.findByOffenderIdIn(aliasOffenderIds)
-                .stream()
-                .collect(Collectors.groupingBy(OffenderIdentifier::getOffenderId));
-
         List<Offender> offenderList = rootOffenders.stream().map(
                 offender -> Offender.builder()
                         .dateOfBirth(offender.getBirthDate().toLocalDateTime().toLocalDate())
@@ -67,9 +46,9 @@ public class OffenderService {
                         .middleNames(combinedMiddlenamesOf(offender))
                         .surname(offender.getLastName())
                         .bookings(bookingsOf(offender.getOffenderBookings()))
-                        .identifiers(identifiersOf(rootOffenderIdentifiersMap.get(offender.getOffenderId())))
+                        .identifiers(identifiersOf(offender.getOffenderIdentifiers()))
                         .offenderId(offender.getOffenderId())
-                        .aliases(aliasesOf(offenderAliasMap.get(offender.getOffenderId()), aliasOffenderIdentifiersMap))
+                        .aliases(aliasesOf(offender.getOffenderAliases()))
                         .nomsId(offender.getOffenderIdDisplay())
                         .build()
         ).collect(Collectors.toList());
@@ -77,7 +56,7 @@ public class OffenderService {
         return new PageImpl<>(offenderList, pageable, rootOffendersRawPage.getTotalElements());
     }
 
-    private List<OffenderAlias> aliasesOf(List<uk.gov.justice.digital.nomis.jpa.entity.Offender> offenderList, Map<Long, List<OffenderIdentifier>> aliasOffenderIdentifiersMap) {
+    private List<OffenderAlias> aliasesOf(List<uk.gov.justice.digital.nomis.jpa.entity.Offender> offenderList) {
         return Optional.ofNullable(offenderList).map(offenders -> offenders
                 .stream()
                 .map(offender -> OffenderAlias.builder()
@@ -86,7 +65,7 @@ public class OffenderService {
                         .middleNames(combinedMiddlenamesOf(offender))
                         .surname(offender.getLastName())
                         .dateOfBirth(offender.getBirthDate().toLocalDateTime().toLocalDate())
-                        .identifiers(identifiersOf(aliasOffenderIdentifiersMap.get(offender.getOffenderId())))
+                        .identifiers(identifiersOf(offender.getOffenderIdentifiers()))
                         .nomsId(offender.getOffenderIdDisplay())
                         .build())
                 .collect(Collectors.toList())).orElse(Collections.emptyList());

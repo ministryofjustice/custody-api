@@ -4,14 +4,21 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.persistence.CollectionTable;
 import javax.persistence.Column;
+import javax.persistence.ConstraintMode;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.ForeignKey;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Data
 @AllArgsConstructor
@@ -116,8 +123,22 @@ public class Offender {
     //private String singleOffenderIdentityId;
     @Column(name = "ALIAS_OFFENDER_ID")
     private Long aliasOffenderId;
+
     @OneToMany
     @JoinColumn(name = "OFFENDER_ID")
     private List<OffenderBooking> offenderBookings;
+
+    @OneToMany
+    @JoinColumn(name = "ROOT_OFFENDER_ID", referencedColumnName = "OFFENDER_ID",
+            foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    private List<Offender> offenderAliases;
+
+    @OneToMany
+    @JoinColumn(name = "OFFENDER_ID")
+    private List<OffenderIdentifier> offenderIdentifiers;
+
+    public List<Offender> getOffenderAliases() {
+        return offenderAliases.stream().filter(alias -> !alias.getOffenderId().equals(this.offenderId)).collect(Collectors.toList());
+    }
 
 }

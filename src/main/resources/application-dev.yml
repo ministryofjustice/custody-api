@@ -1,13 +1,13 @@
 spring:
   datasource:
-    data: 'classpath:some_offenders.sql,
-    classpath:some_offender_identifiers.sql,
-    classpath:some_offender_bookings.sql,
-    classpath:some_movement_reasons.sql,
-    classpath:some_offender_external_movements.sql,
-    classpath:some_offender_cases.sql,
-    classpath:some_offender_charges.sql,
-    classpath:some_orders.sql'
+    data: 'classpath:R__1_13__MOVEMENT_REASONS.sql,
+          classpath:R__1_15__OFFENDERS.sql,
+          classpath:R__3_6_1__OFFENDER_BOOKINGS.sql,
+          classpath:R__3_7__OFFENDER_IDENTIFIERS.sql,
+          classpath:R__4_5__OFFENDER_CASES.sql,
+          classpath:R__4_7__OFFENDER_EXTERNAL_MOVEMENTS.sql,
+          classpath:R__5_2__OFFENDER_CHARGES.sql,
+          classpath:R__5_6__ORDERS.sql'
 
   jpa:
     hibernate:

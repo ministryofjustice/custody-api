@@ -18,4 +18,6 @@ public interface OffenderRepository extends JpaRepository<Offender, Long> {
     @Query("select o from Offender o where o.offenderId = o.rootOffenderId")
     Page<Offender> findAllRootOffenders(Pageable pageable);
 
+    Page<Offender> findByRootOffenderIdEqualsAndOffenderId(Pageable pageable);
+
 }
