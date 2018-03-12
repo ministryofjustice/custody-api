@@ -6,6 +6,7 @@ import lombok.Data;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Map;
 
 @Data
@@ -13,7 +14,9 @@ import java.util.Map;
 public class Charge {
     private Long chargeId;
     private Long bookingId;
-    private Offence offence;
+    private Long offenderId;
+    private String offenceCode;
+    private String statuteCode;
     private Integer numberOfOffences;
     private LocalDate offenceDate;
     private LocalDate offenceRangeDate;
@@ -22,7 +25,7 @@ public class Charge {
     private BigDecimal totalPropertyValue;
     private Map<String, String> cjitOffenceCodes;
     private String chargeStatus;
-    private Map<String, Result> result;
+    private List<String> resultCodes;
     @JsonProperty("case")
     private Case offenderCase;
     private Boolean mostSeriousCharge;

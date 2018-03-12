@@ -6,7 +6,6 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinColumns;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import java.math.BigDecimal;
@@ -19,8 +18,9 @@ public class OffenderCharge {
     @Id
     @Column(name = "OFFENDER_CHARGE_ID")
     private Long offenderChargeId;
-    @Column(name = "OFFENDER_BOOK_ID")
-    private Long offenderBookId;
+    @JoinColumn(name = "OFFENDER_BOOK_ID")
+    @OneToOne
+    private OffenderBooking offenderBooking;
     @Column(name = "NO_OF_OFFENCES")
     private Integer noOfOffences;
     @Column(name = "OFFENCE_DATE")
@@ -76,18 +76,14 @@ public class OffenderCharge {
     @OneToOne
     @JoinColumn(name = "CASE_ID", referencedColumnName = "CASE_ID", nullable = false)
     private OffenderCase offenderCase;
-    @OneToOne
-    @JoinColumns({
-            @JoinColumn(name = "OFFENCE_CODE", insertable = false),
-            @JoinColumn(name = "STATUTE_CODE", insertable = false)
-    })
-    private Offence offence;
-    @OneToOne
-    @JoinColumn(name = "RESULT_CODE_1", referencedColumnName = "RESULT_CODE")
-    private OffenceResultCode offenceResult1;
-    @OneToOne
-    @JoinColumn(name = "RESULT_CODE_2", referencedColumnName = "RESULT_CODE")
-    private OffenceResultCode offenceResult2;
+    @Column(name = "OFFENCE_CODE")
+    private String offenceCode;
+    @Column(name = "STATUTE_CODE")
+    private String statuteCode;
+    @Column(name = "RESULT_CODE_1")
+    private String resultCode1;
+    @Column(name = "RESULT_CODE_2")
+    private String resultCode2;
     @OneToOne
     @JoinColumn(name = "ORDER_ID")
     private Order order;
