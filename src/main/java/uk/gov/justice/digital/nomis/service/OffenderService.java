@@ -17,6 +17,7 @@ import uk.gov.justice.digital.nomis.jpa.repository.OffenderIdentifierRepository;
 import uk.gov.justice.digital.nomis.jpa.repository.OffenderRepository;
 
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -71,17 +72,14 @@ public class OffenderService {
                 .collect(Collectors.toList())).orElse(Collections.emptyList());
     }
 
-    private List<Long> offenderIdsOf(List<uk.gov.justice.digital.nomis.jpa.entity.Offender> offenders) {
-        return offenders.stream().map(uk.gov.justice.digital.nomis.jpa.entity.Offender::getOffenderId).collect(Collectors.toList());
-    }
-
     private List<Identifier> identifiersOf(List<OffenderIdentifier> offenderIdentifiers) {
         return Optional.ofNullable(offenderIdentifiers).map(
-                identifiers -> identifiers.stream().map(identifier ->
+                identifiers -> identifiers.stream().sorted(Comparator.comparing(OffenderIdentifier::getOffenderIdSeq).reversed()).map(identifier ->
                         Identifier.builder()
                                 .identifier(identifier.getIdentifier())
                                 .identifierType(identifier.getIdentifierType())
                                 .sequenceNumber(identifier.getOffenderIdSeq())
+                                .createdDateTime(identifier.getCreateDatetime().toLocalDateTime())
                                 .build())
                         .collect(Collectors.toList())
         ).orElse(Collections.emptyList());
