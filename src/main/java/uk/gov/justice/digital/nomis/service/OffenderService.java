@@ -13,13 +13,12 @@ import uk.gov.justice.digital.nomis.api.Offender;
 import uk.gov.justice.digital.nomis.api.OffenderAlias;
 import uk.gov.justice.digital.nomis.jpa.entity.OffenderBooking;
 import uk.gov.justice.digital.nomis.jpa.entity.OffenderIdentifier;
-import uk.gov.justice.digital.nomis.jpa.repository.OffenderIdentifierRepository;
 import uk.gov.justice.digital.nomis.jpa.repository.OffenderRepository;
 
+import java.sql.Timestamp;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -79,7 +78,7 @@ public class OffenderService {
                                 .identifier(identifier.getIdentifier())
                                 .identifierType(identifier.getIdentifierType())
                                 .sequenceNumber(identifier.getOffenderIdSeq())
-                                .createdDateTime(identifier.getCreateDatetime().toLocalDateTime())
+                                .createdDateTime(Optional.ofNullable(identifier.getCreateDatetime()).map(Timestamp::toLocalDateTime).orElse(null))
                                 .build())
                         .collect(Collectors.toList())
         ).orElse(Collections.emptyList());

@@ -6,11 +6,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
+import org.springframework.data.web.HateoasPageableHandlerMethodArgumentResolver;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 
 @SpringBootApplication
@@ -39,4 +43,22 @@ public class NewNomisAPI {
         return jsonConverter;
     }
 
+
+    @Bean
+    BeanPostProcessor pageablePostProcessor(@Value("${maxPageSize:#{T(Integer).MAX_VALUE}}") Integer maxPageSize) {
+        return new BeanPostProcessor() {
+            @Override
+            public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
+                return bean;
+            }
+
+            @Override
+            public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
+                if (bean instanceof HateoasPageableHandlerMethodArgumentResolver) {
+                    ((HateoasPageableHandlerMethodArgumentResolver) bean).setMaxPageSize(maxPageSize);
+                }
+                return bean;
+            }
+        };
+    }
 }
