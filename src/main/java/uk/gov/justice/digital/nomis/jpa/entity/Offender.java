@@ -3,20 +3,9 @@ package uk.gov.justice.digital.nomis.jpa.entity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.BatchSize;
 
-import javax.persistence.CollectionTable;
-import javax.persistence.Column;
-import javax.persistence.ConstraintMode;
-import javax.persistence.ElementCollection;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.ForeignKey;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToMany;
-import javax.persistence.OrderBy;
-import javax.persistence.Table;
-import javax.persistence.Transient;
+import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -126,15 +115,18 @@ public class Offender {
     private Long aliasOffenderId;
 
     @OneToMany
+    @BatchSize(size = 1000)
     @JoinColumn(name = "OFFENDER_ID")
     private List<OffenderBooking> offenderBookings;
 
     @OneToMany
+    @BatchSize(size = 1000)
     @JoinColumn(name = "ROOT_OFFENDER_ID", referencedColumnName = "OFFENDER_ID",
             foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private List<Offender> offenderAliases;
 
     @OneToMany
+    @BatchSize(size = 1000)
     @JoinColumn(name = "OFFENDER_ID")
     private List<OffenderIdentifier> offenderIdentifiers;
 
