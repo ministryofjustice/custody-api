@@ -42,23 +42,4 @@ public class NewNomisAPI {
         jsonConverter.setObjectMapper(objectMapper);
         return jsonConverter;
     }
-
-
-    @Bean
-    BeanPostProcessor pageablePostProcessor(@Value("${maxPageSize:#{T(Integer).MAX_VALUE}}") Integer maxPageSize) {
-        return new BeanPostProcessor() {
-            @Override
-            public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
-                return bean;
-            }
-
-            @Override
-            public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
-                if (bean instanceof HateoasPageableHandlerMethodArgumentResolver) {
-                    ((HateoasPageableHandlerMethodArgumentResolver) bean).setMaxPageSize(maxPageSize);
-                }
-                return bean;
-            }
-        };
-    }
 }
