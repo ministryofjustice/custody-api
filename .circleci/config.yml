@@ -67,16 +67,16 @@ jobs:
               ./scripts/publishDockerImage.sh newnomisapi "${BUILD_VERSION}" "${CIRCLE_BUILD_NUM}" "${CIRCLE_BUILD_URL}" "${CIRCLE_SHA1}" "${DOCKER_EMAIL}" "${DOCKER_USERNAME}" "${DOCKER_PASSWORD}"
             fi
 
-      - deploy:
-          name: Install elastic beanstalk CLI
-          command: |
-            if [ "${CIRCLE_BRANCH}" == "master" ]; then
-              ./scripts/installElasticBeanstalk.sh
-            fi
-
-      - deploy:
-          name: Deploy to Elastic Beanstalk Staging
-          command: |
-            if [ "${CIRCLE_BRANCH}" == "master" ]; then
-              ./scripts/deployElasticBeanstalk.sh "${BUILD_VERSION}"
-            fi
+#      - deploy:
+#          name: Install elastic beanstalk CLI
+#          command: |
+#            if [ "${CIRCLE_BRANCH}" == "master" ]; then
+#              ./scripts/installElasticBeanstalk.sh
+#            fi
+#
+#      - deploy:
+#          name: Deploy to Elastic Beanstalk Staging
+#          command: |
+#            if [ "${CIRCLE_BRANCH}" == "master" ]; then
+#              ./scripts/deployElasticBeanstalk.sh "${BUILD_VERSION}"
+#            fi
