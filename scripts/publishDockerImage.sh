@@ -25,3 +25,5 @@ docker build . \
 docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
 
 docker push $IMAGE_TAG
+docker tag $IMAGE_TAG mojdigitalstudio/$APPLICATION_NAME:latest
+docker push mojdigitalstudio/$APPLICATION_NAME:latest
