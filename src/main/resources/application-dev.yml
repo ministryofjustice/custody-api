@@ -7,7 +7,8 @@ spring:
           classpath:R__4_5__OFFENDER_CASES.sql,
           classpath:R__4_7__OFFENDER_EXTERNAL_MOVEMENTS.sql,
           classpath:R__5_2__OFFENDER_CHARGES.sql,
-          classpath:R__5_6__ORDERS.sql'
+          classpath:R__5_6__ORDERS.sql,
+          classpath:R__6_3__OFFENDER_SENTENCES.sql'
 
   jpa:
     hibernate:
