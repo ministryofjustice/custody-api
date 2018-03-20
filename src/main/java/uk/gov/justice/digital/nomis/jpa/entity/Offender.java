@@ -143,7 +143,7 @@ public class Offender {
 
     @OneToMany
     @BatchSize(size = 1000)
-    @JoinColumn(name = "OWNER_ID", insertable = false, updatable = false)
+    @JoinColumn(name = "OWNER_ID", insertable = false, updatable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     private List<OffenderAddress> offenderAddresses;
 
 }
