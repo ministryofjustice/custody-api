@@ -2,6 +2,7 @@ spring:
   datasource:
     data: 'classpath:R__1_13__MOVEMENT_REASONS.sql,
           classpath:R__1_15__OFFENDERS.sql,
+          classpath:R__1_2__ADDRESSES.sql,
           classpath:R__3_6_1__OFFENDER_BOOKINGS.sql,
           classpath:R__3_7__OFFENDER_IDENTIFIERS.sql,
           classpath:R__4_5__OFFENDER_CASES.sql,
