@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.justice.digital.nomis.api.Address;
+import uk.gov.justice.digital.nomis.jpa.entity.AddressUsage;
 import uk.gov.justice.digital.nomis.jpa.repository.AddressRepository;
 import uk.gov.justice.digital.nomis.jpa.repository.OffenderRepository;
 
@@ -31,7 +32,7 @@ public class AddressService {
         Page<uk.gov.justice.digital.nomis.jpa.entity.Address> rawAddressPage = addressRepository.findAll(pageable);
 
         List<Address> addresses = rawAddressPage.getContent().stream().map(
-                address -> addressOf(address)
+                this::addressOf
         ).collect(Collectors.toList());
 
         return new PageImpl<>(addresses, pageable, rawAddressPage.getTotalElements());
@@ -41,7 +42,7 @@ public class AddressService {
         return Address.builder()
                 .addressId(address.getAddressId())
                 .addressType(address.getAddressType())
-                .addressUsage(Optional.ofNullable(address.getAddressUsage()).map(au -> au.getAddressUsage()).orElse(null))
+                .addressUsage(Optional.ofNullable(address.getAddressUsage()).map(AddressUsage::getAddressUsage).orElse(null))
                 .businessHour(address.getBusinessHour())
                 .capacity(address.getCapacity())
                 .cityCode(address.getCityCode())
