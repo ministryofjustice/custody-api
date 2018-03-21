@@ -34,13 +34,9 @@ public class MovementsFilter implements Specification<OffenderExternalMovement> 
     public Predicate toPredicate(Root<OffenderExternalMovement> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
         ImmutableList.Builder<Predicate> predicateBuilder = ImmutableList.builder();
 
-        if (from.isPresent()) {
-            predicateBuilder.add(cb.greaterThanOrEqualTo(root.get("movementTime"), Timestamp.valueOf(from.get())));
-        }
+        from.ifPresent(localDateTime -> predicateBuilder.add(cb.greaterThanOrEqualTo(root.get("movementTime"), Timestamp.valueOf(localDateTime))));
 
-        if (to.isPresent()) {
-            predicateBuilder.add(cb.lessThanOrEqualTo(root.get("movementTime"), Timestamp.valueOf(to.get())));
-        }
+        to.ifPresent(localDateTime -> predicateBuilder.add(cb.lessThanOrEqualTo(root.get("movementTime"), Timestamp.valueOf(localDateTime))));
 
         ImmutableList<Predicate> predicates = predicateBuilder.build();
 
