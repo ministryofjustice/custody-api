@@ -73,4 +73,21 @@ public class OffenderService {
 
         return offenderTransformer.middleNamesOf(secondName, thirdName);
     }
+
+    public Optional<Offender> getOffender(Long offenderId) {
+        Optional<uk.gov.justice.digital.nomis.jpa.entity.Offender> optional = Optional.of(offenderRepository.findOne(offenderId));
+
+        return optional.map(offender ->
+                Offender.builder()
+                    .dateOfBirth(offender.getBirthDate().toLocalDateTime().toLocalDate())
+                    .firstName(offender.getFirstName())
+                    .middleNames(combinedMiddlenamesOf(offender))
+                    .surname(offender.getLastName())
+                    .bookings(bookingsOf(offender.getOffenderBookings()))
+                    .identifiers(identifiersOf(offender.getOffenderIdentifiers()))
+                    .offenderId(offender.getOffenderId())
+                    .aliases(aliasesOf(offender.getOffenderAliases()))
+                    .nomsId(offender.getOffenderIdDisplay())
+                    .build());
+    }
 }
