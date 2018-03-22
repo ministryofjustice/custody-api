@@ -81,4 +81,18 @@ public class OffenderTransformer {
                 .flatMap(o -> o.map(Stream::of).orElseGet(Stream::empty))
                 .collect(Collectors.toList());
     }
+
+    public uk.gov.justice.digital.nomis.api.Offender offenderOf(uk.gov.justice.digital.nomis.jpa.entity.Offender offender) {
+        return uk.gov.justice.digital.nomis.api.Offender.builder()
+                .dateOfBirth(offender.getBirthDate().toLocalDateTime().toLocalDate())
+                .firstName(offender.getFirstName())
+                .middleNames(combinedMiddlenamesOf(offender))
+                .surname(offender.getLastName())
+                .bookings(bookingsOf(offender.getOffenderBookings()))
+                .identifiers(identifiersOf(offender.getOffenderIdentifiers()))
+                .offenderId(offender.getOffenderId())
+                .aliases(aliasesOf(offender.getOffenderAliases()))
+                .nomsId(offender.getOffenderIdDisplay())
+                .build();
+    }
 }
