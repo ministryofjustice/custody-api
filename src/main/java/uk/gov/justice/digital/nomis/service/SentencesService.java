@@ -12,10 +12,8 @@ import uk.gov.justice.digital.nomis.jpa.entity.OffenderBooking;
 import uk.gov.justice.digital.nomis.jpa.entity.OffenderSentence;
 import uk.gov.justice.digital.nomis.jpa.repository.OffenderRepository;
 import uk.gov.justice.digital.nomis.jpa.repository.OffenderSentencesRepository;
+import uk.gov.justice.digital.nomis.service.transformer.SentenceTransformer;
 
-import java.sql.Timestamp;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -26,11 +24,13 @@ public class SentencesService {
 
     private final OffenderSentencesRepository offenderSentencesRepository;
     private final OffenderRepository offenderRepository;
+    private final SentenceTransformer sentenceTransformer;
 
     @Autowired
-    public SentencesService(OffenderSentencesRepository offenderSentencesRepository, OffenderRepository offenderRepository) {
+    public SentencesService(OffenderSentencesRepository offenderSentencesRepository, OffenderRepository offenderRepository, SentenceTransformer sentenceTransformer) {
         this.offenderSentencesRepository = offenderSentencesRepository;
         this.offenderRepository = offenderRepository;
+        this.sentenceTransformer = sentenceTransformer;
     }
 
     @Transactional
@@ -40,62 +40,10 @@ public class SentencesService {
 
         List<Sentence> sentencesList = offenderSentences.getContent()
                 .stream()
-                .map(this::sentenceOf)
+                .map(sentenceTransformer::sentenceOf)
                 .collect(Collectors.toList());
 
         return new PageImpl<>(sentencesList, pageable, offenderSentences.getTotalElements());
-    }
-
-    private Sentence sentenceOf(OffenderSentence offenderSentence) {
-        OffenderBooking offenderBooking = offenderSentence.getOffenderBooking();
-        return Sentence.builder()
-                .bookingId(offenderBooking.getOffenderBookId())
-                .offenderId(offenderBooking.getOffenderId())
-                .sentenceSequenceNumber(offenderSentence.getSentenceSeq())
-                .aggregateAdjustDays(offenderSentence.getAggregateAdjustDays())
-                .aggregateTerm(offenderSentence.getAggregateTerm())
-                .apdCalculatedDate(localDateOf(offenderSentence.getApdCalculatedDate()))
-                .ardCalculatedDate(localDateOf(offenderSentence.getArdCalculatedDate()))
-                .breachLevel(offenderSentence.getBreachLevel())
-                .comments(offenderSentence.getCommentText())
-                .consecToSentenceSeq(offenderSentence.getConsecToSentenceSeq())
-                .counts(offenderSentence.getCounts())
-                .crdCalculatedDate(localDateOf(offenderSentence.getCrdCalculatedDate()))
-                .createdAt(localDateTimeOf(offenderSentence.getCreateDatetime()))
-                .dischargeDate(localDateOf(offenderSentence.getDischargeDate()))
-                .dprrdCalculatedDate(localDateOf(offenderSentence.getDprrdCalculatedDate()))
-                .endDate(localDateOf(offenderSentence.getEndDate()))
-                .etdCalculatedDate(localDateOf(offenderSentence.getEtdCalculatedDate()))
-                .extendedDays(offenderSentence.getExtendedDays())
-                .fineAmount(offenderSentence.getFineAmount())
-                .hdcedCalculatedDate(localDateOf(offenderSentence.getHdcedCalculatedDate()))
-                .hdcExclusion(ynToBoolean(offenderSentence.getHdcExclusionFlag()))
-                .hdcExclusionReason(offenderSentence.getHdcExclusionReason())
-                .ledCalculatedDate(localDateOf(offenderSentence.getLedCalculatedDate()))
-                .ltdCalculatedDate(localDateOf(offenderSentence.getLtdCalculatedDate()))
-                .mtdCalculatedDate(localDateOf(offenderSentence.getMtdCalculatedDate()))
-                .npdCalculatedDate(localDateOf(offenderSentence.getNpdCalculatedDate()))
-                .pedCalculatedDate(localDateOf(offenderSentence.getPedCalculatedDate()))
-                .numberOfUnexcusedAbsences(offenderSentence.getNoOfUnexcusedAbsence())
-                .prrdCalculatedDate(localDateOf(offenderSentence.getPrrdCalculatedDate()))
-                .revokedDate(localDateOf(offenderSentence.getRevokedDate()))
-                .sedCalculatedDate(localDateOf(offenderSentence.getSedCalculatedDate()))
-                .sentenceCategory(offenderSentence.getSentenceCategory())
-                .sentenceLevel(offenderSentence.getSentenceLevel())
-                .sentenceStatus(offenderSentence.getSentenceStatus())
-                .sentenceText(offenderSentence.getSentenceText())
-                .sled2CalcDate(localDateOf(offenderSentence.getSled2Calc()))
-                .startDate(localDateOf(offenderSentence.getStartDate()))
-                .startDate2Calc(localDateOf(offenderSentence.getStartDate2Calc()))
-                .tariffCalculatedDate(localDateOf(offenderSentence.getTariffCalculatedDate()))
-                .terminationDate(localDateOf(offenderSentence.getTerminationDate()))
-                .terminationReason(offenderSentence.getTerminationReason())
-                .tusedCalculatedDate(localDateOf(offenderSentence.getTusedCalculatedDate()))
-                .build();
-    }
-
-    private LocalDateTime localDateTimeOf(Timestamp timestamp) {
-        return Optional.ofNullable(timestamp).map(t -> t.toLocalDateTime()).orElse(null);
     }
 
     @Transactional
@@ -107,7 +55,10 @@ public class SentencesService {
                                 flatMap(Collection::stream).
                                 collect(Collectors.toList()));
 
-        return maybeOffenderSentences.map(offenderSentences -> offenderSentences.stream().map(this::sentenceOf).collect(Collectors.toList()));
+        return maybeOffenderSentences.map(offenderSentences -> offenderSentences
+                .stream()
+                .map(sentenceTransformer::sentenceOf)
+                .collect(Collectors.toList()));
     }
 
     @Transactional
@@ -124,18 +75,9 @@ public class SentencesService {
                 .findFirst();
 
         Optional<List<Sentence>> maybeSentences = maybeOffenderBooking.map(ob -> ob.getOffenderSentences()
-                .stream().map(this::sentenceOf).collect(Collectors.toList()));
+                .stream().map(sentenceTransformer::sentenceOf).collect(Collectors.toList()));
 
         return maybeSentences;
     }
-
-    private LocalDate localDateOf(Timestamp timestamp) {
-        return Optional.ofNullable(timestamp).map(t -> t.toLocalDateTime().toLocalDate()).orElse(null);
-    }
-
-    private Boolean ynToBoolean(String yn) {
-        return Optional.ofNullable(yn).map("Y"::equalsIgnoreCase).orElse(null);
-    }
-
 
 }
