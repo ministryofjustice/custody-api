@@ -74,10 +74,10 @@ public class SentencesService {
                 .filter(ob -> ob.getOffenderBookId().equals(bookingId))
                 .findFirst();
 
-        Optional<List<Sentence>> maybeSentences = maybeOffenderBooking.map(ob -> ob.getOffenderSentences()
-                .stream().map(sentenceTransformer::sentenceOf).collect(Collectors.toList()));
-
-        return maybeSentences;
+        return maybeOffenderBooking.map(ob -> ob.getOffenderSentences()
+                .stream()
+                .map(sentenceTransformer::sentenceOf)
+                .collect(Collectors.toList()));
     }
 
 }

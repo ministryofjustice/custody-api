@@ -70,9 +70,9 @@ public class OffenderChargesService {
                 .filter(ob -> ob.getOffenderBookId().equals(bookingId))
                 .findFirst();
 
-        Optional<List<Charge>> maybeCharges = maybeOffenderBooking.map(ob -> ob.getOffenderCharges()
-                .stream().map(chargesTransformer::chargeOf).collect(Collectors.toList()));
-
-        return maybeCharges;
+        return maybeOffenderBooking.map(ob -> ob.getOffenderCharges()
+                .stream()
+                .map(chargesTransformer::chargeOf)
+                .collect(Collectors.toList()));
     }
 }
