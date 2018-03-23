@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.justice.digital.nomis.api.OffenderAssessment;
+import uk.gov.justice.digital.nomis.jpa.entity.Offender;
 import uk.gov.justice.digital.nomis.jpa.entity.OffenderBooking;
 import uk.gov.justice.digital.nomis.jpa.repository.OffenderAssessmentRepository;
 import uk.gov.justice.digital.nomis.jpa.repository.OffenderRepository;
@@ -56,5 +57,24 @@ public class OffenderAssessmentService {
                 .map(assessmentsTransformer::assessmentOf)
                 .collect(Collectors.toList()));
     }
+
+    public Optional<List<OffenderAssessment>> assessmentsForOffenderIdAndBookingId(Long offenderId, Long bookingId) {
+        Optional<Offender> maybeOffender = Optional.ofNullable(offenderRepository.findOne(offenderId));
+
+        if (!maybeOffender.isPresent()) {
+            return Optional.empty();
+        }
+
+        Optional<OffenderBooking> maybeOffenderBooking = maybeOffender.get().getOffenderBookings()
+                .stream()
+                .filter(ob -> ob.getOffenderBookId().equals(bookingId))
+                .findFirst();
+
+        return maybeOffenderBooking.map(ob -> ob.getOffenderAssessments()
+                .stream()
+                .map(assessmentsTransformer::assessmentOf)
+                .collect(Collectors.toList()));
+    }
+
 
 }

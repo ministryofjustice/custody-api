@@ -16,12 +16,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.justice.digital.nomis.api.OffenderAssessment;
 import uk.gov.justice.digital.nomis.service.OffenderAssessmentService;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
@@ -51,12 +53,16 @@ public class OffenderAssessmentsController {
 
     @RequestMapping(path = "/offenders/offenderId/{offenderId}/assessments", method = RequestMethod.GET)
     @ApiResponses({
-            @ApiResponse(code = 404, message = "Offender not found"),
+            @ApiResponse(code = 404, message = "Offender or bookingId not found"),
             @ApiResponse(code = 200, message = "OK")})
-    public ResponseEntity<List<OffenderAssessment>> getOffenderAddresses(@PathVariable("offenderId") Long offenderId) {
+    public ResponseEntity<List<OffenderAssessment>> getOffenderAssessments(@PathVariable("offenderId") Long offenderId,
+                                                                           @RequestParam("bookingId") Optional<Long> maybeBookingId) {
 
-        return offenderAssessmentService.getOffenderAssessments(offenderId)
-                .map(addresses -> new ResponseEntity<>(addresses, HttpStatus.OK))
+        return maybeBookingId
+                .map(bookingId -> offenderAssessmentService.assessmentsForOffenderIdAndBookingId(offenderId, bookingId))
+                .orElse(offenderAssessmentService.getOffenderAssessments(offenderId))
+                .map(healthProblems -> new ResponseEntity<>(healthProblems, HttpStatus.OK))
                 .orElse(new ResponseEntity<>(NOT_FOUND));
+
     }
 }

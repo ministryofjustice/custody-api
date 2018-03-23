@@ -63,12 +63,15 @@ public class MovementsController {
 
     @RequestMapping(path = "/offenders/offenderId/{offenderId}/movements", method = RequestMethod.GET)
     @ApiResponses({
-            @ApiResponse(code = 404, message = "Offender not found"),
+            @ApiResponse(code = 404, message = "Offender or bookingId not found"),
             @ApiResponse(code = 200, message = "OK")})
-    public ResponseEntity<List<ExternalMovement>> getOffenderMovements(@PathVariable("offenderId") Long offenderId) {
+    public ResponseEntity<List<ExternalMovement>> getOffenderMovements(@PathVariable("offenderId") Long offenderId,
+                                                                       @RequestParam("bookingId") Optional<Long> maybeBookingId) {
 
-        return movementsService.getOffenderMovements(offenderId)
-                .map(addresses -> new ResponseEntity<>(addresses, HttpStatus.OK))
+        return maybeBookingId
+                .map(bookingId -> movementsService.movementsForOffenderIdAndBookingId(offenderId, bookingId))
+                .orElse(movementsService.getOffenderMovements(offenderId))
+                .map(healthProblems -> new ResponseEntity<>(healthProblems, HttpStatus.OK))
                 .orElse(new ResponseEntity<>(NOT_FOUND));
 
     }
