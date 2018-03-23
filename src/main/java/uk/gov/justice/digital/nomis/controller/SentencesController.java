@@ -61,7 +61,7 @@ public class SentencesController {
         return maybeBookingId
                 .map(bookingId -> sentencesService.sentencesForOffenderIdAndBookingId(offenderId, bookingId))
                 .orElse(sentencesService.sentencesForOffenderId(offenderId))
-                .map(charges -> new ResponseEntity<>(charges, HttpStatus.OK))
+                .map(sentences -> new ResponseEntity<>(sentences, HttpStatus.OK))
                 .orElse(new ResponseEntity<>(NOT_FOUND));
 
     }

@@ -71,7 +71,7 @@ public class MovementsController {
         return maybeBookingId
                 .map(bookingId -> movementsService.movementsForOffenderIdAndBookingId(offenderId, bookingId))
                 .orElse(movementsService.getOffenderMovements(offenderId))
-                .map(healthProblems -> new ResponseEntity<>(healthProblems, HttpStatus.OK))
+                .map(movements -> new ResponseEntity<>(movements, HttpStatus.OK))
                 .orElse(new ResponseEntity<>(NOT_FOUND));
 
     }

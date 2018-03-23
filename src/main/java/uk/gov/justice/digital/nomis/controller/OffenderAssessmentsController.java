@@ -61,7 +61,7 @@ public class OffenderAssessmentsController {
         return maybeBookingId
                 .map(bookingId -> offenderAssessmentService.assessmentsForOffenderIdAndBookingId(offenderId, bookingId))
                 .orElse(offenderAssessmentService.getOffenderAssessments(offenderId))
-                .map(healthProblems -> new ResponseEntity<>(healthProblems, HttpStatus.OK))
+                .map(assessments -> new ResponseEntity<>(assessments, HttpStatus.OK))
                 .orElse(new ResponseEntity<>(NOT_FOUND));
 
     }
