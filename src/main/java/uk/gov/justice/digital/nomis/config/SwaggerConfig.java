@@ -44,6 +44,7 @@ public class SwaggerConfig {
                         regex("(\\/sentences.*)"),
                         regex("(\\/addresses.*)"),
                         regex("(\\/assessments.*)"),
+                        regex("(\\/healthProblems.*)"),
                         regex("(\\/movements.*)")))
                 .build();
 
