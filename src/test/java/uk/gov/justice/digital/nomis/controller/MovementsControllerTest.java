@@ -5,7 +5,6 @@ import io.restassured.RestAssured;
 import io.restassured.config.ObjectMapperConfig;
 import io.restassured.config.RestAssuredConfig;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,13 +49,11 @@ public class MovementsControllerTest {
                 .body("page.totalElements", greaterThan(0));
     }
 
-    //TODO
-    @Ignore
     @Test
     public void canGetOffenderMovements() {
         ExternalMovement[] movements = given()
                 .when()
-                .get("/offenders/offenderId/-1001/movements")
+                .get("/offenders/offenderId/-1017/movements")
                 .then()
                 .statusCode(200)
                 .extract()
