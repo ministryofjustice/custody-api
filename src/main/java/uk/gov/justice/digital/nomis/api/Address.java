@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Builder;
 import lombok.Data;
 
+import java.time.LocalDate;
 import java.util.Map;
 
 @Data
@@ -45,4 +46,7 @@ public class Address {
     private String specialNeedsCode;
     private String contactPersonName;
     private String businessHour;
+    private LocalDate startDate;
+    private LocalDate endDate;
+    private Boolean active;
 }

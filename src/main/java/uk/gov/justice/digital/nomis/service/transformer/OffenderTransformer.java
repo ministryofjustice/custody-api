@@ -65,6 +65,13 @@ public class OffenderTransformer {
                         .rootOffenderId(booking.getRootOffenderId())
                         .statusReason(booking.getStatusReason())
                         .build())
+                .sorted((o1, o2) -> {
+                    int compare = o1.getBookingSequence().compareTo(o2.getBookingSequence());
+                    if (compare != 0) {
+                        return compare;
+                    }
+                    return o1.getOffenderBookingId().compareTo(o2.getOffenderBookingId());
+                })
                 .collect(Collectors.toList());
     }
 

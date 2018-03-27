@@ -44,6 +44,9 @@ public class AddressesTransformer {
                 .street(address.getStreet())
                 .type(address.getType())
                 .validatedPaf(typesTransformer.ynToBoolean(address.getValidatedPafFlag()))
+                .startDate(typesTransformer.localDateOf(address.getStartDate()))
+                .endDate(typesTransformer.localDateOf(address.getEndDate()))
+                .active(typesTransformer.ynToBoolean(address.getAddressUsage().getActiveFlag()))
                 .build();
     }
 }

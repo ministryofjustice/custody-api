@@ -47,10 +47,11 @@ public class HealthProblemsService {
     public Optional<List<HealthProblem>> healthProblemsForOffenderId(Long offenderId) {
 
         Optional<List<OffenderHealthProblem>> maybeOffenderHealthProblems = Optional.ofNullable(offenderRepository.findOne(offenderId))
-                .map(offender -> offender.getOffenderBookings().stream()
-                        .map(OffenderBooking::getOffenderHealthProblems).
-                                flatMap(Collection::stream).
-                                collect(Collectors.toList()));
+                .map(offender ->
+                        offender.getOffenderBookings().stream()
+                        .map(OffenderBooking::getOffenderHealthProblems)
+                                .flatMap(Collection::stream)
+                                .collect(Collectors.toList()));
 
         return maybeOffenderHealthProblems.map(healthProblems -> healthProblems.stream().map(healthProblemsTransformer::healthProblemOf).collect(Collectors.toList()));
     }

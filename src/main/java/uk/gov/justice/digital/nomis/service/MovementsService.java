@@ -16,6 +16,7 @@ import uk.gov.justice.digital.nomis.jpa.repository.OffenderRepository;
 import uk.gov.justice.digital.nomis.service.transformer.MovementsTransformer;
 
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -56,6 +57,7 @@ public class MovementsService {
         return maybeOffenderMovements.map(externalMovements -> externalMovements
                 .stream()
                 .map(movementsTransformer::movementOf)
+                .sorted(byMovementDate().reversed())
                 .collect(Collectors.toList()));
     }
 
@@ -77,6 +79,14 @@ public class MovementsService {
                 .collect(Collectors.toList()));
     }
 
-
+    private Comparator<ExternalMovement> byMovementDate() {
+        return (o1, o2) -> {
+            int compare = o1.getMovementDateTime().compareTo(o2.getMovementDateTime());
+            if (compare != 0) {
+                return compare;
+            }
+            return o1.getSequenceNumber().compareTo(o2.getSequenceNumber());
+        };
+    }
 
 }

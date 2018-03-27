@@ -15,6 +15,7 @@ import uk.gov.justice.digital.nomis.jpa.repository.OffenderRepository;
 import uk.gov.justice.digital.nomis.service.transformer.ChargesTransformer;
 
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -50,12 +51,18 @@ public class OffenderChargesService {
     public Optional<List<Charge>> chargesForOffenderId(Long offenderId) {
 
         Optional<List<OffenderCharge>> maybeOffenderCharges = Optional.ofNullable(offenderRepository.findOne(offenderId))
-                .map(offender -> offender.getOffenderBookings().stream()
-                        .map(OffenderBooking::getOffenderCharges).
-                                flatMap(Collection::stream).
-                                collect(Collectors.toList()));
+                .map(offender ->
+                        offender.getOffenderBookings()
+                                .stream()
+                                .map(OffenderBooking::getOffenderCharges)
+                                .flatMap(Collection::stream)
+                                .collect(Collectors.toList()));
 
-        return maybeOffenderCharges.map(offenderCharges -> offenderCharges.stream().map(chargesTransformer::chargeOf).collect(Collectors.toList()));
+        return maybeOffenderCharges.map(offenderCharges ->
+                offenderCharges.stream()
+                        .sorted(byOffenceSeriousness().reversed())
+                        .map(chargesTransformer::chargeOf)
+                        .collect(Collectors.toList()));
     }
 
     public Optional<List<Charge>> chargesForOffenderIdAndBookingId(Long offenderId, Long bookingId) {
@@ -72,7 +79,19 @@ public class OffenderChargesService {
 
         return maybeOffenderBooking.map(ob -> ob.getOffenderCharges()
                 .stream()
+                .sorted(byOffenceSeriousness().reversed())
                 .map(chargesTransformer::chargeOf)
                 .collect(Collectors.toList()));
+    }
+
+    private Comparator<OffenderCharge> byOffenceSeriousness() {
+        return (o1, o2) -> {
+            int compare = o1.getMostSeriousFlag().compareTo(o2.getMostSeriousFlag());
+            if (compare != 0) {
+                return compare;
+            }
+            //todo: to_number(offence.severityRanking)
+            return o1.getOffenderChargeId().compareTo(o2.getOffenderChargeId());
+        };
     }
 }
