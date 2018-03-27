@@ -9,9 +9,12 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.IdClass;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinColumns;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import java.sql.Timestamp;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -95,5 +98,11 @@ public class Offence {
     private String auditClientWorkstationName;
     @Column(name = "AUDIT_ADDITIONAL_INFO")
     private String auditAdditionalInfo;
+    @JoinColumns({
+            @JoinColumn(name = "OFFENCE_CODE", referencedColumnName = "OFFENCE_CODE"),
+            @JoinColumn(name = "STATUTE_CODE", referencedColumnName = "STATUTE_CODE")
+    })
+    @OneToMany()
+    private List<OffenceIndicator> offenceIndicators;
 
 }

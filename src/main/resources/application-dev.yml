@@ -16,7 +16,8 @@ spring:
           classpath:R__2_2__OFFENCES.sql,
           classpath:R__4_4__OFFENDER_ASSESSMENTS.sql,
           classpath:some_health_problems.sql,
-          classpath:some_address_usages.sql'
+          classpath:some_address_usages.sql,
+          classpath:some_offence_indicators.sql'
 
   jpa:
     hibernate:

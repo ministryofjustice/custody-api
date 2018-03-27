@@ -5,9 +5,12 @@ import org.springframework.stereotype.Component;
 import uk.gov.justice.digital.nomis.api.KeyValue;
 import uk.gov.justice.digital.nomis.api.Offence;
 import uk.gov.justice.digital.nomis.jpa.entity.HoCode;
+import uk.gov.justice.digital.nomis.jpa.entity.OffenceIndicator;
 import uk.gov.justice.digital.nomis.jpa.entity.Statute;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Component
 public class OffenceTransformer {
@@ -36,7 +39,13 @@ public class OffenceTransformer {
                 .repealedDate(typesTransformer.localDateOf(offence.getRepealedDate()))
                 .sentenceUnitCode(offence.getSentenceUnitCode())
                 .statute(statuteOf(offence.getStatute()))
+                .offenceIndicators(offenceIndcatorsOf(offence.getOffenceIndicators()))
                 .build();
+    }
+
+    private List<String> offenceIndcatorsOf(List<OffenceIndicator> offenceIndicators) {
+        return Optional.ofNullable(offenceIndicators).map(
+                ois -> ois.stream().map(OffenceIndicator::getIndicatorCode).collect(Collectors.toList())).orElse(null);
     }
 
     private KeyValue statuteOf(Statute statute) {

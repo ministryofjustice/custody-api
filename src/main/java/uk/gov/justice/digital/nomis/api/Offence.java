@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Data
 @Builder
@@ -23,4 +24,5 @@ public class Offence {
     private String offenseDegree;
     private Integer maxGoodTimePerc;
     private KeyValue hoCode;
+    private List<String> offenceIndicators;
 }
