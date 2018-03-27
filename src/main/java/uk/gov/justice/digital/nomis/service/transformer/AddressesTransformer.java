@@ -46,7 +46,7 @@ public class AddressesTransformer {
                 .validatedPaf(typesTransformer.ynToBoolean(address.getValidatedPafFlag()))
                 .startDate(typesTransformer.localDateOf(address.getStartDate()))
                 .endDate(typesTransformer.localDateOf(address.getEndDate()))
-                .active(typesTransformer.ynToBoolean(address.getAddressUsage().getActiveFlag()))
+                .active(typesTransformer.ynToBoolean(Optional.ofNullable(address.getAddressUsage()).map(au -> au.getActiveFlag()).orElse(null)))
                 .build();
     }
 }
