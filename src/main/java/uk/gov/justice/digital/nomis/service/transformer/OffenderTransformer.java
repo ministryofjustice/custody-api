@@ -57,15 +57,8 @@ public class OffenderTransformer {
     }
 
     public List<Booking> bookingsOf(List<OffenderBooking> offenderBookings) {
-        return offenderBookings.stream().map(
-                this::bookingOf)
-                .sorted((o1, o2) -> {
-                    int compare = o1.getBookingSequence().compareTo(o2.getBookingSequence());
-                    if (compare != 0) {
-                        return compare;
-                    }
-                    return o1.getOffenderBookingId().compareTo(o2.getOffenderBookingId());
-                })
+        return offenderBookings.stream().map(this::bookingOf)
+                .sorted(byBookingSequence())
                 .collect(Collectors.toList());
     }
 
@@ -74,7 +67,7 @@ public class OffenderTransformer {
                 .bookingSequence(booking.getBookingSeq())
                 .startDate(booking.getBookingBeginDate().toLocalDateTime().toLocalDate())
                 .endDate(Optional.ofNullable(booking.getBookingEndDate()).map(end -> end.toLocalDateTime().toLocalDate()))
-                .activeFlag(booking.getActiveFlag())
+                .activeFlag(typesTransformer.ynToBoolean(booking.getActiveFlag()))
                 .agencyLocationId(booking.getAgyLocId())
                 .bookingNo(booking.getBookingNo())
                 .bookingStatus(booking.getBookingStatus())
@@ -84,7 +77,7 @@ public class OffenderTransformer {
                 .offenderBookingId(booking.getOffenderBookId())
                 .rootOffenderId(booking.getRootOffenderId())
                 .statusReason(booking.getStatusReason())
-                .build();
+                .build())
     }
 
     public String combinedMiddlenamesOf(Offender offender) {
@@ -113,5 +106,11 @@ public class OffenderTransformer {
                 .aliases(aliasesOf(offender.getOffenderAliases()))
                 .nomsId(offender.getOffenderIdDisplay())
                 .build();
+    }
+
+    private Comparator<Booking> byBookingSequence() {
+        return Comparator
+                .comparingLong(Booking::getBookingSequence)
+                .thenComparingLong(Booking::getOffenderBookingId);
     }
 }

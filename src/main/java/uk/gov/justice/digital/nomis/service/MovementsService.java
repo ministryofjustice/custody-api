@@ -57,7 +57,7 @@ public class MovementsService {
         return maybeOffenderMovements.map(externalMovements -> externalMovements
                 .stream()
                 .map(movementsTransformer::movementOf)
-                .sorted(byMovementDate().reversed())
+                .sorted(byMovementDate())
                 .collect(Collectors.toList()));
     }
 
@@ -80,13 +80,8 @@ public class MovementsService {
     }
 
     private Comparator<ExternalMovement> byMovementDate() {
-        return (o1, o2) -> {
-            int compare = o1.getMovementDateTime().compareTo(o2.getMovementDateTime());
-            if (compare != 0) {
-                return compare;
-            }
-            return o1.getSequenceNumber().compareTo(o2.getSequenceNumber());
-        };
+        return Comparator.comparing(ExternalMovement::getMovementDateTime).reversed()
+                .thenComparingLong(ExternalMovement::getSequenceNumber).reversed();
     }
 
 }

@@ -83,13 +83,10 @@ public class OffenderAssessmentService {
     }
 
     private Comparator<OffenderAssessment> byAssessmentDate() {
-        return (o1, o2) -> {
-            int compare = o1.getAssessmentDate().compareTo(o2.getAssessmentDate());
-            if (compare != 0) {
-                return compare;
-            }
-            return o1.getAssessmentSequence().compareTo(o2.getAssessmentSequence());
-        };
+        return Comparator
+                .comparing(OffenderAssessment::getAssessStatus)
+                .thenComparing(OffenderAssessment::getAssessmentDate).reversed()
+                .thenComparingInt(OffenderAssessment::getAssessmentSequence).reversed();
     }
 
 }

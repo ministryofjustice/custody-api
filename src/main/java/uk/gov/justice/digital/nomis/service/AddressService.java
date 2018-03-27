@@ -69,8 +69,8 @@ public class AddressService {
         return Stream.of(
                 Optional.ofNullable(address.getModifyDatetime()).orElse(new Timestamp(0)),
                 Optional.ofNullable(address.getCreateDatetime()).orElse(new Timestamp(0)),
-                Optional.ofNullable(address.getAddressUsage().getModifyDatetime()).orElse(new Timestamp(0)),
-                Optional.ofNullable(address.getAddressUsage().getCreateDatetime()).orElse(new Timestamp(0))
+                Optional.ofNullable(address.getAddressUsage()).map(x -> x.getModifyDatetime()).orElse(new Timestamp(0)),
+                Optional.ofNullable(address.getAddressUsage()).map(x -> x.getCreateDatetime()).orElse(new Timestamp(0))
         ).max(comparing(Timestamp::getTime)).get();
     }
 

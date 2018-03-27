@@ -15,7 +15,7 @@ public class Booking {
     private Long rootOffenderId;
     private String agencyLocationId;
     private Long livingUnitId;
-    private String activeFlag;
+    private Boolean activeFlag;
     private String bookingStatus;
     private String inOutStatus;
     private String statusReason;

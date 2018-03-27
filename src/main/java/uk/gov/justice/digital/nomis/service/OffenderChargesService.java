@@ -85,13 +85,9 @@ public class OffenderChargesService {
     }
 
     private Comparator<OffenderCharge> byOffenceSeriousness() {
-        return (o1, o2) -> {
-            int compare = o1.getMostSeriousFlag().compareTo(o2.getMostSeriousFlag());
-            if (compare != 0) {
-                return compare;
-            }
-            //todo: to_number(offence.severityRanking)
-            return o1.getOffenderChargeId().compareTo(o2.getOffenderChargeId());
-        };
+        return Comparator
+                .comparing(OffenderCharge::getMostSeriousFlag)
+                //todo: .thenComparingLong(OffenderCharge::severityRanking)
+                .thenComparingLong(OffenderCharge::getOffenderChargeId);
     }
 }

@@ -43,5 +43,4 @@ public class OffenderAssessment {
     private String overrideReason;
     private LocalDateTime createDateTime;
     private String createUserId;
-
 }
