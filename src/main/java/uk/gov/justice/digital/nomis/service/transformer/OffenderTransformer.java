@@ -92,7 +92,14 @@ public class OffenderTransformer {
 
     private List<uk.gov.justice.digital.nomis.api.OffenderImprisonStatus> offenderImprisonStatusesOf(List<OffenderImprisonStatus> offenderImprisonStatuses) {
         return Optional.ofNullable(offenderImprisonStatuses).map(
-                oises -> oises.stream().map(ois -> uk.gov.justice.digital.nomis.api.OffenderImprisonStatus.builder()
+                oises -> oises
+                        .stream()
+                        .filter(ois -> !"N".equalsIgnoreCase(ois.getLatestStatus()))
+                        .sorted(Comparator
+                                .comparing(OffenderImprisonStatus::getEffectiveDate)
+                                .thenComparing(OffenderImprisonStatus::getEffectiveTime)
+                                .reversed())
+                        .map(ois -> uk.gov.justice.digital.nomis.api.OffenderImprisonStatus.builder()
                         .agyLocId(ois.getAgyLocId())
                         .commentText(ois.getCommentText())
                         .effectiveDate(typesTransformer.localDateTimeOf(ois.getEffectiveDate()))
