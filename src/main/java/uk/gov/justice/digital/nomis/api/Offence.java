@@ -3,6 +3,8 @@ package uk.gov.justice.digital.nomis.api;
 import lombok.Builder;
 import lombok.Data;
 
+import java.time.LocalDate;
+
 @Data
 @Builder
 public class Offence {
@@ -11,6 +13,14 @@ public class Offence {
     private KeyValue statute;
     private KeyValue oldStatute;
     private String defaultOffenceType;
+    private Integer maxSentenceLength;
+    private String sentenceUnitCode;
+    private String offenceGroup;
+    private LocalDate repealedDate;
     private Boolean active;
+    private Integer listSeq;
+    private LocalDate expiryDate;
+    private String offenseDegree;
+    private Integer maxGoodTimePerc;
     private KeyValue hoCode;
 }
