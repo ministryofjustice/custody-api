@@ -17,7 +17,9 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.util.Comparator.comparing;
 
@@ -57,30 +59,19 @@ public class AddressService {
     }
 
     private Comparator<OffenderAddress> byOffenderAddressPriority() {
-        return (o1, o2) -> {
-            int compare = o1.getPrimaryFlag().compareTo(o2.getPrimaryFlag());
-            if (compare != 0) {
-                return compare;
-            }
-            compare = o1.getEndDate().compareTo(o2.getEndDate());
-            if (compare != 0) {
-                return compare;
-            }
-            compare = o1.getAddressUsage().getActiveFlag().compareTo(o2.getAddressUsage().getActiveFlag());
-            if (compare != 0) {
-                return compare;
-            }
-            return getLastModifiedDate(o1).compareTo(getLastModifiedDate(o2));
-        };
+        return Comparator.comparing(OffenderAddress::getPrimaryFlag)
+                .thenComparing(o -> Optional.ofNullable(o.getEndDate()).orElse(new Timestamp(0)))
+                .thenComparing(o -> o.getAddressUsage().getActiveFlag())
+                .thenComparing(this::getLastModifiedDate);
     }
 
     private Timestamp getLastModifiedDate(OffenderAddress address) {
-        return Arrays.asList(
-                address.getModifyDatetime(),
-                address.getCreateDatetime(),
-                address.getAddressUsage().getModifyDatetime(),
-                address.getAddressUsage().getCreateDatetime()
-        ).stream().max(comparing(Timestamp::getTime)).get();
+        return Stream.of(
+                Optional.ofNullable(address.getModifyDatetime()).orElse(new Timestamp(0)),
+                Optional.ofNullable(address.getCreateDatetime()).orElse(new Timestamp(0)),
+                Optional.ofNullable(address.getAddressUsage().getModifyDatetime()).orElse(new Timestamp(0)),
+                Optional.ofNullable(address.getAddressUsage().getCreateDatetime()).orElse(new Timestamp(0))
+        ).max(comparing(Timestamp::getTime)).get();
     }
 
 }
