@@ -17,7 +17,7 @@ buildscript {
 
 plugins {
     id 'org.springframework.boot' version '1.5.8.RELEASE'
-    id "com.gorylenko.gradle-git-properties" version "1.4.16"
+    id "com.gorylenko.gradle-git-properties" version "1.4.21"
 }
 
 // Apply the java plugin to add support for Java

@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 @Data
@@ -22,4 +23,5 @@ public class Booking {
     private LocalDate startDate;
     private Optional<LocalDate> endDate;
     private Long bookingSequence;
+    private List<OffenderImprisonStatus> offenderImprisonStatuses;
 }

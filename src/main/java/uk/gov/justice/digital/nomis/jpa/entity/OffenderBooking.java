@@ -159,4 +159,10 @@ public class OffenderBooking {
     @JoinColumn(name = "OFFENDER_BOOK_ID", referencedColumnName = "OFFENDER_BOOK_ID")
     private List<OffenderHealthProblem> offenderHealthProblems;
 
+    @OneToMany
+    @BatchSize(size = 1000)
+    @JoinColumn(name = "OFFENDER_BOOK_ID", referencedColumnName = "OFFENDER_BOOK_ID")
+    private List<OffenderImprisonStatus> offenderImprisonStatuses;
+
+
 }

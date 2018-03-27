@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.nomis.service.transformer;
 
 import com.google.common.collect.ImmutableList;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.justice.digital.nomis.api.Booking;
 import uk.gov.justice.digital.nomis.api.Identifier;
@@ -8,7 +9,9 @@ import uk.gov.justice.digital.nomis.api.OffenderAlias;
 import uk.gov.justice.digital.nomis.jpa.entity.Offender;
 import uk.gov.justice.digital.nomis.jpa.entity.OffenderBooking;
 import uk.gov.justice.digital.nomis.jpa.entity.OffenderIdentifier;
+import uk.gov.justice.digital.nomis.jpa.entity.OffenderImprisonStatus;
 
+import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.Collections;
 import java.util.Comparator;
@@ -19,6 +22,13 @@ import java.util.stream.Stream;
 
 @Component
 public class OffenderTransformer {
+
+    private final TypesTransformer typesTransformer;
+
+    @Autowired
+    public OffenderTransformer(TypesTransformer typesTransformer) {
+        this.typesTransformer = typesTransformer;
+    }
 
     public List<OffenderAlias> aliasesOf(List<Offender> offenderList) {
         return Optional.ofNullable(offenderList).map(offenders -> offenders
@@ -50,21 +60,7 @@ public class OffenderTransformer {
 
     public List<Booking> bookingsOf(List<OffenderBooking> offenderBookings) {
         return offenderBookings.stream().map(
-                booking -> Booking.builder()
-                        .bookingSequence(booking.getBookingSeq())
-                        .startDate(booking.getBookingBeginDate().toLocalDateTime().toLocalDate())
-                        .endDate(Optional.ofNullable(booking.getBookingEndDate()).map(end -> end.toLocalDateTime().toLocalDate()))
-                        .activeFlag(booking.getActiveFlag())
-                        .agencyLocationId(booking.getAgyLocId())
-                        .bookingNo(booking.getBookingNo())
-                        .bookingStatus(booking.getBookingStatus())
-                        .inOutStatus(booking.getInOutStatus())
-                        .livingUnitId(booking.getLivingUnitId())
-                        .offenderId(booking.getOffenderId())
-                        .offenderBookingId(booking.getOffenderBookId())
-                        .rootOffenderId(booking.getRootOffenderId())
-                        .statusReason(booking.getStatusReason())
-                        .build())
+                this::bookingOf)
                 .sorted((o1, o2) -> {
                     int compare = o1.getBookingSequence().compareTo(o2.getBookingSequence());
                     if (compare != 0) {
@@ -73,6 +69,41 @@ public class OffenderTransformer {
                     return o1.getOffenderBookingId().compareTo(o2.getOffenderBookingId());
                 })
                 .collect(Collectors.toList());
+    }
+
+    public Booking bookingOf(OffenderBooking booking) {
+        return Booking.builder()
+                .bookingSequence(booking.getBookingSeq())
+                .startDate(booking.getBookingBeginDate().toLocalDateTime().toLocalDate())
+                .endDate(Optional.ofNullable(booking.getBookingEndDate()).map(end -> end.toLocalDateTime().toLocalDate()))
+                .activeFlag(booking.getActiveFlag())
+                .agencyLocationId(booking.getAgyLocId())
+                .bookingNo(booking.getBookingNo())
+                .bookingStatus(booking.getBookingStatus())
+                .inOutStatus(booking.getInOutStatus())
+                .livingUnitId(booking.getLivingUnitId())
+                .offenderId(booking.getOffenderId())
+                .offenderBookingId(booking.getOffenderBookId())
+                .rootOffenderId(booking.getRootOffenderId())
+                .statusReason(booking.getStatusReason())
+                .offenderImprisonStatuses(offenderImprisonStatusesOf(booking.getOffenderImprisonStatuses()))
+                .build();
+    }
+
+    private List<uk.gov.justice.digital.nomis.api.OffenderImprisonStatus> offenderImprisonStatusesOf(List<OffenderImprisonStatus> offenderImprisonStatuses) {
+        return Optional.ofNullable(offenderImprisonStatuses).map(
+                oises -> oises.stream().map(ois -> uk.gov.justice.digital.nomis.api.OffenderImprisonStatus.builder()
+                        .agyLocId(ois.getAgyLocId())
+                        .commentText(ois.getCommentText())
+                        .effectiveDate(typesTransformer.localDateTimeOf(ois.getEffectiveDate()))
+                        .effectiveTime(Optional.ofNullable(ois.getEffectiveTime()).map(Time::toLocalTime).orElse(null))
+                        .expiryDate(typesTransformer.localDateOf(ois.getExpiryDate()))
+                        .imprisonmentStatus(ois.getImprisonmentStatus())
+                        .imprisonStatusSeq(ois.getImprisonStatusSeq())
+                        .latestStatus(typesTransformer.ynToBoolean(ois.getLatestStatus()))
+                        .offenderBookId(ois.getOffenderBookId())
+                        .build()
+                ).collect(Collectors.toList())).orElse(null);
     }
 
     public String combinedMiddlenamesOf(Offender offender) {

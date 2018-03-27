@@ -2,6 +2,7 @@ package uk.gov.justice.digital.nomis.service.transformer;
 
 import org.springframework.stereotype.Component;
 
+import java.sql.Date;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -12,6 +13,10 @@ public class TypesTransformer {
 
     public LocalDate localDateOf(Timestamp timestamp) {
         return Optional.ofNullable(timestamp).map(t -> t.toLocalDateTime().toLocalDate()).orElse(null);
+    }
+
+    public LocalDate localDateOf(Date date) {
+        return Optional.ofNullable(date).map(d -> d.toLocalDate()).orElse(null);
     }
 
     public LocalDateTime localDateTimeOf(Timestamp timestamp) {
