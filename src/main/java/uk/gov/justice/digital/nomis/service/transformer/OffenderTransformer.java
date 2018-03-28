@@ -9,9 +9,7 @@ import uk.gov.justice.digital.nomis.api.OffenderAlias;
 import uk.gov.justice.digital.nomis.jpa.entity.Offender;
 import uk.gov.justice.digital.nomis.jpa.entity.OffenderBooking;
 import uk.gov.justice.digital.nomis.jpa.entity.OffenderIdentifier;
-import uk.gov.justice.digital.nomis.jpa.entity.OffenderImprisonStatus;
 
-import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.Collections;
 import java.util.Comparator;
@@ -86,31 +84,7 @@ public class OffenderTransformer {
                 .offenderBookingId(booking.getOffenderBookId())
                 .rootOffenderId(booking.getRootOffenderId())
                 .statusReason(booking.getStatusReason())
-                .offenderImprisonStatuses(offenderImprisonStatusesOf(booking.getOffenderImprisonStatuses()))
                 .build();
-    }
-
-    private List<uk.gov.justice.digital.nomis.api.OffenderImprisonStatus> offenderImprisonStatusesOf(List<OffenderImprisonStatus> offenderImprisonStatuses) {
-        return Optional.ofNullable(offenderImprisonStatuses).map(
-                oises -> oises
-                        .stream()
-                        .filter(ois -> !"N".equalsIgnoreCase(ois.getLatestStatus()))
-                        .sorted(Comparator
-                                .comparing(OffenderImprisonStatus::getEffectiveDate)
-                                .thenComparing(OffenderImprisonStatus::getEffectiveTime)
-                                .reversed())
-                        .map(ois -> uk.gov.justice.digital.nomis.api.OffenderImprisonStatus.builder()
-                        .agyLocId(ois.getAgyLocId())
-                        .commentText(ois.getCommentText())
-                        .effectiveDate(typesTransformer.localDateTimeOf(ois.getEffectiveDate()))
-                        .effectiveTime(Optional.ofNullable(ois.getEffectiveTime()).map(Time::toLocalTime).orElse(null))
-                        .expiryDate(typesTransformer.localDateOf(ois.getExpiryDate()))
-                        .imprisonmentStatus(ois.getImprisonmentStatus())
-                        .imprisonStatusSeq(ois.getImprisonStatusSeq())
-                        .latestStatus(typesTransformer.ynToBoolean(ois.getLatestStatus()))
-                        .offenderBookId(ois.getOffenderBookId())
-                        .build()
-                ).collect(Collectors.toList())).orElse(null);
     }
 
     public String combinedMiddlenamesOf(Offender offender) {

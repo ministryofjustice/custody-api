@@ -164,5 +164,9 @@ public class OffenderBooking {
     @JoinColumn(name = "OFFENDER_BOOK_ID", referencedColumnName = "OFFENDER_BOOK_ID")
     private List<OffenderImprisonStatus> offenderImprisonStatuses;
 
+    @OneToMany
+    @BatchSize(size = 1000)
+    @JoinColumn(name = "OFFENDER_BOOK_ID", referencedColumnName = "OFFENDER_BOOK_ID")
+    private List<OffenderSentCalculation> offenderSentCalculations;
 
 }
