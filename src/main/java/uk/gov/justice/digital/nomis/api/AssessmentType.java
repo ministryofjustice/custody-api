@@ -11,4 +11,5 @@ public class AssessmentType {
     private Long parentAssessmentId;
     private String assessmentCode;
     private String description;
+    private boolean cellSharingAlertFlag;
 }

@@ -60,8 +60,8 @@ public class AddressService {
 
     private Comparator<OffenderAddress> byOffenderAddressPriority() {
         return Comparator.comparing(OffenderAddress::getPrimaryFlag)
-                .thenComparing(o -> Optional.ofNullable(o.getEndDate()).orElse(new Timestamp(0)))
-                .thenComparing(o -> o.getAddressUsage().getActiveFlag())
+                .thenComparing(a -> Optional.ofNullable(a.getEndDate()).orElse(new Timestamp(0)))
+                .thenComparing(a -> Optional.ofNullable(a.getAddressUsage()).map(x -> x.getActiveFlag()).orElse("N"))
                 .thenComparing(this::getLastModifiedDate);
     }
 

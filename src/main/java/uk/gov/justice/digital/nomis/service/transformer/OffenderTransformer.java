@@ -39,6 +39,8 @@ public class OffenderTransformer {
                         .dateOfBirth(offender.getBirthDate().toLocalDateTime().toLocalDate())
                         .identifiers(identifiersOf(offender.getOffenderIdentifiers()))
                         .nomsId(offender.getOffenderIdDisplay())
+                        .sexCode(offender.getSexCode())
+                        .raceCode(offender.getRaceCode())
                         .build())
                 .collect(Collectors.toList())).orElse(Collections.emptyList());
     }
@@ -77,7 +79,7 @@ public class OffenderTransformer {
                 .offenderBookingId(booking.getOffenderBookId())
                 .rootOffenderId(booking.getRootOffenderId())
                 .statusReason(booking.getStatusReason())
-                .build())
+                .build();
     }
 
     public String combinedMiddlenamesOf(Offender offender) {
@@ -105,6 +107,8 @@ public class OffenderTransformer {
                 .offenderId(offender.getOffenderId())
                 .aliases(aliasesOf(offender.getOffenderAliases()))
                 .nomsId(offender.getOffenderIdDisplay())
+                .sexCode(offender.getSexCode())
+                .raceCode(offender.getRaceCode())
                 .build();
     }
 

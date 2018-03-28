@@ -63,6 +63,7 @@ public class AssessmentsTransformer {
                         .assessmentClass(a.getAssessmentClass())
                         .assessmentCode(a.getAssessmentCode())
                         .assessmentId(a.getAssessmentId())
+                        .cellSharingAlertFlag(typesTransformer.ynToBoolean(a.getCellSharingAlertFlag()))
                         .build()
         ).orElse(null);
     }
