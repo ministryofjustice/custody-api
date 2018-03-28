@@ -40,7 +40,7 @@ public class OffenderReleaseDetailsControllerTest {
     }
 
     @Test
-    public void canGetAllSentenceCalculations() {
+    public void canGetAllReleaseDetails() {
         given()
                 .when()
                 .get("/releaseDetails")
@@ -50,7 +50,7 @@ public class OffenderReleaseDetailsControllerTest {
     }
 
     @Test
-    public void canGetOffenderSentenceCalculations() {
+    public void canGetOffenderReleaseDetails() {
         HealthProblem[] healthProblems = given()
                 .when()
                 .get("/offenders/offenderId/-1001/releaseDetails")
