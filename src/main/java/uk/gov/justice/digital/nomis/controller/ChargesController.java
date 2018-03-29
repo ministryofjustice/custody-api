@@ -29,7 +29,7 @@ import java.util.Optional;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 @RestController
-@Api( description = "Offender charge resources", tags = "Offender Chargges")
+@Api( description = "Offender charge resources", tags = "Offender Charges")
 public class ChargesController {
 
     private final OffenderChargesService offenderChargesService;
