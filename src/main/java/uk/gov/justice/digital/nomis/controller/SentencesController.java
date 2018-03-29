@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.nomis.controller;
 
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiParam;
@@ -28,6 +29,7 @@ import java.util.Optional;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 @RestController
+@Api( description = "Sentence resources", tags = "Offender Sentences")
 public class SentencesController {
 
     private final SentencesService sentencesService;
