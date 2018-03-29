@@ -64,6 +64,7 @@ public class AssessmentsTransformer {
                         .assessmentCode(a.getAssessmentCode())
                         .assessmentId(a.getAssessmentId())
                         .cellSharingAlertFlag(typesTransformer.ynToBoolean(a.getCellSharingAlertFlag()))
+                        .determineSupLevelFlag(typesTransformer.ynToBoolean(a.getDetermineSupLevelFlag()))
                         .build()
         ).orElse(null);
     }
