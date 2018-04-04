@@ -14,6 +14,7 @@ import uk.gov.justice.digital.nomis.jpa.repository.OffenderSentenceCalculationsR
 import uk.gov.justice.digital.nomis.service.transformer.SentenceCalculationsTransformer;
 
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -37,9 +38,10 @@ public class OffenderSentenceCalculationsService {
     public Page<SentenceCalculation> getSentenceCalculations(Pageable pageable) {
         Page<uk.gov.justice.digital.nomis.jpa.entity.OffenderSentCalculation> rawSentenceCalcsPage = sentenceCalculationsRepository.findAll(pageable);
 
-        List<SentenceCalculation> sentenceCalculations = rawSentenceCalcsPage.getContent().stream().map(
-                sentenceCalculationsTransformer::sentenceCalculationOf
-        ).collect(Collectors.toList());
+        List<SentenceCalculation> sentenceCalculations = rawSentenceCalcsPage.getContent().stream()
+                .map(sentenceCalculationsTransformer::sentenceCalculationOf)
+                .sorted(byCalculationDate())
+                .collect(Collectors.toList());
 
         return new PageImpl<>(sentenceCalculations, pageable, rawSentenceCalcsPage.getTotalElements());
     }
@@ -53,7 +55,12 @@ public class OffenderSentenceCalculationsService {
                                 .flatMap(Collection::stream)
                                 .collect(Collectors.toList()));
 
-        return maybeSentenceCalculations.map(sentCalculations -> sentCalculations.stream().map(sentenceCalculationsTransformer::sentenceCalculationOf).collect(Collectors.toList()));
+        return maybeSentenceCalculations
+                .map(sentCalculations ->
+                        sentCalculations.stream()
+                            .map(sentenceCalculationsTransformer::sentenceCalculationOf)
+                            .sorted(byCalculationDate())
+                            .collect(Collectors.toList()));
     }
 
     public Optional<List<SentenceCalculation>> sentenceCalculationsForOffenderIdAndBookingId(Long offenderId, Long bookingId) {
@@ -63,15 +70,20 @@ public class OffenderSentenceCalculationsService {
             return Optional.empty();
         }
 
-        Optional<OffenderBooking> maybeOffenderBooking = maybeOffender.get().getOffenderBookings()
-                .stream()
-                .filter(ob -> ob.getOffenderBookId().equals(bookingId))
-                .findFirst();
+        Optional<OffenderBooking> maybeOffenderBooking = maybeOffender.get()
+                .getOffenderBookings().stream()
+                    .filter(ob -> ob.getOffenderBookId().equals(bookingId))
+                    .findFirst();
 
-        return maybeOffenderBooking.map(ob -> ob.getOffenderSentCalculations()
-                .stream()
-                .map(sentenceCalculationsTransformer::sentenceCalculationOf)
-                .collect(Collectors.toList()));
+        return maybeOffenderBooking.map(ob ->
+                ob.getOffenderSentCalculations().stream()
+                    .map(sentenceCalculationsTransformer::sentenceCalculationOf)
+                    .sorted(byCalculationDate())
+                    .collect(Collectors.toList()));
+    }
+
+    private Comparator<SentenceCalculation> byCalculationDate() {
+        return Comparator.comparing(SentenceCalculation::getCalculationDate).reversed();
     }
 
 }
