@@ -9,6 +9,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.embedded.LocalServerPort;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -31,6 +32,9 @@ public class SentencesControllerTest {
     @Qualifier("globalObjectMapper")
     private ObjectMapper objectMapper;
 
+    @Value("${sample.token}")
+    private String validOauthToken;
+
     @Before
     public void setup() {
         RestAssured.port = port;
@@ -44,6 +48,7 @@ public class SentencesControllerTest {
     public void canGetAllSentences() {
         given()
                 .when()
+                .auth().oauth2(validOauthToken)
                 .get("/sentences")
                 .then()
                 .statusCode(200)
@@ -53,7 +58,7 @@ public class SentencesControllerTest {
     @Test
     public void canGetOffenderSentences() {
         Sentence[] sentences = given()
-                .when()
+                .when().auth().oauth2(validOauthToken)
                 .get("/offenders/offenderId/-1001/sentences")
                 .then()
                 .statusCode(200)
@@ -62,6 +67,24 @@ public class SentencesControllerTest {
                 .as(Sentence[].class);
 
         assertThat(sentences.length).isGreaterThan(0);
+    }
+
+    @Test
+    public void sentencesAreAuthorized() {
+        given()
+                .when()
+                .get("/sentences")
+                .then()
+                .statusCode(401);
+    }
+
+    @Test
+    public void offenderSentencesAreAuthorized() {
+        given()
+                .when()
+                .get("/offenders/offenderId/-1001/sentences")
+                .then()
+                .statusCode(401);
     }
 
 }

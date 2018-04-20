@@ -9,6 +9,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.embedded.LocalServerPort;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -31,6 +32,9 @@ public class OffenderImprisonStatusesControllerTest {
     @Qualifier("globalObjectMapper")
     private ObjectMapper objectMapper;
 
+    @Value("${sample.token}")
+    private String validOauthToken;
+
     @Before
     public void setup() {
         RestAssured.port = port;
@@ -43,6 +47,7 @@ public class OffenderImprisonStatusesControllerTest {
     public void canGetAllImprisonmentStatuses() {
         given()
                 .when()
+                .auth().oauth2(validOauthToken)
                 .get("/imprisonmentStatuses")
                 .then()
                 .statusCode(200)
@@ -53,6 +58,7 @@ public class OffenderImprisonStatusesControllerTest {
     public void canGetOffenderImprisonmentStatuses() {
         HealthProblem[] healthProblems = given()
                 .when()
+                .auth().oauth2(validOauthToken)
                 .get("/offenders/offenderId/-1001/imprisonmentStatuses")
                 .then()
                 .statusCode(200)
@@ -61,6 +67,24 @@ public class OffenderImprisonStatusesControllerTest {
                 .as(HealthProblem[].class);
 
         assertThat(healthProblems.length).isGreaterThan(0);
+    }
+
+    @Test
+    public void imprisonmentStatusesAreAuthorized() {
+        given()
+                .when()
+                .get("/imprisonmentStatuses")
+                .then()
+                .statusCode(401);
+    }
+
+    @Test
+    public void offenderImprisonmentStatusesAreAuthorized() {
+        given()
+                .when()
+                .get("/offenders/offenderId/-1001/imprisonmentStatuses")
+                .then()
+                .statusCode(401);
     }
 
 }

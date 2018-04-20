@@ -9,6 +9,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.embedded.LocalServerPort;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -31,6 +32,9 @@ public class AddressesControllerTest {
     @Qualifier("globalObjectMapper")
     private ObjectMapper objectMapper;
 
+    @Value("${sample.token}")
+    private String validOauthToken;
+
     @Before
     public void setup() {
         RestAssured.port = port;
@@ -43,6 +47,7 @@ public class AddressesControllerTest {
     public void canGetAllAddresses() {
         given()
                 .when()
+                .auth().oauth2(validOauthToken)
                 .get("/addresses")
                 .then()
                 .statusCode(200)
@@ -54,7 +59,8 @@ public class AddressesControllerTest {
     public void canGetOffenderAddresses() {
         Address[] addresses = given()
                 .when()
-                .get("/offenders/offenderId/-1001/addresses")
+                .auth().oauth2(validOauthToken)
+                .get("offenders/offenderId/-1001/addresses")
                 .then()
                 .statusCode(200)
                 .extract()
@@ -62,6 +68,24 @@ public class AddressesControllerTest {
                 .as(Address[].class);
 
         assertThat(addresses.length).isGreaterThan(0);
+    }
+
+    @Test
+    public void addressesAreAuthorized() {
+        given()
+                .when()
+                .get("/addresses")
+                .then()
+                .statusCode(401);
+    }
+
+    @Test
+    public void offenderAddressesAreAuthorized() {
+        given()
+                .when()
+                .get("offenders/offenderId/-1001/addresses")
+                .then()
+                .statusCode(401);
     }
 
 }

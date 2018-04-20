@@ -9,6 +9,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.embedded.LocalServerPort;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -29,6 +30,9 @@ public class OffencesControllerTest {
     @Qualifier("globalObjectMapper")
     private ObjectMapper objectMapper;
 
+    @Value("${sample.token}")
+    private String validOauthToken;
+
     @Before
     public void setup() {
         RestAssured.port = port;
@@ -41,10 +45,20 @@ public class OffencesControllerTest {
     public void canGetAllOffences() {
         given()
                 .when()
+                .auth().oauth2(validOauthToken)
                 .get("/offences")
                 .then()
                 .statusCode(200)
                 .body("page.totalElements", greaterThan(0));
+    }
+
+    @Test
+    public void offencesAreAuthorized() {
+        given()
+                .when()
+                .get("/offences")
+                .then()
+                .statusCode(401);
 
     }
 }

@@ -9,6 +9,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.embedded.LocalServerPort;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -31,6 +32,9 @@ public class ChargesControllerTest {
     @Qualifier("globalObjectMapper")
     private ObjectMapper objectMapper;
 
+    @Value("${sample.token}")
+    private String validOauthToken;
+
     @Before
     public void setup() {
         RestAssured.port = port;
@@ -43,6 +47,7 @@ public class ChargesControllerTest {
     public void canGetAllCharges() {
         given()
                 .when()
+                .auth().oauth2(validOauthToken)
                 .get("/charges")
                 .then()
                 .statusCode(200)
@@ -53,6 +58,7 @@ public class ChargesControllerTest {
     public void canGetOffenderCharges() {
         Charge[] charges = given()
                 .when()
+                .auth().oauth2(validOauthToken)
                 .get("/offenders/offenderId/-1001/charges")
                 .then()
                 .statusCode(200)
@@ -63,4 +69,21 @@ public class ChargesControllerTest {
         assertThat(charges.length).isGreaterThan(0);
     }
 
+    @Test
+    public void chargesAreAuthorized() {
+        given()
+                .when()
+                .get("/charges")
+                .then()
+                .statusCode(401);
+    }
+
+    @Test
+    public void offenderChargesAreAuthorized() {
+        given()
+                .when()
+                .get("/offenders/offenderId/-1001/charges")
+                .then()
+                .statusCode(401);
+    }
 }

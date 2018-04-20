@@ -9,6 +9,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.embedded.LocalServerPort;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -31,6 +32,9 @@ public class HealthProblemsControllerTest {
     @Qualifier("globalObjectMapper")
     private ObjectMapper objectMapper;
 
+    @Value("${sample.token}")
+    private String validOauthToken;
+
     @Before
     public void setup() {
         RestAssured.port = port;
@@ -43,6 +47,7 @@ public class HealthProblemsControllerTest {
     public void canGetAllHealthProblems() {
         given()
                 .when()
+                .auth().oauth2(validOauthToken)
                 .get("/healthProblems")
                 .then()
                 .statusCode(200)
@@ -53,6 +58,7 @@ public class HealthProblemsControllerTest {
     public void canGetOffenderHealthProblems() {
         HealthProblem[] healthProblems = given()
                 .when()
+                .auth().oauth2(validOauthToken)
                 .get("/offenders/offenderId/-1001/healthProblems")
                 .then()
                 .statusCode(200)
@@ -61,6 +67,24 @@ public class HealthProblemsControllerTest {
                 .as(HealthProblem[].class);
 
         assertThat(healthProblems.length).isGreaterThan(0);
+    }
+
+    @Test
+    public void healthProblemsAreAuthorized() {
+        given()
+                .when()
+                .get("/healthProblems")
+                .then()
+                .statusCode(401);
+    }
+
+    @Test
+    public void offenderHealthProblemsAreAuthorized() {
+        given()
+                .when()
+                .get("/offenders/offenderId/-1001/healthProblems")
+                .then()
+                .statusCode(401);
     }
 
 }

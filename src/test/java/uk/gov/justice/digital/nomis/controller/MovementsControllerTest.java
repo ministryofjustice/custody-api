@@ -9,6 +9,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.embedded.LocalServerPort;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -31,6 +32,9 @@ public class MovementsControllerTest {
     @Qualifier("globalObjectMapper")
     private ObjectMapper objectMapper;
 
+    @Value("${sample.token}")
+    private String validOauthToken;
+
     @Before
     public void setup() {
         RestAssured.port = port;
@@ -43,6 +47,7 @@ public class MovementsControllerTest {
     public void canGetAllMovements() {
         given()
                 .when()
+                .auth().oauth2(validOauthToken)
                 .get("/movements")
                 .then()
                 .statusCode(200)
@@ -53,6 +58,7 @@ public class MovementsControllerTest {
     public void canGetOffenderMovements() {
         ExternalMovement[] movements = given()
                 .when()
+                .auth().oauth2(validOauthToken)
                 .get("/offenders/offenderId/-1017/movements")
                 .then()
                 .statusCode(200)
@@ -61,6 +67,24 @@ public class MovementsControllerTest {
                 .as(ExternalMovement[].class);
 
         assertThat(movements.length).isGreaterThan(0);
+    }
+
+    @Test
+    public void movementsAreAuthorized() {
+        given()
+                .when()
+                .get("/movements")
+                .then()
+                .statusCode(401);
+    }
+
+    @Test
+    public void offenderMovementsAreAuthorized() {
+        given()
+                .when()
+                .get("/offenders/offenderId/-1017/movements")
+                .then()
+                .statusCode(401);
     }
 
 }

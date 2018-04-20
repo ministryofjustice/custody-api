@@ -38,18 +38,7 @@ public class SwaggerConfig {
                 .apis(RequestHandlerSelectors.any())
                 .paths(Predicates.or(regex("(\\/info.*)"),
                         regex("(\\/health.*)"),
-                        regex("(\\/logon.*)"),
-                        regex("(\\/offenders.*)"),
-                        regex("(\\/charges.*)"),
-                        regex("(\\/sentences.*)"),
-                        regex("(\\/addresses.*)"),
-                        regex("(\\/assessments.*)"),
-                        regex("(\\/healthProblems.*)"),
-                        regex("(\\/offences.*)"),
-                        regex("(\\/imprisonmentStatuses.*)"),
-                        regex("(\\/sentenceCalculations.*)"),
-                        regex("(\\/releaseDetails.*)"),
-                        regex("(\\/movements.*)")))
+                        regex("(\\/api.*)")))
                 .build();
 
         docket.genericModelSubstitutes(Optional.class);

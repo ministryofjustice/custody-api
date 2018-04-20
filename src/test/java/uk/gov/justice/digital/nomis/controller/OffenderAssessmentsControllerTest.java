@@ -9,6 +9,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.embedded.LocalServerPort;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -31,6 +32,9 @@ public class OffenderAssessmentsControllerTest {
     @Qualifier("globalObjectMapper")
     private ObjectMapper objectMapper;
 
+    @Value("${sample.token}")
+    private String validOauthToken;
+
     @Before
     public void setup() {
         RestAssured.port = port;
@@ -43,6 +47,7 @@ public class OffenderAssessmentsControllerTest {
     public void canGetAllAssessments() {
         given()
                 .when()
+                .auth().oauth2(validOauthToken)
                 .get("/assessments")
                 .then()
                 .statusCode(200)
@@ -53,6 +58,7 @@ public class OffenderAssessmentsControllerTest {
     public void canGetOffenderAssessments() {
         OffenderAssessment[] assessments = given()
                 .when()
+                .auth().oauth2(validOauthToken)
                 .get("/offenders/offenderId/-1001/assessments")
                 .then()
                 .statusCode(200)
@@ -62,4 +68,23 @@ public class OffenderAssessmentsControllerTest {
 
         assertThat(assessments.length).isGreaterThan(0);
     }
+
+    @Test
+    public void assessmentsAreAuthorized() {
+        given()
+                .when()
+                .get("/assessments")
+                .then()
+                .statusCode(401);
+    }
+
+    @Test
+    public void offenderAssessmentsAreAuthorized() {
+        given()
+                .when()
+                .get("/offenders/offenderId/-1001/assessments")
+                .then()
+                .statusCode(401);
+    }
+
 }
