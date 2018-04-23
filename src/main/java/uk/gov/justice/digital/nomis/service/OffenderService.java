@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.nomis.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -15,6 +16,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class OffenderService {
 
     private final OffenderRepository offenderRepository;
@@ -40,6 +42,7 @@ public class OffenderService {
         return new PageImpl<>(offenderList, pageable, rootOffendersRawPage.getTotalElements());
     }
 
+    @Transactional
     public Optional<Offender> getOffender(Long offenderId) {
         Optional<uk.gov.justice.digital.nomis.jpa.entity.Offender> maybeOffender = Optional.of(offenderRepository.findOne(offenderId));
 

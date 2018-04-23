@@ -10,6 +10,4 @@ import java.util.List;
 @Repository
 public interface OffenderIdentifierRepository extends JpaRepository<OffenderIdentifier, OffenderIdentifierPK> {
 
-    List<OffenderIdentifier> findByOffenderIdIn(List<Long> ids);
-
 }

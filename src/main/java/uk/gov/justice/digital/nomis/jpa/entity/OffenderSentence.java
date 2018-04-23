@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.nomis.jpa.entity;
 
 import lombok.Data;
+import lombok.ToString;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -14,6 +15,7 @@ import java.math.BigDecimal;
 import java.sql.Timestamp;
 
 @Data
+@ToString(exclude = "offenderBooking")
 @Entity
 @Table(name = "OFFENDER_SENTENCES")
 @IdClass(OffenderSentencePk.class)

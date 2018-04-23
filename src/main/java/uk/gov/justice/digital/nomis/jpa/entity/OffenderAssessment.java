@@ -1,8 +1,7 @@
 package uk.gov.justice.digital.nomis.jpa.entity;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
@@ -17,13 +16,12 @@ import java.sql.Timestamp;
 
 @Data
 @Entity
-@AllArgsConstructor
-@NoArgsConstructor
 @Table(name = "OFFENDER_ASSESSMENTS")
 public class OffenderAssessment {
 
     @Embeddable
     @Data
+    @ToString(exclude = "offenderBooking")
     public static class Pk implements Serializable {
         @ManyToOne
         @JoinColumn(name = "OFFENDER_BOOK_ID")

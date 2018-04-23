@@ -5,30 +5,39 @@ import lombok.Data;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.IdClass;
 import javax.persistence.Table;
 import java.sql.Timestamp;
 
 @Data
 @Entity
-@Table(name = "HO_CODES")
-public class HoCode {
+@Table(name = "OFFENDER_IDENTIFYING_MARKS")
+@IdClass(OffenderIdentifyingMarksPK.class)
+public class OffenderIdentifyingMarks {
     @Id
-    @Column(name = "HO_CODE")
-    private String hoCode;
-    @Column(name = "DESCRIPTION")
-    private String description;
-    @Column(name = "ACTIVE_FLAG")
-    private String activeFlag;
-    @Column(name = "EXPIRY_DATE")
-    private Timestamp expiryDate;
-    @Column(name = "CREATE_USER_ID")
-    private String createUserId;
-    @Column(name = "MODIFY_USER_ID")
-    private String modifyUserId;
-    @Column(name = "MODIFY_DATETIME")
-    private Timestamp modifyDatetime;
+    @Column(name = "OFFENDER_BOOK_ID")
+    private Long offenderBookId;
+    @Id
+    @Column(name = "ID_MARK_SEQ")
+    private Long idMarkSeq;
+    @Column(name = "BODY_PART_CODE")
+    private String bodyPartCode;
+    @Column(name = "MARK_TYPE")
+    private String markType;
+    @Column(name = "SIDE_CODE")
+    private String sideCode;
+    @Column(name = "PART_ORIENTATION_CODE")
+    private String partOrientationCode;
+    @Column(name = "COMMENT_TEXT")
+    private String commentText;
     @Column(name = "CREATE_DATETIME")
     private Timestamp createDatetime;
+    @Column(name = "CREATE_USER_ID")
+    private String createUserId;
+    @Column(name = "MODIFY_DATETIME")
+    private Timestamp modifyDatetime;
+    @Column(name = "MODIFY_USER_ID")
+    private String modifyUserId;
     @Column(name = "AUDIT_TIMESTAMP")
     private Timestamp auditTimestamp;
     @Column(name = "AUDIT_USER_ID")

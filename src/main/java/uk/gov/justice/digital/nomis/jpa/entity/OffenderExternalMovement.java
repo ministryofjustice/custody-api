@@ -1,8 +1,6 @@
 package uk.gov.justice.digital.nomis.jpa.entity;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
@@ -16,8 +14,6 @@ import java.io.Serializable;
 import java.sql.Timestamp;
 
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
 @Entity
 @Table(name = "OFFENDER_EXTERNAL_MOVEMENTS")
 public class OffenderExternalMovement {

@@ -1,8 +1,6 @@
 package uk.gov.justice.digital.nomis.jpa.entity;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.hibernate.annotations.BatchSize;
 
 import javax.persistence.Column;
@@ -18,8 +16,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
 @Entity
 @Table(name = "OFFENDERS")
 public class Offender {

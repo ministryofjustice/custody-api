@@ -1,8 +1,6 @@
 package uk.gov.justice.digital.nomis.jpa.entity;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.hibernate.annotations.BatchSize;
 
 import javax.persistence.Column;
@@ -15,8 +13,6 @@ import java.sql.Timestamp;
 import java.util.List;
 
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
 @Entity
 @Table(name = "OFFENDER_BOOKINGS")
 public class OffenderBooking {
@@ -173,5 +169,21 @@ public class OffenderBooking {
     @BatchSize(size = 1000)
     @JoinColumn(name = "OFFENDER_BOOK_ID", referencedColumnName = "OFFENDER_BOOK_ID")
     private List<OffenderReleaseDetails> offenderReleaseDetails;
+
+    @OneToMany
+    @BatchSize(size = 1000)
+    @JoinColumn(name = "OFFENDER_BOOK_ID", referencedColumnName = "OFFENDER_BOOK_ID")
+    private List<OffenderIdentifyingMarks> offenderIdentifyingMarks;
+
+    @OneToMany
+    @BatchSize(size = 1000)
+    @JoinColumn(name = "OFFENDER_BOOK_ID", referencedColumnName = "OFFENDER_BOOK_ID")
+    private List<OffenderPhysicalAttributes> offenderPhysicalAttributes;
+
+    @OneToMany
+    @BatchSize(size = 1000)
+    @JoinColumn(name = "OFFENDER_BOOK_ID", referencedColumnName = "OFFENDER_BOOK_ID")
+    private List<OffenderProfileDetails> offenderProfileDetails;
+
 
 }

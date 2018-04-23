@@ -1,8 +1,7 @@
 package uk.gov.justice.digital.nomis.jpa.entity;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -13,8 +12,7 @@ import javax.persistence.Table;
 import java.sql.Date;
 
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
+@ToString(exclude = "offenderBooking")
 @Table(name = "OFFENDER_HEALTH_PROBLEMS")
 @Entity
 public class OffenderHealthProblem {
