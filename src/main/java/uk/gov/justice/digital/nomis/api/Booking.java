@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Data
@@ -21,5 +22,6 @@ public class Booking {
     private String statusReason;
     private LocalDate startDate;
     private Optional<LocalDate> endDate;
+    private LocalDateTime caseDateTime;
     private Long bookingSequence;
 }

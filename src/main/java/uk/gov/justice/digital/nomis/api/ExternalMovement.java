@@ -34,6 +34,7 @@ public class ExternalMovement {
     private String escortCode;
     private String escortText;
     private LocalDateTime reportingDateTime;
+    private LocalDateTime applicationDateTime;
     private String toCityCode;
     private String fromCityCode;
     private String toCountryCode;

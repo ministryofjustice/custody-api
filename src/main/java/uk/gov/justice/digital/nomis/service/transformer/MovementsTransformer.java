@@ -46,6 +46,7 @@ public class MovementsTransformer {
                 .escortCode(em.getEscortCode())
                 .escortText(em.getEscortText())
                 .reportingDateTime(typesTransformer.localDateTimeOf(em.getReportingDate(), em.getReportingTime()))
+                .applicationDateTime(typesTransformer.localDateTimeOf(em.getApplicationDate(), em.getApplicationTime()))
                 .toCityCode(em.getToCity())
                 .fromCityCode(em.getFromCity())
                 .toCountryCode(em.getToCountryCode())

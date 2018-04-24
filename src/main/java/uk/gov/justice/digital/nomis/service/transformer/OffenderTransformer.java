@@ -79,6 +79,7 @@ public class OffenderTransformer {
                 .offenderBookingId(booking.getOffenderBookId())
                 .rootOffenderId(booking.getRootOffenderId())
                 .statusReason(booking.getStatusReason())
+                .caseDateTime(typesTransformer.localDateTimeOf(booking.getCaseDate(), booking.getCaseTime()))
                 .build();
     }
 
