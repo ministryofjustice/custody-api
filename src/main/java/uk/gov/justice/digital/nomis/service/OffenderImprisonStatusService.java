@@ -6,7 +6,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import uk.gov.justice.digital.nomis.api.OffenderImprisonStatus;
+import uk.gov.justice.digital.nomis.api.OffenderImprisonmentStatus;
 import uk.gov.justice.digital.nomis.jpa.entity.Offender;
 import uk.gov.justice.digital.nomis.jpa.entity.OffenderBooking;
 import uk.gov.justice.digital.nomis.jpa.repository.OffenderImprisonStatusesRepository;
@@ -35,17 +35,17 @@ public class OffenderImprisonStatusService {
 
 
     @Transactional
-    public Page<OffenderImprisonStatus> getOffenderImprisonStatuses(Pageable pageable) {
+    public Page<OffenderImprisonmentStatus> getOffenderImprisonStatuses(Pageable pageable) {
         Page<uk.gov.justice.digital.nomis.jpa.entity.OffenderImprisonStatus> rawImprisonStatusesPage = offenderImprisonStatusesRepository.findAll(pageable);
 
-        List<OffenderImprisonStatus> offenderImprisonStatuses = rawImprisonStatusesPage.getContent().stream().map(
+        List<OffenderImprisonmentStatus> offenderImprisonmentStatuses = rawImprisonStatusesPage.getContent().stream().map(
                 offenderImprisonStatusTransformer::offenderImprisonStatusOf
         ).collect(Collectors.toList());
 
-        return new PageImpl<>(offenderImprisonStatuses, pageable, rawImprisonStatusesPage.getTotalElements());
+        return new PageImpl<>(offenderImprisonmentStatuses, pageable, rawImprisonStatusesPage.getTotalElements());
     }
 
-    public Optional<List<OffenderImprisonStatus>> offenderImprisonStatusForOffenderId(Long offenderId) {
+    public Optional<List<OffenderImprisonmentStatus>> offenderImprisonStatusForOffenderId(Long offenderId) {
 
         Optional<List<uk.gov.justice.digital.nomis.jpa.entity.OffenderImprisonStatus>> maybeImprisonStatuses = Optional.ofNullable(offenderRepository.findOne(offenderId))
                 .map(offender ->
@@ -61,7 +61,7 @@ public class OffenderImprisonStatusService {
                 .collect(Collectors.toList()));
     }
 
-    public Optional<List<OffenderImprisonStatus>> offenderImprisonStatusForOffenderIdAndBookingId(Long offenderId, Long bookingId) {
+    public Optional<List<OffenderImprisonmentStatus>> offenderImprisonStatusForOffenderIdAndBookingId(Long offenderId, Long bookingId) {
         Optional<Offender> maybeOffender = Optional.ofNullable(offenderRepository.findOne(offenderId));
 
         if (!maybeOffender.isPresent()) {
@@ -80,10 +80,9 @@ public class OffenderImprisonStatusService {
                 .collect(Collectors.toList()));
     }
 
-    private Comparator<OffenderImprisonStatus> byEffectiveStatus() {
-        return Comparator.comparing(OffenderImprisonStatus::getLatestStatus)
-                .thenComparing(OffenderImprisonStatus::getEffectiveDate).reversed()
-                .thenComparing(OffenderImprisonStatus::getEffectiveTime).reversed();
+    private Comparator<OffenderImprisonmentStatus> byEffectiveStatus() {
+        return Comparator.comparing(OffenderImprisonmentStatus::getLatestStatus)
+                .thenComparing(OffenderImprisonmentStatus::getEffectiveDateTime).reversed();
     }
 
 }

@@ -2,9 +2,8 @@ package uk.gov.justice.digital.nomis.service.transformer;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import uk.gov.justice.digital.nomis.api.OffenderImprisonStatus;
+import uk.gov.justice.digital.nomis.api.OffenderImprisonmentStatus;
 
-import java.sql.Time;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -20,25 +19,21 @@ public class OffenderImprisonStatusTransformer {
         this.typesTransformer = typesTransformer;
     }
 
-    public List<OffenderImprisonStatus> offenderImprisonStatusesOf(List<uk.gov.justice.digital.nomis.jpa.entity.OffenderImprisonStatus> offenderImprisonStatuses) {
+    public List<OffenderImprisonmentStatus> offenderImprisonStatusesOf(List<uk.gov.justice.digital.nomis.jpa.entity.OffenderImprisonStatus> offenderImprisonStatuses) {
         return Optional.ofNullable(offenderImprisonStatuses).map(
                 oises -> oises
                         .stream()
                         .filter(ois -> !"N".equalsIgnoreCase(ois.getLatestStatus()))
-                        .sorted(Comparator
-                                .comparing(uk.gov.justice.digital.nomis.jpa.entity.OffenderImprisonStatus::getEffectiveDate)
-                                .thenComparing(uk.gov.justice.digital.nomis.jpa.entity.OffenderImprisonStatus::getEffectiveTime)
-                                .reversed())
-                        .map(this::offenderImprisonStatusOf
-                        ).collect(Collectors.toList())).orElse(null);
+                        .map(this::offenderImprisonStatusOf)
+                        .collect(Collectors.toList()))
+                .orElse(null);
     }
 
-    public OffenderImprisonStatus offenderImprisonStatusOf(uk.gov.justice.digital.nomis.jpa.entity.OffenderImprisonStatus ois) {
-        return OffenderImprisonStatus.builder()
+    public OffenderImprisonmentStatus offenderImprisonStatusOf(uk.gov.justice.digital.nomis.jpa.entity.OffenderImprisonStatus ois) {
+        return OffenderImprisonmentStatus.builder()
                 .agyLocId(ois.getAgyLocId())
                 .commentText(ois.getCommentText())
-                .effectiveDate(typesTransformer.localDateTimeOf(ois.getEffectiveDate()))
-                .effectiveTime(Optional.ofNullable(ois.getEffectiveTime()).map(Time::toLocalTime).orElse(null))
+                .effectiveDateTime(typesTransformer.localDateTimeOf(ois.getEffectiveDate()))
                 .expiryDate(typesTransformer.localDateOf(ois.getExpiryDate()))
                 .imprisonmentStatus(ois.getImprisonmentStatus())
                 .imprisonStatusSeq(ois.getImprisonStatusSeq())

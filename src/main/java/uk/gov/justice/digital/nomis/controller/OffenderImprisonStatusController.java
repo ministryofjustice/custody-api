@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-import uk.gov.justice.digital.nomis.api.OffenderImprisonStatus;
+import uk.gov.justice.digital.nomis.api.OffenderImprisonmentStatus;
 import uk.gov.justice.digital.nomis.service.OffenderImprisonStatusService;
 
 import java.util.List;
@@ -46,11 +46,11 @@ public class OffenderImprisonStatusController {
                     value = "Results page you want to retrieve (0..N)"),
             @ApiImplicitParam(name = "size", dataType = "int", paramType = "query",
                     value = "Number of records per page.")})
-    public PagedResources<Resource<OffenderImprisonStatus>> getImprisonmentStatuses(
+    public PagedResources<Resource<OffenderImprisonmentStatus>> getImprisonmentStatuses(
             final @ApiParam Pageable pageable,
-            final PagedResourcesAssembler<OffenderImprisonStatus> assembler) {
+            final PagedResourcesAssembler<OffenderImprisonmentStatus> assembler) {
 
-        Page<OffenderImprisonStatus> imprisonStatuses = offenderImprisonStatusService.getOffenderImprisonStatuses(pageable);
+        Page<OffenderImprisonmentStatus> imprisonStatuses = offenderImprisonStatusService.getOffenderImprisonStatuses(pageable);
         return assembler.toResource(imprisonStatuses);
     }
 
@@ -58,8 +58,8 @@ public class OffenderImprisonStatusController {
     @ApiResponses({
             @ApiResponse(code = 404, message = "Offender or booking not found"),
             @ApiResponse(code = 200, message = "OK")})
-    public ResponseEntity<List<OffenderImprisonStatus>> getOffenderImprisonmentStatuses(@PathVariable("offenderId") Long offenderId,
-                                                                                        @RequestParam("bookingId") Optional<Long> maybeBookingId) {
+    public ResponseEntity<List<OffenderImprisonmentStatus>> getOffenderImprisonmentStatuses(@PathVariable("offenderId") Long offenderId,
+                                                                                            @RequestParam("bookingId") Optional<Long> maybeBookingId) {
 
         return maybeBookingId
                 .map(bookingId -> offenderImprisonStatusService.offenderImprisonStatusForOffenderIdAndBookingId(offenderId, bookingId))
