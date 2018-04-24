@@ -60,7 +60,7 @@ public class OffenderChargesService {
 
         return maybeOffenderCharges.map(offenderCharges ->
                 offenderCharges.stream()
-                        .sorted(byOffenceSeriousness().reversed())
+                        .sorted(byOffenceRank())
                         .map(chargesTransformer::chargeOf)
                         .collect(Collectors.toList()));
     }
@@ -79,15 +79,15 @@ public class OffenderChargesService {
 
         return maybeOffenderBooking.map(ob -> ob.getOffenderCharges()
                 .stream()
-                .sorted(byOffenceSeriousness().reversed())
+                .sorted(byOffenceRank())
                 .map(chargesTransformer::chargeOf)
                 .collect(Collectors.toList()));
     }
 
-    private Comparator<OffenderCharge> byOffenceSeriousness() {
+    private Comparator<OffenderCharge> byOffenceRank() {
         return Comparator
                 .comparing(OffenderCharge::getMostSeriousFlag)
-                //todo: .thenComparingLong(OffenderCharge::severityRanking)
-                .thenComparingLong(OffenderCharge::getOffenderChargeId);
+                //todo: .thenComparingLong(Offence::severityRanking).reversed()
+                .thenComparingLong(OffenderCharge::getOffenderChargeId).reversed();
     }
 }

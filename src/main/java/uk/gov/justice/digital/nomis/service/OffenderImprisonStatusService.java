@@ -14,6 +14,7 @@ import uk.gov.justice.digital.nomis.jpa.repository.OffenderRepository;
 import uk.gov.justice.digital.nomis.service.transformer.OffenderImprisonStatusTransformer;
 
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -53,7 +54,11 @@ public class OffenderImprisonStatusService {
                                 .flatMap(Collection::stream)
                                 .collect(Collectors.toList()));
 
-        return maybeImprisonStatuses.map(imprisonStatuses -> imprisonStatuses.stream().map(offenderImprisonStatusTransformer::offenderImprisonStatusOf).collect(Collectors.toList()));
+        return maybeImprisonStatuses.map(imprisonStatuses -> imprisonStatuses
+                .stream()
+                .map(offenderImprisonStatusTransformer::offenderImprisonStatusOf)
+                .sorted(byEffectiveStatus())
+                .collect(Collectors.toList()));
     }
 
     public Optional<List<OffenderImprisonStatus>> offenderImprisonStatusForOffenderIdAndBookingId(Long offenderId, Long bookingId) {
@@ -71,7 +76,14 @@ public class OffenderImprisonStatusService {
         return maybeOffenderBooking.map(ob -> ob.getOffenderImprisonStatuses()
                 .stream()
                 .map(offenderImprisonStatusTransformer::offenderImprisonStatusOf)
+                .sorted(byEffectiveStatus())
                 .collect(Collectors.toList()));
+    }
+
+    private Comparator<OffenderImprisonStatus> byEffectiveStatus() {
+        return Comparator.comparing(OffenderImprisonStatus::getLatestStatus)
+                .thenComparing(OffenderImprisonStatus::getEffectiveDate).reversed()
+                .thenComparing(OffenderImprisonStatus::getEffectiveTime).reversed();
     }
 
 }

@@ -38,7 +38,7 @@ public class Offence {
     private Statute oldStatute;
 
     @Column(name = "SEVERITY_RANKING")
-    private String severityRanking;
+    private Long severityRanking;
     @Column(name = "DEFAULT_OFFENCE_TYPE")
     private String defaultOffenceType;
     @Column(name = "MAX_SENTENCE_LENGTH")

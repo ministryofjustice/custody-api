@@ -53,14 +53,14 @@ public class AddressService {
         return Optional.ofNullable(offenderRepository.findOne(offenderId))
                 .map(offender -> offender.getOffenderAddresses()
                         .stream()
-                        .sorted(byOffenderAddressPriority().reversed())
+                        .sorted(byOffenderAddressPriority())
                         .map(addressesTransformer::addressOf)
                         .collect(Collectors.toList()));
     }
 
     private Comparator<OffenderAddress> byOffenderAddressPriority() {
         return Comparator.comparing(OffenderAddress::getPrimaryFlag)
-                .thenComparing(a -> Optional.ofNullable(a.getEndDate()).orElse(new Timestamp(0)))
+                .thenComparing(a -> Optional.ofNullable(a.getEndDate()).orElse(new Timestamp(0))).reversed()
                 .thenComparing(a -> Optional.ofNullable(a.getAddressUsage()).map(x -> x.getActiveFlag()).orElse("N"))
                 .thenComparing(this::getLastModifiedDate);
     }

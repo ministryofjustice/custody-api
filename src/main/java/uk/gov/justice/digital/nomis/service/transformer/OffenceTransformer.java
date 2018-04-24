@@ -45,7 +45,10 @@ public class OffenceTransformer {
 
     private List<String> offenceIndcatorsOf(List<OffenceIndicator> offenceIndicators) {
         return Optional.ofNullable(offenceIndicators).map(
-                ois -> ois.stream().map(OffenceIndicator::getIndicatorCode).collect(Collectors.toList())).orElse(null);
+                ois -> ois.stream()
+                        .map(OffenceIndicator::getIndicatorCode)
+                        .collect(Collectors.toList())
+        ).orElse(null);
     }
 
     private KeyValue statuteOf(Statute statute) {

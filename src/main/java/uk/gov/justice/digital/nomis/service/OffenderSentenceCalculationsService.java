@@ -84,6 +84,7 @@ public class OffenderSentenceCalculationsService {
 
     private Comparator<SentenceCalculation> byCalculationDate() {
         return Comparator.comparing(SentenceCalculation::getCalculationDate).reversed();
+        // return Comparator.comparing(SentenceCalculation::getSentenceCalculationId).reversed();
     }
 
 }

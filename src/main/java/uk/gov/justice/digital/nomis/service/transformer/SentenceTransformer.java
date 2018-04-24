@@ -51,6 +51,7 @@ public class SentenceTransformer {
                 .revokedDate(typesTransformer.localDateOf(offenderSentence.getRevokedDate()))
                 .sedCalculatedDate(typesTransformer.localDateOf(offenderSentence.getSedCalculatedDate()))
                 .sentenceCategory(offenderSentence.getSentenceCategory())
+                .sentenceCalcType(offenderSentence.getSentenceCalcType())
                 .sentenceLevel(offenderSentence.getSentenceLevel())
                 .sentenceStatus(offenderSentence.getSentenceStatus())
                 .sentenceText(offenderSentence.getSentenceText())
