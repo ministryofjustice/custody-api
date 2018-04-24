@@ -24,11 +24,13 @@ public class TypesTransformer {
     }
 
     public LocalDateTime localDateTimeOf(Timestamp date, Timestamp time) {
-        LocalDateTime dateTime = date.toLocalDateTime();
-
-        return Optional.ofNullable(time)
-                .map(t -> t.toLocalDateTime().toLocalTime().atDate(dateTime.toLocalDate()))
-                .orElse(dateTime);
+        return Optional.ofNullable(date)
+                .map(d -> d.toLocalDateTime())
+                .map(dateTime ->
+                        Optional.ofNullable(time)
+                            .map(t -> t.toLocalDateTime().toLocalTime().atDate(dateTime.toLocalDate()))
+                            .orElse(dateTime))
+                .orElse(null);
     }
 
     public Boolean ynToBoolean(String yn) {
