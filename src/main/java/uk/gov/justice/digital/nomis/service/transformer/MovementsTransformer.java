@@ -6,9 +6,6 @@ import uk.gov.justice.digital.nomis.api.ExternalMovement;
 import uk.gov.justice.digital.nomis.jpa.entity.MovementReason;
 import uk.gov.justice.digital.nomis.jpa.entity.OffenderExternalMovement;
 
-import java.sql.Timestamp;
-import java.util.Optional;
-
 @Component
 public class MovementsTransformer {
 
@@ -36,7 +33,7 @@ public class MovementsTransformer {
                 .offenderBookingId(em.getId().getOffenderBooking().getOffenderBookId())
                 .offenderId(em.getId().getOffenderBooking().getRootOffenderId())
                 .sequenceNumber(em.getId().getMovementSeq())
-                .movementDateTime(em.getMovementTime().toLocalDateTime())
+                .movementDateTime(typesTransformer.localDateTimeOf(em.getMovementDate(), em.getMovementTime()))
                 .unemploymentPay(typesTransformer.ynToBoolean(movementReason.getUnemploymentPay()))
                 .escapeRecapture(typesTransformer.ynToBoolean(movementReason.getEscRecapFlag()))
                 .inMovementType(movementReason.getInMovementType())
@@ -48,11 +45,12 @@ public class MovementsTransformer {
                 .toProvStatCode(em.getToProvStatCode())
                 .escortCode(em.getEscortCode())
                 .escortText(em.getEscortText())
-                .reportingDateTime(Optional.ofNullable(em.getReportingTime()).map(Timestamp::toLocalDateTime).orElse(null))
+                .reportingDateTime(typesTransformer.localDateTimeOf(em.getReportingDate(), em.getReportingTime()))
                 .toCityCode(em.getToCity())
                 .fromCityCode(em.getFromCity())
                 .toCountryCode(em.getToCountryCode())
                 .ojLocationCode(em.getOjLocationCode())
                 .build();
     }
+
 }

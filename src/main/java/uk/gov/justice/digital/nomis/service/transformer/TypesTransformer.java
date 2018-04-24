@@ -23,8 +23,15 @@ public class TypesTransformer {
         return Optional.ofNullable(timestamp).map(Timestamp::toLocalDateTime).orElse(null);
     }
 
+    public LocalDateTime localDateTimeOf(Timestamp date, Timestamp time) {
+        LocalDateTime dateTime = date.toLocalDateTime();
+
+        return Optional.ofNullable(time)
+                .map(t -> t.toLocalDateTime().toLocalTime().atDate(dateTime.toLocalDate()))
+                .orElse(dateTime);
+    }
+
     public Boolean ynToBoolean(String yn) {
         return Optional.ofNullable(yn).map("Y"::equalsIgnoreCase).orElse(null);
     }
-
 }
