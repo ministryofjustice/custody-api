@@ -28,11 +28,17 @@ public class ResourceServerConfiguration extends ResourceServerConfigurerAdapter
     @Override
     public void configure(HttpSecurity http) throws Exception {
         http
+                .csrf().disable().antMatcher("/**")
+                .cors().disable().antMatcher("/**")
                 .authorizeRequests()
+                .antMatchers("/h2-console/**", "/v2/api-docs", "/configuration/ui", "/swagger-resources", "/configuration/security",
+                        "/swagger-ui.html", "/webjars/**", "/swagger-resources/configuration/ui", "/swagger-ui.html",
+                        "/swagger-resources/configuration/security").permitAll()
                 .antMatchers("/{apiBasePath}/**").hasRole("REPORTING")
                 .anyRequest()
                 .permitAll();
 
+        http.headers().frameOptions().disable();
 
     }
 
