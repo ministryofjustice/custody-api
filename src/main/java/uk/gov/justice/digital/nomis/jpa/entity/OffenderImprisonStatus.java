@@ -30,7 +30,7 @@ public class OffenderImprisonStatus {
     @Column(name = "EFFECTIVE_DATE")
     private Timestamp effectiveDate;
     @Column(name = "EFFECTIVE_TIME")
-    private Time effectiveTime;
+    private Timestamp effectiveTime;
     @Column(name = "EXPIRY_DATE")
     private Date expiryDate;
     @Column(name = "AGY_LOC_ID")

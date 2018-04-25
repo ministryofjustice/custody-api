@@ -33,7 +33,7 @@ public class OffenderImprisonStatusTransformer {
         return OffenderImprisonmentStatus.builder()
                 .agyLocId(ois.getAgyLocId())
                 .commentText(ois.getCommentText())
-                .effectiveDateTime(typesTransformer.localDateTimeOf(ois.getEffectiveDate()))
+                .effectiveDateTime(typesTransformer.localDateTimeOf(ois.getEffectiveDate(), ois.getEffectiveTime()))
                 .expiryDate(typesTransformer.localDateOf(ois.getExpiryDate()))
                 .imprisonmentStatus(ois.getImprisonmentStatus())
                 .imprisonStatusSeq(ois.getImprisonStatusSeq())
