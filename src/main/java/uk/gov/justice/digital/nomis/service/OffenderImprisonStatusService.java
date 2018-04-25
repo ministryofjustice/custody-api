@@ -49,7 +49,8 @@ public class OffenderImprisonStatusService {
 
         Optional<List<uk.gov.justice.digital.nomis.jpa.entity.OffenderImprisonStatus>> maybeImprisonStatuses = Optional.ofNullable(offenderRepository.findOne(offenderId))
                 .map(offender ->
-                        offender.getOffenderBookings().stream()
+                        offender.getOffenderBookings()
+                                .stream()
                                 .map(OffenderBooking::getOffenderImprisonStatuses)
                                 .flatMap(Collection::stream)
                                 .collect(Collectors.toList()));
@@ -82,7 +83,8 @@ public class OffenderImprisonStatusService {
 
     private Comparator<OffenderImprisonmentStatus> byEffectiveStatus() {
         return Comparator.comparing(OffenderImprisonmentStatus::getLatestStatus)
-                .thenComparing(OffenderImprisonmentStatus::getEffectiveDateTime).reversed();
+                .thenComparing(OffenderImprisonmentStatus::getEffectiveDateTime).reversed()
+                .thenComparing(OffenderImprisonmentStatus::getImprisonStatusSeq);
     }
 
 }
