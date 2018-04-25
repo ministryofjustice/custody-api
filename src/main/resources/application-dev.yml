@@ -25,7 +25,8 @@ spring:
           classpath:R__4_11__OFFENDER_IMPRISON_STATUSES.sql,
           classpath:R__4_15__OFFENDER_PHYSICAL_ATTRIBUTES.sql,
           classpath:R__4_17__OFFENDER_PROFILE_DETAILS.sql,
-          classpath:R__4_18__OFFENDER_RELEASE_DETAILS.sql'
+          classpath:R__4_18__OFFENDER_RELEASE_DETAILS.sql,
+          classpath:some_employments.sql'
 
   jpa:
     hibernate:
