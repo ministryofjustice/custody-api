@@ -17,6 +17,7 @@ public class EmploymentsTransformer {
 
     public Employment employmentOf(OffenderEmployment offenderEmployment) {
         return Employment.builder()
+                .bookingId(offenderEmployment.getOffenderBookId())
                 .caseloadType(offenderEmployment.getCaseloadType())
                 .certification(offenderEmployment.getCertification())
                 .comments(offenderEmployment.getCommentText())
