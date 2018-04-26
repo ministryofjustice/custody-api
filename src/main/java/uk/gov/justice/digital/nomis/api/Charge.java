@@ -17,6 +17,7 @@ public class Charge {
     private Long offenderId;
     private String offenceCode;
     private String statuteCode;
+    private Long offenceSeverityRanking;
     private Integer numberOfOffences;
     private LocalDate offenceDate;
     private LocalDate offenceRangeDate;

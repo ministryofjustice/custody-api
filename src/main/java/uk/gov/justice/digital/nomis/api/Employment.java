@@ -5,6 +5,7 @@ import lombok.Data;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 @Builder
@@ -36,4 +37,6 @@ public class Employment {
     private Long offenderEmploymentId;
     private String employmentSchedule;
     private String certification;
+    private LocalDateTime createdDateTime;
+    private LocalDateTime modifiedDateTime;
 }

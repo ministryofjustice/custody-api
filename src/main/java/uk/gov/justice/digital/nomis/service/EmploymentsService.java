@@ -32,10 +32,11 @@ public class EmploymentsService {
                                 .map(employmentsTransformer::employmentOf)
                                 .sorted(byEmploymentSequence())
                                 .collect(Collectors.toList()));
-
     }
 
     private Comparator<Employment> byEmploymentSequence() {
-        return Comparator.comparing(Employment::getEmploymentSequence);
+        return Comparator.comparing(Employment::getModifiedDateTime).reversed()
+                .thenComparing(Employment::getCreatedDateTime).reversed()
+                .thenComparing(Employment::getEmploymentSequence);
     }
 }
