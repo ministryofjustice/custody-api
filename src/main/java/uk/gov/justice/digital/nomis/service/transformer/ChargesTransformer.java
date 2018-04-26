@@ -13,6 +13,7 @@ import uk.gov.justice.digital.nomis.jpa.entity.OffenderCharge;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Component
 public class ChargesTransformer {
@@ -46,7 +47,16 @@ public class ChargesTransformer {
                 .propertyValue(oc.getPropertyValue())
                 .totalPropertyValue(oc.getTotalPropertyValue())
                 .resultCodes(resultCodesOf(oc))
+                .offenceIndicatorCodes(offenceIndicatorCodesOf(oc))
                 .build();
+    }
+
+    private List<String> offenceIndicatorCodesOf(OffenderCharge oc) {
+        return Optional.ofNullable(oc.getOffence()).map(o ->
+                o.getOffenceIndicators().stream()
+                        .map(oi -> oi.getIndicatorCode())
+                        .collect(Collectors.toList())
+        ).orElse(null);
     }
 
     public List<String> resultCodesOf(OffenderCharge oc) {
