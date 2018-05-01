@@ -38,6 +38,7 @@ public class ChargesTransformer {
                 .numberOfOffences(oc.getNoOfOffences())
                 .offenceCode(oc.getOffenceCode())
                 .statuteCode(oc.getStatuteCode())
+                .offenceSeverityRanking(Optional.ofNullable(oc.getOffence()).map(o -> o.getSeverityRanking()).orElse(null))
                 .offenceDate(Optional.ofNullable(oc.getOffenceDate()).map(d -> d.toLocalDateTime().toLocalDate()).orElse(null))
                 .offenceRangeDate(Optional.ofNullable(oc.getOffenceRangeDate()).map(d -> d.toLocalDateTime().toLocalDate()).orElse(null))
                 .order(orderOf(oc))

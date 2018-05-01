@@ -4,9 +4,12 @@ import lombok.Data;
 import lombok.ToString;
 
 import javax.persistence.Column;
+import javax.persistence.ConstraintMode;
 import javax.persistence.Entity;
+import javax.persistence.ForeignKey;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinColumns;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import java.math.BigDecimal;
@@ -90,5 +93,13 @@ public class OffenderCharge {
     @JoinColumn(name = "ORDER_ID")
     private Order order;
 
+    @OneToOne
+    @JoinColumns(
+    foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT),
+    value = {
+        @JoinColumn(name = "OFFENCE_CODE", referencedColumnName = "OFFENCE_CODE", insertable = false, updatable = false),
+        @JoinColumn(name = "STATUTE_CODE", referencedColumnName = "STATUTE_CODE", insertable = false, updatable = false)
+    })
+    private Offence offence;
 
 }

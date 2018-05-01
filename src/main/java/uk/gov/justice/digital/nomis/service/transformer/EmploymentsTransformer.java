@@ -44,6 +44,8 @@ public class EmploymentsTransformer {
                 .terminationReason(offenderEmployment.getTerminationReasonText())
                 .wage(offenderEmployment.getWage())
                 .wagePeriodCode(offenderEmployment.getWagePeriodCode())
+                .createdDateTime(typesTransformer.localDateTimeOf(offenderEmployment.getCreateDatetime()))
+                .modifiedDateTime(typesTransformer.localDateTimeOf(offenderEmployment.getModifyDatetime()))
                 .build();
     }
 }

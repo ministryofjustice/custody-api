@@ -6,6 +6,7 @@ import uk.gov.justice.digital.nomis.api.Employment;
 import uk.gov.justice.digital.nomis.jpa.repository.OffenderRepository;
 import uk.gov.justice.digital.nomis.service.transformer.EmploymentsTransformer;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -26,11 +27,16 @@ public class EmploymentsService {
 
         return Optional.ofNullable(offenderRepository.findOne(offenderId))
                 .map(offender ->
-                        offender.getOffenderBookings()
-                                .stream()
+                        offender.getOffenderBookings().stream()
                                 .flatMap(offenderBooking -> offenderBooking.getOffenderEmployments().stream())
                                 .map(employmentsTransformer::employmentOf)
+                                .sorted(byEmploymentSequence())
                                 .collect(Collectors.toList()));
+    }
 
+    private Comparator<Employment> byEmploymentSequence() {
+        return Comparator.comparing(Employment::getModifiedDateTime).reversed()
+                .thenComparing(Employment::getCreatedDateTime).reversed()
+                .thenComparing(Employment::getEmploymentSequence);
     }
 }
