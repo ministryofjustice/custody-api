@@ -56,7 +56,7 @@ public class Offender {
     private String middleNameKey;
     @Column(name = "OFFENDER_ID_DISPLAY")
     private String offenderIdDisplay;
-    @Column(name = "ROOT_OFFENDER_ID")
+    @Column(name = "ROOT_OFFENDER_ID", insertable = false, updatable = false)
     private Long rootOffenderId;
     @Column(name = "CASELOAD_TYPE")
     private String caseloadType;
@@ -119,13 +119,12 @@ public class Offender {
 
     @OneToMany
     @BatchSize(size = 1000)
-    @JoinColumn(name = "OFFENDER_ID")
+    @JoinColumn(name = "ROOT_OFFENDER_ID", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT), nullable = true)
     private List<OffenderBooking> offenderBookings;
 
     @OneToMany
     @BatchSize(size = 1000)
-    @JoinColumn(name = "ROOT_OFFENDER_ID", referencedColumnName = "OFFENDER_ID",
-            foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(name = "ROOT_OFFENDER_ID", referencedColumnName = "OFFENDER_ID")
     private List<Offender> offenderAliases;
 
     @OneToMany

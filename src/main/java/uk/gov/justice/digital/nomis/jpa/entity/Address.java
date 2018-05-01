@@ -9,9 +9,11 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import java.sql.Timestamp;
+import java.util.List;
 
 @Data
 @Entity
@@ -100,6 +102,10 @@ public abstract class Address {
     @OneToOne
     @JoinColumn(name = "ADDRESS_ID")
     private AddressUsage addressUsage;
+
+    @OneToMany
+    @JoinColumn(name = "OWNER_ID", referencedColumnName = "ADDRESS_ID")
+    private List<AddressPhone> phones;
 
     public abstract String getType();
 

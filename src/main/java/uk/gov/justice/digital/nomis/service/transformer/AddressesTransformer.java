@@ -3,9 +3,13 @@ package uk.gov.justice.digital.nomis.service.transformer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.justice.digital.nomis.api.Address;
+import uk.gov.justice.digital.nomis.api.Phone;
+import uk.gov.justice.digital.nomis.jpa.entity.AddressPhone;
 import uk.gov.justice.digital.nomis.jpa.entity.AddressUsage;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Component
 public class AddressesTransformer {
@@ -47,6 +51,20 @@ public class AddressesTransformer {
                 .startDate(typesTransformer.localDateOf(address.getStartDate()))
                 .endDate(typesTransformer.localDateOf(address.getEndDate()))
                 .active(typesTransformer.ynToBoolean(Optional.ofNullable(address.getAddressUsage()).map(AddressUsage::getActiveFlag).orElse(null)))
+                .phones(phonesOf(address.getPhones()))
                 .build();
+    }
+
+    private List<Phone> phonesOf(List<AddressPhone> phones) {
+        return phones.stream().map(phone -> Phone.builder()
+            .extNo(phone.getExtNo())
+            .ownerClass(phone.getOwnerClass())
+            .ownerCode(phone.getOwnerCode())
+            .ownerSeq(phone.getOwnerSeq())
+            .phoneId(phone.getPhoneId())
+            .phoneNo(phone.getPhoneNo())
+            .phoneType(phone.getPhoneType())
+            .relationship(phone.getRelationship())
+            .build()).collect(Collectors.toList());
     }
 }
