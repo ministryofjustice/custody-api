@@ -19,11 +19,9 @@ public class OffenderImprisonStatus {
     @Id
     @Column(name = "OFFENDER_BOOK_ID")
     private Long offenderBookId;
-
     @Id
     @Column(name = "IMPRISON_STATUS_SEQ")
     private Long imprisonStatusSeq;
-
     @Column(name = "IMPRISONMENT_STATUS")
     private String imprisonmentStatus;
     @Column(name = "EFFECTIVE_DATE")

@@ -2,7 +2,9 @@ package uk.gov.justice.digital.nomis.service.transformer;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import uk.gov.justice.digital.nomis.api.ImprisonmentStatus;
 import uk.gov.justice.digital.nomis.api.OffenderImprisonmentStatus;
+import uk.gov.justice.digital.nomis.jpa.repository.ImprisonmentStatusesRepository;
 
 import java.util.List;
 import java.util.Optional;
@@ -12,10 +14,12 @@ import java.util.stream.Collectors;
 public class OffenderImprisonStatusTransformer {
 
     private final TypesTransformer typesTransformer;
+    private final ImprisonmentStatusesRepository imprisonmentStatusesRepository;
 
     @Autowired
-    public OffenderImprisonStatusTransformer(TypesTransformer typesTransformer) {
+    public OffenderImprisonStatusTransformer(TypesTransformer typesTransformer, ImprisonmentStatusesRepository imprisonmentStatusesRepository) {
         this.typesTransformer = typesTransformer;
+        this.imprisonmentStatusesRepository = imprisonmentStatusesRepository;
     }
 
     public List<OffenderImprisonmentStatus> offenderImprisonStatusesOf(List<uk.gov.justice.digital.nomis.jpa.entity.OffenderImprisonStatus> offenderImprisonStatuses) {
@@ -34,10 +38,21 @@ public class OffenderImprisonStatusTransformer {
                 .commentText(ois.getCommentText())
                 .effectiveDateTime(typesTransformer.localDateTimeOf(ois.getEffectiveDate(), ois.getEffectiveTime()))
                 .expiryDate(typesTransformer.localDateOf(ois.getExpiryDate()))
-                .imprisonmentStatus(ois.getImprisonmentStatus())
+                .imprisonmentStatuses(imprisonmentStatusesOf(ois.getImprisonmentStatus()))
                 .imprisonStatusSeq(ois.getImprisonStatusSeq())
                 .latestStatus(typesTransformer.ynToBoolean(ois.getLatestStatus()))
                 .offenderBookId(ois.getOffenderBookId())
                 .build();
+    }
+
+    private List<ImprisonmentStatus> imprisonmentStatusesOf(String imprisonmentStatus) {
+        return imprisonmentStatusesRepository.findByImprisonmentStatus(imprisonmentStatus).stream().map(is -> ImprisonmentStatus.builder()
+                .bandCode(is.getBandCode())
+                .description(is.getDescription())
+                .imprisonmentStatus(is.getImprisonmentStatus())
+                .imprisonmentStatusId(is.getImprisonmentStatusId())
+                .imprisonmentStatusSeq(is.getImprisonmentStatusSeq())
+                .rankValue(is.getRankValue())
+                .build()).collect(Collectors.toList());
     }
 }
