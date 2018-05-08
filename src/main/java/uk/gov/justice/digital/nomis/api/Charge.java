@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 @Data
-@Builder
+@Builder(toBuilder = true)
 public class Charge {
     private Long chargeId;
     private Long bookingId;
@@ -33,5 +33,7 @@ public class Charge {
     private Integer chargeSequence;
     private Order order;
     private Integer lidsOffenceNumber;
+
+    private List<Sentence> sentences;
 
 }

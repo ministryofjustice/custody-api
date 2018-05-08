@@ -2,6 +2,7 @@ package uk.gov.justice.digital.nomis.jpa.entity;
 
 import lombok.Data;
 import lombok.ToString;
+import org.hibernate.annotations.BatchSize;
 
 import javax.persistence.Column;
 import javax.persistence.ConstraintMode;
@@ -10,10 +11,13 @@ import javax.persistence.ForeignKey;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinColumns;
+import javax.persistence.JoinTable;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
+import java.util.List;
 
 @Data
 @ToString(exclude = "offenderBooking")
@@ -95,11 +99,22 @@ public class OffenderCharge {
 
     @OneToOne
     @JoinColumns(
-    foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT),
-    value = {
-        @JoinColumn(name = "OFFENCE_CODE", referencedColumnName = "OFFENCE_CODE", insertable = false, updatable = false),
-        @JoinColumn(name = "STATUTE_CODE", referencedColumnName = "STATUTE_CODE", insertable = false, updatable = false)
-    })
+            foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT),
+            value = {
+                    @JoinColumn(name = "OFFENCE_CODE", referencedColumnName = "OFFENCE_CODE", insertable = false, updatable = false),
+                    @JoinColumn(name = "STATUTE_CODE", referencedColumnName = "STATUTE_CODE", insertable = false, updatable = false)
+            })
     private Offence offence;
+
+    @OneToMany
+    @BatchSize(size = 1000)
+    @JoinTable(name = "OFFENDER_SENTENCE_CHARGES",
+            joinColumns = {@JoinColumn(name = "OFFENDER_CHARGE_ID", referencedColumnName = "OFFENDER_CHARGE_ID")},
+            inverseJoinColumns = {@JoinColumn(name = "OFFENDER_BOOK_ID", referencedColumnName = "OFFENDER_BOOK_ID"), @JoinColumn(name = "SENTENCE_SEQ", referencedColumnName = "SENTENCE_SEQ")},
+            foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT),
+            inverseForeignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT)
+    )
+    private List<OffenderSentence> sentences;
+
 
 }
