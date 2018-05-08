@@ -3,6 +3,7 @@ package uk.gov.justice.digital.nomis.api;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
+import uk.gov.justice.digital.nomis.jpa.entity.OffenceIndicator;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -18,6 +19,7 @@ public class Charge {
     private String offenceCode;
     private String statuteCode;
     private Long offenceSeverityRanking;
+    private List<String> offenceIndicatorCodes;
     private Integer numberOfOffences;
     private LocalDate offenceDate;
     private LocalDate offenceRangeDate;
