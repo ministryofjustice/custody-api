@@ -13,11 +13,9 @@ import uk.gov.justice.digital.nomis.jpa.repository.OffenderRepository;
 import uk.gov.justice.digital.nomis.service.transformer.AddressesTransformer;
 
 import java.sql.Timestamp;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -41,9 +39,9 @@ public class AddressService {
     public Page<Address> getAddresses(Pageable pageable) {
         Page<uk.gov.justice.digital.nomis.jpa.entity.Address> rawAddressPage = addressRepository.findAll(pageable);
 
-        List<Address> addresses = rawAddressPage.getContent().stream().map(
-                addressesTransformer::addressOf
-        ).collect(Collectors.toList());
+        List<Address> addresses = rawAddressPage.getContent().stream()
+                .map(addressesTransformer::addressOf)
+                .collect(Collectors.toList());
 
         return new PageImpl<>(addresses, pageable, rawAddressPage.getTotalElements());
     }

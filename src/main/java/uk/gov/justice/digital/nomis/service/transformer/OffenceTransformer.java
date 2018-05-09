@@ -39,33 +39,33 @@ public class OffenceTransformer {
                 .repealedDate(typesTransformer.localDateOf(offence.getRepealedDate()))
                 .sentenceUnitCode(offence.getSentenceUnitCode())
                 .statute(statuteOf(offence.getStatute()))
-                .offenceIndicators(offenceIndcatorsOf(offence.getOffenceIndicators()))
+                .offenceIndicators(offenceIndicatorsOf(offence.getOffenceIndicators()))
                 .build();
     }
 
-    private List<String> offenceIndcatorsOf(List<OffenceIndicator> offenceIndicators) {
-        return Optional.ofNullable(offenceIndicators).map(
-                ois -> ois.stream()
+    private List<String> offenceIndicatorsOf(List<OffenceIndicator> offenceIndicators) {
+        return Optional.ofNullable(offenceIndicators)
+                .map(ois -> ois.stream()
                         .map(OffenceIndicator::getIndicatorCode)
-                        .collect(Collectors.toList())
-        ).orElse(null);
+                        .collect(Collectors.toList()))
+                .orElse(null);
     }
 
     private KeyValue statuteOf(Statute statute) {
-        return Optional.ofNullable(statute).map(
-                s -> KeyValue.builder()
+        return Optional.ofNullable(statute)
+                .map(s -> KeyValue.builder()
                         .code(s.getStatuteCode())
                         .description(s.getDescription())
-                        .build()
-        ).orElse(null);
+                        .build())
+                .orElse(null);
     }
 
     private KeyValue hoCodeOf(HoCode hoCode) {
-        return Optional.ofNullable(hoCode).map(
-                hoc -> KeyValue.builder()
+        return Optional.ofNullable(hoCode)
+                .map(hoc -> KeyValue.builder()
                         .code(hoc.getHoCode())
                         .description(hoc.getDescription())
-                        .build()
-        ).orElse(null);
+                        .build())
+                .orElse(null);
     }
 }

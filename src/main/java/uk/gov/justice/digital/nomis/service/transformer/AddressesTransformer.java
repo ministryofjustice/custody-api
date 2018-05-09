@@ -56,15 +56,19 @@ public class AddressesTransformer {
     }
 
     private List<Phone> phonesOf(List<AddressPhone> phones) {
-        return phones.stream().map(phone -> Phone.builder()
-            .extNo(phone.getExtNo())
-            .ownerClass(phone.getOwnerClass())
-            .ownerCode(phone.getOwnerCode())
-            .ownerSeq(phone.getOwnerSeq())
-            .phoneId(phone.getPhoneId())
-            .phoneNo(phone.getPhoneNo())
-            .phoneType(phone.getPhoneType())
-            .relationship(phone.getRelationship())
-            .build()).collect(Collectors.toList());
+        return phones
+                .stream()
+                .map(phone -> Phone.builder()
+                        .extNo(phone.getExtNo())
+                        .ownerClass(phone.getOwnerClass())
+                        .ownerCode(phone.getOwnerCode())
+                        .ownerSeq(phone.getOwnerSeq())
+                        .phoneId(phone.getPhoneId())
+                        .phoneNo(phone.getPhoneNo())
+                        .phoneType(phone.getPhoneType())
+                        .relationship(phone.getRelationship())
+                        .build())
+                //todo: sort phones
+                .collect(Collectors.toList());
     }
 }

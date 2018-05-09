@@ -23,8 +23,8 @@ public class OffenderContactPersonsTransformer {
     }
 
     public uk.gov.justice.digital.nomis.api.OffenderContactPerson offenderContactPersonOf(OffenderContactPerson offenderContactPerson) {
-        return Optional.ofNullable(offenderContactPerson).map(
-                ocp -> uk.gov.justice.digital.nomis.api.OffenderContactPerson.builder()
+        return Optional.ofNullable(offenderContactPerson)
+                .map(ocp -> uk.gov.justice.digital.nomis.api.OffenderContactPerson.builder()
                         .active(typesTransformer.ynToBoolean(ocp.getActiveFlag()))
                         .addresses(personTransformer.addressesOf(ocp.getPerson()))
                         .approvedVisitor(typesTransformer.ynToBoolean(ocp.getApprovedVisitorFlag()))
@@ -40,18 +40,21 @@ public class OffenderContactPersonsTransformer {
                         .offenderContactPersonId(ocp.getOffenderContactPersonId())
                         .person(personTransformer.personOf(ocp.getPerson()))
                         .contactPersonType(contactPersonTypeOf(ocp.getContactPersonType()))
-                        .build()).orElse(null);
+                        .build())
+                .orElse(null);
     }
 
     private ContactPersonType contactPersonTypeOf(uk.gov.justice.digital.nomis.jpa.entity.ContactPersonType contactPersonType) {
-        return Optional.ofNullable(contactPersonType).map(cpt -> ContactPersonType.builder()
-                .contactType(cpt.getContactType())
-                .relationshipType(cpt.getRelationshipType())
-                .active(typesTransformer.ynToBoolean(cpt.getActiveFlag()))
-                .contactClass(cpt.getContactClass())
-                .expiryDate(typesTransformer.localDateOf(cpt.getExpiryDate()))
-                .listSeq(cpt.getListSeq())
-                .updateAllowed(typesTransformer.ynToBoolean(cpt.getUpdateAllowedFlag()))
-                .build()).orElse(null);
+        return Optional.ofNullable(contactPersonType)
+                .map(cpt -> ContactPersonType.builder()
+                        .contactType(cpt.getContactType())
+                        .relationshipType(cpt.getRelationshipType())
+                        .active(typesTransformer.ynToBoolean(cpt.getActiveFlag()))
+                        .contactClass(cpt.getContactClass())
+                        .expiryDate(typesTransformer.localDateOf(cpt.getExpiryDate()))
+                        .listSeq(cpt.getListSeq())
+                        .updateAllowed(typesTransformer.ynToBoolean(cpt.getUpdateAllowedFlag()))
+                        .build())
+                .orElse(null);
     }
 }

@@ -52,11 +52,12 @@ public class ChargesTransformer {
     }
 
     private List<String> offenceIndicatorCodesOf(OffenderCharge oc) {
-        return Optional.ofNullable(oc.getOffence()).map(o ->
-                o.getOffenceIndicators().stream()
+        return Optional.ofNullable(oc.getOffence())
+                .map(o ->o.getOffenceIndicators()
+                        .stream()
                         .map(oi -> oi.getIndicatorCode())
-                        .collect(Collectors.toList())
-        ).orElse(null);
+                        .collect(Collectors.toList()))
+                .orElse(null);
     }
 
     public List<String> resultCodesOf(OffenderCharge oc) {
@@ -81,8 +82,8 @@ public class ChargesTransformer {
     }
 
     public Order orderOf(OffenderCharge oc) {
-        return Optional.ofNullable(oc.getOrder()).map(o ->
-                Order.builder()
+        return Optional.ofNullable(oc.getOrder())
+                .map(o -> Order.builder()
                         .comments(o.getCommentText())
                         .completeDate(Optional.ofNullable(o.getCompleteDate()).map(d -> d.toLocalDateTime().toLocalDate()).orElse(null))
                         .courtDate(Optional.ofNullable(o.getCourtDate()).map(d -> d.toLocalDateTime().toLocalDate()).orElse(null))
@@ -128,20 +129,21 @@ public class ChargesTransformer {
     }
 
     public Case caseOf(OffenderCase offenderCase) {
-        return Optional.ofNullable(offenderCase).map(oc -> Case.builder()
-                .agencyLocationId(oc.getAgyLocId())
-                .beginDate(Optional.ofNullable(oc.getBeginDate()).map(d -> d.toLocalDateTime().toLocalDate()).orElse(null))
-                .caseId(oc.getCaseId())
-                .caseInfoNumber(oc.getCaseInfoNumber())
-                .caseSequence(oc.getCaseSeq())
-                .caseStatus(oc.getCaseStatus())
-                .caseType(oc.getCaseType())
-                .combinedCaseId(oc.getCombinedCaseId())
-                .lidsCaseNumber(oc.getLidsCaseNumber())
-                .nomLegalCaseRef(oc.getNomLegalCaseRef())
-                .nomLegalCaseRefTransTo(oc.getNomLegalCaserefTransTo())
-                .victimLiasonUnit(oc.getVictimLiaisonUnit())
-                .build())
+        return Optional.ofNullable(offenderCase)
+                .map(oc -> Case.builder()
+                        .agencyLocationId(oc.getAgyLocId())
+                        .beginDate(Optional.ofNullable(oc.getBeginDate()).map(d -> d.toLocalDateTime().toLocalDate()).orElse(null))
+                        .caseId(oc.getCaseId())
+                        .caseInfoNumber(oc.getCaseInfoNumber())
+                        .caseSequence(oc.getCaseSeq())
+                        .caseStatus(oc.getCaseStatus())
+                        .caseType(oc.getCaseType())
+                        .combinedCaseId(oc.getCombinedCaseId())
+                        .lidsCaseNumber(oc.getLidsCaseNumber())
+                        .nomLegalCaseRef(oc.getNomLegalCaseRef())
+                        .nomLegalCaseRefTransTo(oc.getNomLegalCaserefTransTo())
+                        .victimLiasonUnit(oc.getVictimLiaisonUnit())
+                        .build())
                 .orElse(null);
     }
 }

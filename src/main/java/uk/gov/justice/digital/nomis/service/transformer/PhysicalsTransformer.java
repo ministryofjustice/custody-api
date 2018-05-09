@@ -29,8 +29,8 @@ public class PhysicalsTransformer {
     }
 
     private List<ProfileDetails> profileDetailsOf(List<OffenderProfileDetails> offenderProfileDetails) {
-        return Optional.ofNullable(offenderProfileDetails).map(
-                dets -> dets
+        return Optional.ofNullable(offenderProfileDetails)
+                .map(dets -> dets
                         .stream()
                         .map(det -> ProfileDetails.builder()
                                 .caseloadType(det.getCaseloadType())
@@ -45,8 +45,8 @@ public class PhysicalsTransformer {
     }
 
     private List<PhysicalAttribute> physicalAttributesOf(List<OffenderPhysicalAttributes> offenderPhysicalAttributes) {
-        return Optional.ofNullable(offenderPhysicalAttributes).map(
-                attrs -> attrs
+        return Optional.ofNullable(offenderPhysicalAttributes)
+                .map(attrs -> attrs
                         .stream()
                         .map(attr -> PhysicalAttribute.builder()
                                 .attributeSeq(attr.getAttributeSeq())
@@ -61,8 +61,8 @@ public class PhysicalsTransformer {
     }
 
     private List<IdentifyingMark> identifyingMarksOf(List<OffenderIdentifyingMarks> offenderIdentifyingMarks) {
-        return Optional.ofNullable(offenderIdentifyingMarks).map(
-                marks -> marks
+        return Optional.ofNullable(offenderIdentifyingMarks)
+                .map(marks -> marks
                         .stream()
                         .map(mark -> IdentifyingMark.builder()
                                 .bodyPartCode(mark.getBodyPartCode())

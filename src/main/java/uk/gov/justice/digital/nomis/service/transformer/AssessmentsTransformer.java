@@ -58,14 +58,14 @@ public class AssessmentsTransformer {
     }
 
     public AssessmentType assessmentTypeOf(Assessment assessment) {
-        return Optional.ofNullable(assessment).map(
-                a -> AssessmentType.builder()
+        return Optional.ofNullable(assessment)
+                .map(a -> AssessmentType.builder()
                         .assessmentClass(a.getAssessmentClass())
                         .assessmentCode(a.getAssessmentCode())
                         .assessmentId(a.getAssessmentId())
                         .cellSharingAlertFlag(typesTransformer.ynToBoolean(a.getCellSharingAlertFlag()))
                         .determineSupLevelFlag(typesTransformer.ynToBoolean(a.getDetermineSupLevelFlag()))
-                        .build()
-        ).orElse(null);
+                        .build())
+                .orElse(null);
     }
 }

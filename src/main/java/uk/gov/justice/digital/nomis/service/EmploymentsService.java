@@ -26,12 +26,11 @@ public class EmploymentsService {
     public Optional<List<Employment>> employmentsForOffenderId(Long offenderId) {
 
         return Optional.ofNullable(offenderRepository.findOne(offenderId))
-                .map(offender ->
-                        offender.getOffenderBookings().stream()
-                                .flatMap(offenderBooking -> offenderBooking.getOffenderEmployments().stream())
-                                .map(employmentsTransformer::employmentOf)
-                                .sorted(byEmploymentSequence())
-                                .collect(Collectors.toList()));
+                .map(offender -> offender.getOffenderBookings().stream()
+                        .flatMap(offenderBooking -> offenderBooking.getOffenderEmployments().stream())
+                        .map(employmentsTransformer::employmentOf)
+                        .sorted(byEmploymentSequence())
+                        .collect(Collectors.toList()));
     }
 
     private Comparator<Employment> byEmploymentSequence() {

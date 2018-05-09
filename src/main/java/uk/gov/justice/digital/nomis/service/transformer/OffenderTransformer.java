@@ -29,37 +29,41 @@ public class OffenderTransformer {
     }
 
     public List<OffenderAlias> aliasesOf(List<Offender> offenderList) {
-        return Optional.ofNullable(offenderList).map(offenders -> offenders
-                .stream()
-                .map(offender -> OffenderAlias.builder()
-                        .offenderId(offender.getOffenderId())
-                        .firstName(offender.getFirstName())
-                        .middleNames(combinedMiddlenamesOf(offender))
-                        .surname(offender.getLastName())
-                        .dateOfBirth(offender.getBirthDate().toLocalDateTime().toLocalDate())
-                        .identifiers(identifiersOf(offender.getOffenderIdentifiers()))
-                        .nomsId(offender.getOffenderIdDisplay())
-                        .sexCode(offender.getSexCode())
-                        .raceCode(offender.getRaceCode())
-                        .build())
-                .collect(Collectors.toList())).orElse(Collections.emptyList());
+        return Optional.ofNullable(offenderList)
+                .map(offenders -> offenders
+                        .stream()
+                        .map(offender -> OffenderAlias.builder()
+                                .offenderId(offender.getOffenderId())
+                                .firstName(offender.getFirstName())
+                                .middleNames(combinedMiddlenamesOf(offender))
+                                .surname(offender.getLastName())
+                                .dateOfBirth(offender.getBirthDate().toLocalDateTime().toLocalDate())
+                                .identifiers(identifiersOf(offender.getOffenderIdentifiers()))
+                                .nomsId(offender.getOffenderIdDisplay())
+                                .sexCode(offender.getSexCode())
+                                .raceCode(offender.getRaceCode())
+                                .build())
+                        .collect(Collectors.toList()))
+                .orElse(Collections.emptyList());
     }
 
     public List<Identifier> identifiersOf(List<OffenderIdentifier> offenderIdentifiers) {
-        return Optional.ofNullable(offenderIdentifiers).map(
-                identifiers -> identifiers.stream().sorted(Comparator.comparing(OffenderIdentifier::getOffenderIdSeq).reversed()).map(identifier ->
-                        Identifier.builder()
+        return Optional.ofNullable(offenderIdentifiers)
+                .map(identifiers -> identifiers.stream()
+                        .sorted(Comparator.comparing(OffenderIdentifier::getOffenderIdSeq).reversed())
+                        .map(identifier -> Identifier.builder()
                                 .identifier(identifier.getIdentifier())
                                 .identifierType(identifier.getIdentifierType())
                                 .sequenceNumber(identifier.getOffenderIdSeq())
                                 .createdDateTime(Optional.ofNullable(identifier.getCreateDatetime()).map(Timestamp::toLocalDateTime).orElse(null))
                                 .build())
-                        .collect(Collectors.toList())
-        ).orElse(Collections.emptyList());
+                        .collect(Collectors.toList()))
+                .orElse(Collections.emptyList());
     }
 
     public List<Booking> bookingsOf(List<OffenderBooking> offenderBookings) {
-        return offenderBookings.stream().map(this::bookingOf)
+        return offenderBookings.stream()
+                .map(this::bookingOf)
                 .sorted(byBookingSequence())
                 .collect(Collectors.toList());
     }
@@ -84,7 +88,8 @@ public class OffenderTransformer {
     }
 
     public String combinedMiddlenamesOf(Offender offender) {
-        return middleNamesOf(offender.getMiddleName(), offender.getMiddleName2()).stream().collect(Collectors.joining(" "));
+        return middleNamesOf(offender.getMiddleName(), offender.getMiddleName2()).stream()
+                .collect(Collectors.joining(" "));
     }
 
     public List<String> middleNamesOf(String secondName, String thirdName) {

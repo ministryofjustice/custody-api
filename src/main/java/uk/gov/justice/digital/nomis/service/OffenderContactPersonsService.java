@@ -26,12 +26,11 @@ public class OffenderContactPersonsService {
     public Optional<List<OffenderContactPerson>> contactPersonsForOffender(Long offenderId) {
 
         return Optional.ofNullable(offenderRepository.findOne(offenderId))
-                .map(offender ->
-                        offender.getOffenderBookings()
-                                .stream()
-                                .flatMap(offenderBooking -> offenderBooking.getOffenderContactPersons().stream())
-                                .map(offenderContactPersonsTransformer::offenderContactPersonOf)
-                                .collect(Collectors.toList()));
+                .map(offender -> offender.getOffenderBookings()
+                        .stream()
+                        .flatMap(offenderBooking -> offenderBooking.getOffenderContactPersons().stream())
+                        .map(offenderContactPersonsTransformer::offenderContactPersonOf)
+                        .collect(Collectors.toList()));
 
     }
 }

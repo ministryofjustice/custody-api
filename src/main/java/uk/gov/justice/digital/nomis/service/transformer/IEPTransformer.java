@@ -18,19 +18,20 @@ public class IEPTransformer {
     }
 
     public OffenderIepLevel offenderIepLevelOf(uk.gov.justice.digital.nomis.jpa.entity.OffenderIepLevel offenderIepLevel) {
-        return Optional.ofNullable(offenderIepLevel).map(
-                iep -> OffenderIepLevel.builder()
+        return Optional.ofNullable(offenderIepLevel)
+                .map(iep -> OffenderIepLevel.builder()
                         .bookingId(iep.getOffenderBookId())
                         .comments(iep.getCommentText())
                         .iepDateTime(typesTransformer.localDateTimeOf(iep.getIepDate(), iep.getIepTime()))
                         .iepLevel(iepLevelOf(iep.getIepLevelThing()))
                         .iepLevelSeq(iep.getIepLevelSeq())
-                        .build()).orElse(null);
+                        .build())
+                .orElse(null);
     }
 
     private IepLevel iepLevelOf(uk.gov.justice.digital.nomis.jpa.entity.IepLevel iep) {
-        return Optional.ofNullable(iep).map(
-                iepLevel -> IepLevel.builder()
+        return Optional.ofNullable(iep)
+                .map(iepLevel -> IepLevel.builder()
                         .active(typesTransformer.ynToBoolean(iep.getActiveFlag()))
                         .agyLocId(iep.getAgyLocId())
                         .convictedSpendLimit(iep.getConvictedSpendLimit())

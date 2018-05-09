@@ -23,8 +23,8 @@ public class OffenderImprisonStatusTransformer {
     }
 
     public List<OffenderImprisonmentStatus> offenderImprisonStatusesOf(List<uk.gov.justice.digital.nomis.jpa.entity.OffenderImprisonStatus> offenderImprisonStatuses) {
-        return Optional.ofNullable(offenderImprisonStatuses).map(
-                oises -> oises
+        return Optional.ofNullable(offenderImprisonStatuses)
+                .map(oises -> oises
                         .stream()
                         .filter(ois -> !"N".equalsIgnoreCase(ois.getLatestStatus()))
                         .map(this::offenderImprisonStatusOf)

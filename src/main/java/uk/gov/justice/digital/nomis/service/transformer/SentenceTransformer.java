@@ -17,7 +17,9 @@ public class SentenceTransformer {
     }
 
     public Sentence sentenceOf(OffenderSentence offenderSentence) {
+
         OffenderBooking offenderBooking = offenderSentence.getOffenderBooking();
+
         return Sentence.builder()
                 .bookingId(offenderBooking.getOffenderBookId())
                 .offenderId(offenderBooking.getOffenderId())
