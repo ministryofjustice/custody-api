@@ -34,7 +34,9 @@ spring:
           classpath:some_employments.sql,
           classpath:some_court_events.sql,
           classpath:some_court_event_charges.sql,
-          classpath:some_offender_sentence_charges.sql'
+          classpath:some_offender_sentence_charges.sql,
+          classpath:some_offender_rehab_decisions.sql,
+          classpath:some_offender_rehab_providers.sql'
 
   jpa:
     hibernate:
