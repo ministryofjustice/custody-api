@@ -30,12 +30,12 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 @RestController
 @Api( description = "Offender Assessment resources", tags = "Offender Assessments")
-public class OffenderAssessmentsController {
+public class AssessmentsController {
 
     private final OffenderAssessmentService offenderAssessmentService;
 
     @Autowired
-    public OffenderAssessmentsController(OffenderAssessmentService offenderAssessmentService) {
+    public AssessmentsController(OffenderAssessmentService offenderAssessmentService) {
         this.offenderAssessmentService = offenderAssessmentService;
     }
 

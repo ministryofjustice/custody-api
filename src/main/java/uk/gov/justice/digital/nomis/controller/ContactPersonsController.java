@@ -19,12 +19,12 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 @RestController
 @Api(description = "Offender Contact Person resources", tags = "Offender Contact Persons")
-public class OffenderContactPersonsController {
+public class ContactPersonsController {
 
     private final OffenderContactPersonsService offenderContactPersonsService;
 
     @Autowired
-    public OffenderContactPersonsController(OffenderContactPersonsService offenderContactPersonsService) {
+    public ContactPersonsController(OffenderContactPersonsService offenderContactPersonsService) {
         this.offenderContactPersonsService = offenderContactPersonsService;
     }
 

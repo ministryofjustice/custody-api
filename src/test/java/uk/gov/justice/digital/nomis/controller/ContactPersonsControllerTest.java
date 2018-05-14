@@ -14,16 +14,15 @@ import org.springframework.boot.context.embedded.LocalServerPort;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import uk.gov.justice.digital.nomis.api.HealthProblem;
+import uk.gov.justice.digital.nomis.api.OffenderContactPerson;
 
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.greaterThan;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @RunWith(SpringJUnit4ClassRunner.class)
 @ActiveProfiles("dev")
-public class OffenderReleaseDetailsControllerTest {
+public class ContactPersonsControllerTest {
 
     @LocalServerPort
     int port;
@@ -44,45 +43,25 @@ public class OffenderReleaseDetailsControllerTest {
     }
 
     @Test
-    public void canGetAllReleaseDetails() {
-        given()
+    public void canGetOffenderContactPersons() {
+        OffenderContactPerson[] contactPeople = given()
                 .when()
                 .auth().oauth2(validOauthToken)
-                .get("/releaseDetails")
-                .then()
-                .statusCode(200)
-                .body("page.totalElements", greaterThan(0));
-    }
-
-    @Test
-    public void canGetOffenderReleaseDetails() {
-        HealthProblem[] healthProblems = given()
-                .when()
-                .auth().oauth2(validOauthToken)
-                .get("/offenders/offenderId/-1001/releaseDetails")
+                .get("/offenders/offenderId/-1001/contactPersons")
                 .then()
                 .statusCode(200)
                 .extract()
                 .body()
-                .as(HealthProblem[].class);
+                .as(OffenderContactPerson[].class);
 
-        assertThat(healthProblems.length).isGreaterThan(0);
+        assertThat(contactPeople.length).isGreaterThan(0);
     }
 
     @Test
-    public void releaseDetailsAreAuthorized() {
+    public void offenderIEPsAreAuthorized() {
         given()
                 .when()
-                .get("/releaseDetails")
-                .then()
-                .statusCode(401);
-    }
-
-    @Test
-    public void offenderReleaseDetails() {
-        given()
-                .when()
-                .get("/offenders/offenderId/-1001/releaseDetails")
+                .get("/offenders/offenderId/-1001/contactPersons")
                 .then()
                 .statusCode(401);
     }

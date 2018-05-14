@@ -23,7 +23,7 @@ import static org.hamcrest.Matchers.greaterThan;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @RunWith(SpringJUnit4ClassRunner.class)
 @ActiveProfiles("dev")
-public class OffenderSentenceCalculationsControllerTest {
+public class ReleaseDetailsControllerTest {
 
     @LocalServerPort
     int port;
@@ -44,22 +44,22 @@ public class OffenderSentenceCalculationsControllerTest {
     }
 
     @Test
-    public void canGetAllSentenceCalculations() {
+    public void canGetAllReleaseDetails() {
         given()
                 .when()
                 .auth().oauth2(validOauthToken)
-                .get("/sentenceCalculations")
+                .get("/releaseDetails")
                 .then()
                 .statusCode(200)
                 .body("page.totalElements", greaterThan(0));
     }
 
     @Test
-    public void canGetOffenderSentenceCalculations() {
+    public void canGetOffenderReleaseDetails() {
         HealthProblem[] healthProblems = given()
                 .when()
                 .auth().oauth2(validOauthToken)
-                .get("/offenders/offenderId/-1001/sentenceCalculations")
+                .get("/offenders/offenderId/-1001/releaseDetails")
                 .then()
                 .statusCode(200)
                 .extract()
@@ -70,19 +70,19 @@ public class OffenderSentenceCalculationsControllerTest {
     }
 
     @Test
-    public void sentenceCalculationsAreAuthorized() {
+    public void releaseDetailsAreAuthorized() {
         given()
                 .when()
-                .get("/sentenceCalculations")
+                .get("/releaseDetails")
                 .then()
                 .statusCode(401);
     }
 
     @Test
-    public void offenderSentenceCalculationsAreAuthorized() {
+    public void offenderReleaseDetails() {
         given()
                 .when()
-                .get("/offenders/offenderId/-1001/sentenceCalculations")
+                .get("/offenders/offenderId/-1001/releaseDetails")
                 .then()
                 .statusCode(401);
     }
