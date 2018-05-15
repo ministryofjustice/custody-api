@@ -4,21 +4,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.justice.digital.nomis.api.OffenderContactPerson;
 import uk.gov.justice.digital.nomis.jpa.repository.OffenderRepository;
-import uk.gov.justice.digital.nomis.service.transformer.OffenderContactPersonsTransformer;
+import uk.gov.justice.digital.nomis.service.transformer.ContactPersonsTransformer;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-public class OffenderContactPersonsService {
+public class ContactPersonsService {
 
-    private final OffenderContactPersonsTransformer offenderContactPersonsTransformer;
+    private final ContactPersonsTransformer contactPersonsTransformer;
     private final OffenderRepository offenderRepository;
 
     @Autowired
-    public OffenderContactPersonsService(OffenderContactPersonsTransformer offenderContactPersonsTransformer, OffenderRepository offenderRepository) {
-        this.offenderContactPersonsTransformer = offenderContactPersonsTransformer;
+    public ContactPersonsService(ContactPersonsTransformer contactPersonsTransformer, OffenderRepository offenderRepository) {
+        this.contactPersonsTransformer = contactPersonsTransformer;
         this.offenderRepository = offenderRepository;
     }
 
@@ -29,7 +29,7 @@ public class OffenderContactPersonsService {
                 .map(offender -> offender.getOffenderBookings()
                         .stream()
                         .flatMap(offenderBooking -> offenderBooking.getOffenderContactPersons().stream())
-                        .map(offenderContactPersonsTransformer::offenderContactPersonOf)
+                        .map(contactPersonsTransformer::offenderContactPersonOf)
                         .collect(Collectors.toList()));
 
     }

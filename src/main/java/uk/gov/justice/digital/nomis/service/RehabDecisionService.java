@@ -15,7 +15,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-public class OffenderRehabService {
+public class RehabDecisionService {
 
     private final RehabDecisionTransformer rehabDecisionTransformer;
     private final OffenderRepository offenderRepository;
@@ -32,7 +32,7 @@ public class OffenderRehabService {
                     .reversed();
 
     @Autowired
-    public OffenderRehabService(RehabDecisionTransformer rehabDecisionTransformer, OffenderRepository offenderRepository, OffenderRehabProviderRepository offenderRehabProviderRepository) {
+    public RehabDecisionService(RehabDecisionTransformer rehabDecisionTransformer, OffenderRepository offenderRepository, OffenderRehabProviderRepository offenderRehabProviderRepository) {
         this.rehabDecisionTransformer = rehabDecisionTransformer;
         this.offenderRepository = offenderRepository;
         this.offenderRehabProviderRepository = offenderRehabProviderRepository;

@@ -23,7 +23,7 @@ import static org.hamcrest.Matchers.greaterThan;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @RunWith(SpringJUnit4ClassRunner.class)
 @ActiveProfiles("dev")
-public class OffenderAssessmentsControllerTest {
+public class AssessmentsControllerTest {
 
     @LocalServerPort
     int port;

@@ -20,8 +20,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-import uk.gov.justice.digital.nomis.api.ReleaseDetails;
-import uk.gov.justice.digital.nomis.service.OffenderReleaseDetailsService;
+import uk.gov.justice.digital.nomis.api.OffenderAssessment;
+import uk.gov.justice.digital.nomis.service.AssessmentService;
 
 import java.util.List;
 import java.util.Optional;
@@ -29,42 +29,42 @@ import java.util.Optional;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 @RestController
-@Api( description = "Release Detail resources", tags = "Offender Release details")
-public class OffenderReleaseDetailsController {
+@Api( description = "Offender Assessment resources", tags = "Offender Assessments")
+public class AssessmentsController {
 
-    private final OffenderReleaseDetailsService releaseDetailsService;
+    private final AssessmentService assessmentService;
 
     @Autowired
-    public OffenderReleaseDetailsController(OffenderReleaseDetailsService releaseDetailsService) {
-        this.releaseDetailsService = releaseDetailsService;
+    public AssessmentsController(AssessmentService assessmentService) {
+        this.assessmentService = assessmentService;
     }
 
-    @RequestMapping(path = "/releaseDetails", method = RequestMethod.GET)
+    @RequestMapping(path = "/assessments", method = RequestMethod.GET)
     @ResponseBody
     @ApiImplicitParams({
             @ApiImplicitParam(name = "page", dataType = "int", paramType = "query",
                     value = "Results page you want to retrieve (0..N)"),
             @ApiImplicitParam(name = "size", dataType = "int", paramType = "query",
                     value = "Number of records per page.")})
-    public PagedResources<Resource<ReleaseDetails>> getReleaseDetails(
-            final @ApiParam Pageable pageable,
-            final PagedResourcesAssembler<ReleaseDetails> assembler) {
+    public PagedResources<Resource<OffenderAssessment>> getAssessments(final @ApiParam Pageable pageable,
+                                                                       final PagedResourcesAssembler<OffenderAssessment> assembler) {
 
-        Page<ReleaseDetails> releaseDetails = releaseDetailsService.getReleaseDetails(pageable);
-        return assembler.toResource(releaseDetails);
+        Page<OffenderAssessment> addresses = assessmentService.getAssessments(pageable);
+        return assembler.toResource(addresses);
     }
 
-    @RequestMapping(path = "/offenders/offenderId/{offenderId}/releaseDetails", method = RequestMethod.GET)
+    @RequestMapping(path = "/offenders/offenderId/{offenderId}/assessments", method = RequestMethod.GET)
     @ApiResponses({
-            @ApiResponse(code = 404, message = "Offender or booking not found"),
+            @ApiResponse(code = 404, message = "Offender or bookingId not found"),
             @ApiResponse(code = 200, message = "OK")})
-    public ResponseEntity<List<ReleaseDetails>> getOffenderReleaseDetails(@PathVariable("offenderId") Long offenderId,
-                                                                          @RequestParam("bookingId") Optional<Long> maybeBookingId) {
+    public ResponseEntity<List<OffenderAssessment>> getOffenderAssessments(@PathVariable("offenderId") Long offenderId,
+                                                                           @RequestParam("bookingId") Optional<Long> maybeBookingId) {
 
         return maybeBookingId
-                .map(bookingId -> releaseDetailsService.releaseDetailsForOffenderIdAndBookingId(offenderId, bookingId))
-                .orElse(releaseDetailsService.releaseDetailsForOffenderId(offenderId))
-                .map(releaseDetails -> new ResponseEntity<>(releaseDetails, HttpStatus.OK))
+                .map(bookingId -> assessmentService.assessmentsForOffenderIdAndBookingId(offenderId, bookingId))
+                .orElse(assessmentService.getOffenderAssessments(offenderId))
+                .map(assessments -> new ResponseEntity<>(assessments, HttpStatus.OK))
                 .orElse(new ResponseEntity<>(NOT_FOUND));
+
     }
 }

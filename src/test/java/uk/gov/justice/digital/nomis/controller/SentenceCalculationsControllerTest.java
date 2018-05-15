@@ -14,15 +14,16 @@ import org.springframework.boot.context.embedded.LocalServerPort;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import uk.gov.justice.digital.nomis.api.OffenderContactPerson;
+import uk.gov.justice.digital.nomis.api.HealthProblem;
 
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.greaterThan;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @RunWith(SpringJUnit4ClassRunner.class)
 @ActiveProfiles("dev")
-public class OffenderContactPersonsControllerTest {
+public class SentenceCalculationsControllerTest {
 
     @LocalServerPort
     int port;
@@ -43,25 +44,45 @@ public class OffenderContactPersonsControllerTest {
     }
 
     @Test
-    public void canGetOffenderContactPersons() {
-        OffenderContactPerson[] contactPeople = given()
+    public void canGetAllSentenceCalculations() {
+        given()
                 .when()
                 .auth().oauth2(validOauthToken)
-                .get("/offenders/offenderId/-1001/contactPersons")
+                .get("/sentenceCalculations")
+                .then()
+                .statusCode(200)
+                .body("page.totalElements", greaterThan(0));
+    }
+
+    @Test
+    public void canGetOffenderSentenceCalculations() {
+        HealthProblem[] healthProblems = given()
+                .when()
+                .auth().oauth2(validOauthToken)
+                .get("/offenders/offenderId/-1001/sentenceCalculations")
                 .then()
                 .statusCode(200)
                 .extract()
                 .body()
-                .as(OffenderContactPerson[].class);
+                .as(HealthProblem[].class);
 
-        assertThat(contactPeople.length).isGreaterThan(0);
+        assertThat(healthProblems.length).isGreaterThan(0);
     }
 
     @Test
-    public void offenderIEPsAreAuthorized() {
+    public void sentenceCalculationsAreAuthorized() {
         given()
                 .when()
-                .get("/offenders/offenderId/-1001/contactPersons")
+                .get("/sentenceCalculations")
+                .then()
+                .statusCode(401);
+    }
+
+    @Test
+    public void offenderSentenceCalculationsAreAuthorized() {
+        given()
+                .when()
+                .get("/offenders/offenderId/-1001/sentenceCalculations")
                 .then()
                 .statusCode(401);
     }

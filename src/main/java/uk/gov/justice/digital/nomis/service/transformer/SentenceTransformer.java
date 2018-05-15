@@ -55,7 +55,7 @@ public class SentenceTransformer {
                 .sentenceCategory(offenderSentence.getSentenceCategory())
                 .sentenceCalcType(offenderSentence.getSentenceCalcType())
                 .sentenceLevel(offenderSentence.getSentenceLevel())
-                .sentenceStatus(offenderSentence.getSentenceStatus())
+                .isActive(typesTransformer.isActiveOf(offenderSentence.getSentenceStatus()))
                 .sentenceText(offenderSentence.getSentenceText())
                 .sled2CalcDate(typesTransformer.localDateOf(offenderSentence.getSled2Calc()))
                 .startDate(typesTransformer.localDateOf(offenderSentence.getStartDate()))

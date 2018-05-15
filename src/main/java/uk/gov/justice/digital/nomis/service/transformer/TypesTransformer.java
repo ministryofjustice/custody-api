@@ -12,15 +12,21 @@ import java.util.Optional;
 public class TypesTransformer {
 
     public LocalDate localDateOf(Timestamp timestamp) {
-        return Optional.ofNullable(timestamp).map(t -> t.toLocalDateTime().toLocalDate()).orElse(null);
+        return Optional.ofNullable(timestamp)
+                .map(t -> t.toLocalDateTime().toLocalDate())
+                .orElse(null);
     }
 
     public LocalDate localDateOf(Date date) {
-        return Optional.ofNullable(date).map(d -> d.toLocalDate()).orElse(null);
+        return Optional.ofNullable(date)
+                .map(d -> d.toLocalDate())
+                .orElse(null);
     }
 
     public LocalDateTime localDateTimeOf(Timestamp timestamp) {
-        return Optional.ofNullable(timestamp).map(Timestamp::toLocalDateTime).orElse(null);
+        return Optional.ofNullable(timestamp)
+                .map(Timestamp::toLocalDateTime)
+                .orElse(null);
     }
 
     public LocalDateTime localDateTimeOf(Timestamp date, Timestamp time) {
@@ -34,6 +40,14 @@ public class TypesTransformer {
     }
 
     public Boolean ynToBoolean(String yn) {
-        return Optional.ofNullable(yn).map("Y"::equalsIgnoreCase).orElse(null);
+        return Optional.ofNullable(yn)
+                .map("Y"::equalsIgnoreCase)
+                .orElse(false);
+    }
+
+    public Boolean isActiveOf(String active) {
+        return Optional.ofNullable(active)
+                .map("A"::equalsIgnoreCase)
+                .orElse(false);
     }
 }

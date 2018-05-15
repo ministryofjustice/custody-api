@@ -3,6 +3,7 @@ package uk.gov.justice.digital.nomis.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.justice.digital.nomis.api.DiaryDetail;
+import uk.gov.justice.digital.nomis.jpa.entity.CourtEvent;
 import uk.gov.justice.digital.nomis.jpa.entity.Offender;
 import uk.gov.justice.digital.nomis.jpa.entity.OffenderBooking;
 import uk.gov.justice.digital.nomis.jpa.entity.ReferenceCodePK;
@@ -10,6 +11,7 @@ import uk.gov.justice.digital.nomis.jpa.repository.OffenderRepository;
 import uk.gov.justice.digital.nomis.jpa.repository.ReferenceCodesRepository;
 import uk.gov.justice.digital.nomis.service.transformer.DiaryDetailTransformer;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -69,8 +71,13 @@ public class DiaryDetailService {
                                                 .domain(ESCORT)
                                                 .build()) : null));
 
-        return Stream.concat(Stream.concat(courtEventDiaryDetailStream, offenderReleaseDetailsDiaryDetailStream), offenderIndSchedulesDiaryDetailStream);
+        return Stream.concat(Stream.concat(courtEventDiaryDetailStream, offenderReleaseDetailsDiaryDetailStream), offenderIndSchedulesDiaryDetailStream)
+                .sorted(byCourtEventDate());
 
+    }
+
+    private Comparator<DiaryDetail> byCourtEventDate() {
+        return Comparator.comparing(DiaryDetail::getMovementDateTime).reversed();
     }
 
 }

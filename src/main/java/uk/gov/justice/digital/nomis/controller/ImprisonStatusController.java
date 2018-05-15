@@ -20,8 +20,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-import uk.gov.justice.digital.nomis.api.OffenderAssessment;
-import uk.gov.justice.digital.nomis.service.OffenderAssessmentService;
+import uk.gov.justice.digital.nomis.api.OffenderImprisonmentStatus;
+import uk.gov.justice.digital.nomis.service.ImprisonStatusService;
 
 import java.util.List;
 import java.util.Optional;
@@ -29,42 +29,42 @@ import java.util.Optional;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 @RestController
-@Api( description = "Offender Assessment resources", tags = "Offender Assessments")
-public class OffenderAssessmentsController {
+@Api( description = "Imprisonment Status resources", tags = "Offender Imprisonment statuses")
+public class ImprisonStatusController {
 
-    private final OffenderAssessmentService offenderAssessmentService;
+    private final ImprisonStatusService imprisonStatusService;
 
     @Autowired
-    public OffenderAssessmentsController(OffenderAssessmentService offenderAssessmentService) {
-        this.offenderAssessmentService = offenderAssessmentService;
+    public ImprisonStatusController(ImprisonStatusService imprisonStatusService) {
+        this.imprisonStatusService = imprisonStatusService;
     }
 
-    @RequestMapping(path = "/assessments", method = RequestMethod.GET)
+    @RequestMapping(path = "/imprisonmentStatuses", method = RequestMethod.GET)
     @ResponseBody
     @ApiImplicitParams({
             @ApiImplicitParam(name = "page", dataType = "int", paramType = "query",
                     value = "Results page you want to retrieve (0..N)"),
             @ApiImplicitParam(name = "size", dataType = "int", paramType = "query",
                     value = "Number of records per page.")})
-    public PagedResources<Resource<OffenderAssessment>> getAssessments(final @ApiParam Pageable pageable,
-                                                                       final PagedResourcesAssembler<OffenderAssessment> assembler) {
+    public PagedResources<Resource<OffenderImprisonmentStatus>> getImprisonmentStatuses(
+            final @ApiParam Pageable pageable,
+            final PagedResourcesAssembler<OffenderImprisonmentStatus> assembler) {
 
-        Page<OffenderAssessment> addresses = offenderAssessmentService.getAssessments(pageable);
-        return assembler.toResource(addresses);
+        Page<OffenderImprisonmentStatus> imprisonStatuses = imprisonStatusService.getOffenderImprisonStatuses(pageable);
+        return assembler.toResource(imprisonStatuses);
     }
 
-    @RequestMapping(path = "/offenders/offenderId/{offenderId}/assessments", method = RequestMethod.GET)
+    @RequestMapping(path = "/offenders/offenderId/{offenderId}/imprisonmentStatuses", method = RequestMethod.GET)
     @ApiResponses({
-            @ApiResponse(code = 404, message = "Offender or bookingId not found"),
+            @ApiResponse(code = 404, message = "Offender or booking not found"),
             @ApiResponse(code = 200, message = "OK")})
-    public ResponseEntity<List<OffenderAssessment>> getOffenderAssessments(@PathVariable("offenderId") Long offenderId,
-                                                                           @RequestParam("bookingId") Optional<Long> maybeBookingId) {
+    public ResponseEntity<List<OffenderImprisonmentStatus>> getOffenderImprisonmentStatuses(@PathVariable("offenderId") Long offenderId,
+                                                                                            @RequestParam("bookingId") Optional<Long> maybeBookingId) {
 
         return maybeBookingId
-                .map(bookingId -> offenderAssessmentService.assessmentsForOffenderIdAndBookingId(offenderId, bookingId))
-                .orElse(offenderAssessmentService.getOffenderAssessments(offenderId))
-                .map(assessments -> new ResponseEntity<>(assessments, HttpStatus.OK))
+                .map(bookingId -> imprisonStatusService.offenderImprisonStatusForOffenderIdAndBookingId(offenderId, bookingId))
+                .orElse(imprisonStatusService.offenderImprisonStatusForOffenderId(offenderId))
+                .map(imprisonStatuses -> new ResponseEntity<>(imprisonStatuses, HttpStatus.OK))
                 .orElse(new ResponseEntity<>(NOT_FOUND));
-
     }
 }
