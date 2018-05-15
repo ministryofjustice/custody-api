@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.justice.digital.nomis.api.SentenceCalculation;
-import uk.gov.justice.digital.nomis.service.OffenderSentenceCalculationsService;
+import uk.gov.justice.digital.nomis.service.SentenceCalculationsService;
 
 import java.util.List;
 import java.util.Optional;
@@ -32,10 +32,10 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 @Api( description = "Sentence Calculation resources", tags = "Offender Sentence calculations")
 public class SentenceCalculationsController {
 
-    private final OffenderSentenceCalculationsService sentenceCalculationsService;
+    private final SentenceCalculationsService sentenceCalculationsService;
 
     @Autowired
-    public SentenceCalculationsController(OffenderSentenceCalculationsService sentenceCalculationsService) {
+    public SentenceCalculationsController(SentenceCalculationsService sentenceCalculationsService) {
         this.sentenceCalculationsService = sentenceCalculationsService;
     }
 

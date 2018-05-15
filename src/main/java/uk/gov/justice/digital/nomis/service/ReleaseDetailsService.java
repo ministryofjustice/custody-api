@@ -19,14 +19,14 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-public class OffenderReleaseDetailsService {
+public class ReleaseDetailsService {
 
     private final ReleaseDetailsTransformer releaseDetailsTransformer;
     private final OffenderReleaseDetailsRepository releaseDetailsRepository;
     private final OffenderRepository offenderRepository;
 
     @Autowired
-    public OffenderReleaseDetailsService(ReleaseDetailsTransformer releaseDetailsTransformer, OffenderReleaseDetailsRepository releaseDetailsRepository, OffenderRepository offenderRepository) {
+    public ReleaseDetailsService(ReleaseDetailsTransformer releaseDetailsTransformer, OffenderReleaseDetailsRepository releaseDetailsRepository, OffenderRepository offenderRepository) {
         this.releaseDetailsTransformer = releaseDetailsTransformer;
         this.releaseDetailsRepository = releaseDetailsRepository;
         this.offenderRepository = offenderRepository;

@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.justice.digital.nomis.api.RehabDecision;
-import uk.gov.justice.digital.nomis.service.OffenderRehabService;
+import uk.gov.justice.digital.nomis.service.RehabDecisionService;
 
 import java.util.List;
 
@@ -21,11 +21,11 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 @Api(description = "Offender Rehab Decisions and associated resources", tags = "Offender IEPs")
 public class RehabDecisionsController {
 
-    private final OffenderRehabService offenderRehabService;
+    private final RehabDecisionService rehabDecisionService;
 
     @Autowired
-    public RehabDecisionsController(OffenderRehabService offenderRehabService) {
-        this.offenderRehabService = offenderRehabService;
+    public RehabDecisionsController(RehabDecisionService rehabDecisionService) {
+        this.rehabDecisionService = rehabDecisionService;
     }
 
     @RequestMapping(path = "/offenders/offenderId/{offenderId}/rehabDecisions", method = RequestMethod.GET)
@@ -34,7 +34,7 @@ public class RehabDecisionsController {
             @ApiResponse(code = 200, message = "OK")})
     public ResponseEntity<List<RehabDecision>> getOffenderRehabDecisions(@PathVariable("offenderId") Long offenderId) {
 
-        return offenderRehabService.rehabDecisionsForOffenderId(offenderId)
+        return rehabDecisionService.rehabDecisionsForOffenderId(offenderId)
                 .map(events -> new ResponseEntity<>(events, HttpStatus.OK))
                 .orElse(new ResponseEntity<>(NOT_FOUND));
     }

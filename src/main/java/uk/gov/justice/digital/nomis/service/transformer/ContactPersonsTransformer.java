@@ -8,7 +8,7 @@ import uk.gov.justice.digital.nomis.jpa.entity.OffenderContactPerson;
 import java.util.Optional;
 
 @Component
-public class OffenderContactPersonsTransformer {
+public class ContactPersonsTransformer {
 
     private final AddressesTransformer addressesTransformer;
     private final TypesTransformer typesTransformer;
@@ -16,7 +16,7 @@ public class OffenderContactPersonsTransformer {
 
 
     @Autowired
-    public OffenderContactPersonsTransformer(AddressesTransformer addressesTransformer, TypesTransformer typesTransformer, PersonTransformer personTransformer) {
+    public ContactPersonsTransformer(AddressesTransformer addressesTransformer, TypesTransformer typesTransformer, PersonTransformer personTransformer) {
         this.addressesTransformer = addressesTransformer;
         this.typesTransformer = typesTransformer;
         this.personTransformer = personTransformer;

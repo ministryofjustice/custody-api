@@ -21,15 +21,15 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-public class OffenderChargesService {
+public class ChargesService {
 
     private final OffenderChargesRepository offenderChargesRepository;
     private final OffenderRepository offenderRepository;
     private final ChargesTransformer chargesTransformer;
 
     @Autowired
-    public OffenderChargesService(final OffenderChargesRepository offenderChargesRepository,
-                                  final OffenderRepository offenderRepository, ChargesTransformer chargesTransformer) {
+    public ChargesService(final OffenderChargesRepository offenderChargesRepository,
+                          final OffenderRepository offenderRepository, ChargesTransformer chargesTransformer) {
         this.offenderChargesRepository = offenderChargesRepository;
         this.offenderRepository = offenderRepository;
         this.chargesTransformer = chargesTransformer;

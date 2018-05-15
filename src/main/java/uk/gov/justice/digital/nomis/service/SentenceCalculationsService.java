@@ -20,14 +20,14 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-public class OffenderSentenceCalculationsService {
+public class SentenceCalculationsService {
 
     private final SentenceCalculationsTransformer sentenceCalculationsTransformer;
     private final OffenderSentenceCalculationsRepository sentenceCalculationsRepository;
     private final OffenderRepository offenderRepository;
 
     @Autowired
-    public OffenderSentenceCalculationsService(SentenceCalculationsTransformer sentenceCalculationsTransformer, OffenderSentenceCalculationsRepository sentenceCalculationsRepository, OffenderRepository offenderRepository) {
+    public SentenceCalculationsService(SentenceCalculationsTransformer sentenceCalculationsTransformer, OffenderSentenceCalculationsRepository sentenceCalculationsRepository, OffenderRepository offenderRepository) {
         this.sentenceCalculationsTransformer = sentenceCalculationsTransformer;
         this.sentenceCalculationsRepository = sentenceCalculationsRepository;
         this.offenderRepository = offenderRepository;

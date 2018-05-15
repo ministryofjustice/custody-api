@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.justice.digital.nomis.api.OffenderContactPerson;
-import uk.gov.justice.digital.nomis.service.OffenderContactPersonsService;
+import uk.gov.justice.digital.nomis.service.ContactPersonsService;
 
 import java.util.List;
 
@@ -21,11 +21,11 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 @Api(description = "Offender Contact Person resources", tags = "Offender Contact Persons")
 public class ContactPersonsController {
 
-    private final OffenderContactPersonsService offenderContactPersonsService;
+    private final ContactPersonsService contactPersonsService;
 
     @Autowired
-    public ContactPersonsController(OffenderContactPersonsService offenderContactPersonsService) {
-        this.offenderContactPersonsService = offenderContactPersonsService;
+    public ContactPersonsController(ContactPersonsService contactPersonsService) {
+        this.contactPersonsService = contactPersonsService;
     }
 
     @RequestMapping(path = "/offenders/offenderId/{offenderId}/contactPersons", method = RequestMethod.GET)
@@ -34,7 +34,7 @@ public class ContactPersonsController {
             @ApiResponse(code = 200, message = "OK")})
     public ResponseEntity<List<OffenderContactPerson>> getOffenderContactPersons(@PathVariable("offenderId") Long offenderId) {
 
-        return offenderContactPersonsService.contactPersonsForOffender(offenderId)
+        return contactPersonsService.contactPersonsForOffender(offenderId)
                 .map(iepList -> new ResponseEntity<>(iepList, HttpStatus.OK))
                 .orElse(new ResponseEntity<>(NOT_FOUND));
     }

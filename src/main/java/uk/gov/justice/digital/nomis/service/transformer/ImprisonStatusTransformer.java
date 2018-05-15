@@ -11,13 +11,13 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Component
-public class OffenderImprisonStatusTransformer {
+public class ImprisonStatusTransformer {
 
     private final TypesTransformer typesTransformer;
     private final ImprisonmentStatusesRepository imprisonmentStatusesRepository;
 
     @Autowired
-    public OffenderImprisonStatusTransformer(TypesTransformer typesTransformer, ImprisonmentStatusesRepository imprisonmentStatusesRepository) {
+    public ImprisonStatusTransformer(TypesTransformer typesTransformer, ImprisonmentStatusesRepository imprisonmentStatusesRepository) {
         this.typesTransformer = typesTransformer;
         this.imprisonmentStatusesRepository = imprisonmentStatusesRepository;
     }

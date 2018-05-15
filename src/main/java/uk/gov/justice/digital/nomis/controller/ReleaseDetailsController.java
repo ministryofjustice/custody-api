@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.justice.digital.nomis.api.ReleaseDetails;
-import uk.gov.justice.digital.nomis.service.OffenderReleaseDetailsService;
+import uk.gov.justice.digital.nomis.service.ReleaseDetailsService;
 
 import java.util.List;
 import java.util.Optional;
@@ -32,10 +32,10 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 @Api( description = "Release Detail resources", tags = "Offender Release details")
 public class ReleaseDetailsController {
 
-    private final OffenderReleaseDetailsService releaseDetailsService;
+    private final ReleaseDetailsService releaseDetailsService;
 
     @Autowired
-    public ReleaseDetailsController(OffenderReleaseDetailsService releaseDetailsService) {
+    public ReleaseDetailsController(ReleaseDetailsService releaseDetailsService) {
         this.releaseDetailsService = releaseDetailsService;
     }
 

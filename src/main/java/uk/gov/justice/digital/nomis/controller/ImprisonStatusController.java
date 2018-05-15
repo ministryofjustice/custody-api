@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.justice.digital.nomis.api.OffenderImprisonmentStatus;
-import uk.gov.justice.digital.nomis.service.OffenderImprisonStatusService;
+import uk.gov.justice.digital.nomis.service.ImprisonStatusService;
 
 import java.util.List;
 import java.util.Optional;
@@ -32,11 +32,11 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 @Api( description = "Imprisonment Status resources", tags = "Offender Imprisonment statuses")
 public class ImprisonStatusController {
 
-    private final OffenderImprisonStatusService offenderImprisonStatusService;
+    private final ImprisonStatusService imprisonStatusService;
 
     @Autowired
-    public ImprisonStatusController(OffenderImprisonStatusService offenderImprisonStatusService) {
-        this.offenderImprisonStatusService = offenderImprisonStatusService;
+    public ImprisonStatusController(ImprisonStatusService imprisonStatusService) {
+        this.imprisonStatusService = imprisonStatusService;
     }
 
     @RequestMapping(path = "/imprisonmentStatuses", method = RequestMethod.GET)
@@ -50,7 +50,7 @@ public class ImprisonStatusController {
             final @ApiParam Pageable pageable,
             final PagedResourcesAssembler<OffenderImprisonmentStatus> assembler) {
 
-        Page<OffenderImprisonmentStatus> imprisonStatuses = offenderImprisonStatusService.getOffenderImprisonStatuses(pageable);
+        Page<OffenderImprisonmentStatus> imprisonStatuses = imprisonStatusService.getOffenderImprisonStatuses(pageable);
         return assembler.toResource(imprisonStatuses);
     }
 
@@ -62,8 +62,8 @@ public class ImprisonStatusController {
                                                                                             @RequestParam("bookingId") Optional<Long> maybeBookingId) {
 
         return maybeBookingId
-                .map(bookingId -> offenderImprisonStatusService.offenderImprisonStatusForOffenderIdAndBookingId(offenderId, bookingId))
-                .orElse(offenderImprisonStatusService.offenderImprisonStatusForOffenderId(offenderId))
+                .map(bookingId -> imprisonStatusService.offenderImprisonStatusForOffenderIdAndBookingId(offenderId, bookingId))
+                .orElse(imprisonStatusService.offenderImprisonStatusForOffenderId(offenderId))
                 .map(imprisonStatuses -> new ResponseEntity<>(imprisonStatuses, HttpStatus.OK))
                 .orElse(new ResponseEntity<>(NOT_FOUND));
     }

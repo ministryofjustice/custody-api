@@ -6,6 +6,7 @@ import uk.gov.justice.digital.nomis.api.CourtEvent;
 import uk.gov.justice.digital.nomis.jpa.repository.OffenderRepository;
 import uk.gov.justice.digital.nomis.service.transformer.CourtEventsTransformer;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -30,8 +31,14 @@ public class CourtEventsService {
                         offender.getOffenderBookings()
                                 .stream()
                                 .flatMap(offenderBooking -> offenderBooking.getCourtEvents().stream())
+                                .sorted(byCourtEventDate())
                                 .map(courtEventsTransformer::courtEventOf)
                                 .collect(Collectors.toList()));
 
+    }
+
+    private Comparator<uk.gov.justice.digital.nomis.jpa.entity.CourtEvent> byCourtEventDate() {
+        return Comparator.comparing(uk.gov.justice.digital.nomis.jpa.entity.CourtEvent::getEventDate).reversed()
+                .thenComparing(uk.gov.justice.digital.nomis.jpa.entity.CourtEvent::getEventId).reversed();
     }
 }

@@ -13,7 +13,7 @@ public class Sentence {
     private Long offenderId;
     private Long bookingId;
     private Integer sentenceSequenceNumber;
-    private String sentenceStatus;
+    private Boolean isActive;
     private Integer consecToSentenceSeq;
     private String comments;
     private Integer numberOfUnexcusedAbsences;

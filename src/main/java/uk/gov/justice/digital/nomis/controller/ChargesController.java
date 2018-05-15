@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.justice.digital.nomis.api.Charge;
-import uk.gov.justice.digital.nomis.service.OffenderChargesService;
+import uk.gov.justice.digital.nomis.service.ChargesService;
 
 import java.util.List;
 import java.util.Optional;
@@ -32,11 +32,11 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 @Api( description = "Offender charge resources", tags = "Offender Charges")
 public class ChargesController {
 
-    private final OffenderChargesService offenderChargesService;
+    private final ChargesService chargesService;
 
     @Autowired
-    public ChargesController(OffenderChargesService offenderChargesService) {
-        this.offenderChargesService = offenderChargesService;
+    public ChargesController(ChargesService chargesService) {
+        this.chargesService = chargesService;
     }
 
     @RequestMapping(path = "/charges", method = RequestMethod.GET)
@@ -49,7 +49,7 @@ public class ChargesController {
     public PagedResources<Resource<Charge>> getCharges(final @ApiParam Pageable pageable,
                                                        final PagedResourcesAssembler<Charge> assembler) {
 
-        Page<Charge> charges = offenderChargesService.getCharges(pageable);
+        Page<Charge> charges = chargesService.getCharges(pageable);
         return assembler.toResource(charges);
     }
 
@@ -61,8 +61,8 @@ public class ChargesController {
                                                            @RequestParam("bookingId") Optional<Long> maybeBookingId) {
 
         return maybeBookingId
-                .map(bookingId -> offenderChargesService.chargesForOffenderIdAndBookingId(offenderId, bookingId))
-                .orElse(offenderChargesService.chargesForOffenderId(offenderId))
+                .map(bookingId -> chargesService.chargesForOffenderIdAndBookingId(offenderId, bookingId))
+                .orElse(chargesService.chargesForOffenderId(offenderId))
                 .map(charges -> new ResponseEntity<>(charges, HttpStatus.OK))
                 .orElse(new ResponseEntity<>(NOT_FOUND));
 

@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.justice.digital.nomis.api.OffenderAssessment;
-import uk.gov.justice.digital.nomis.service.OffenderAssessmentService;
+import uk.gov.justice.digital.nomis.service.AssessmentService;
 
 import java.util.List;
 import java.util.Optional;
@@ -32,11 +32,11 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 @Api( description = "Offender Assessment resources", tags = "Offender Assessments")
 public class AssessmentsController {
 
-    private final OffenderAssessmentService offenderAssessmentService;
+    private final AssessmentService assessmentService;
 
     @Autowired
-    public AssessmentsController(OffenderAssessmentService offenderAssessmentService) {
-        this.offenderAssessmentService = offenderAssessmentService;
+    public AssessmentsController(AssessmentService assessmentService) {
+        this.assessmentService = assessmentService;
     }
 
     @RequestMapping(path = "/assessments", method = RequestMethod.GET)
@@ -49,7 +49,7 @@ public class AssessmentsController {
     public PagedResources<Resource<OffenderAssessment>> getAssessments(final @ApiParam Pageable pageable,
                                                                        final PagedResourcesAssembler<OffenderAssessment> assembler) {
 
-        Page<OffenderAssessment> addresses = offenderAssessmentService.getAssessments(pageable);
+        Page<OffenderAssessment> addresses = assessmentService.getAssessments(pageable);
         return assembler.toResource(addresses);
     }
 
@@ -61,8 +61,8 @@ public class AssessmentsController {
                                                                            @RequestParam("bookingId") Optional<Long> maybeBookingId) {
 
         return maybeBookingId
-                .map(bookingId -> offenderAssessmentService.assessmentsForOffenderIdAndBookingId(offenderId, bookingId))
-                .orElse(offenderAssessmentService.getOffenderAssessments(offenderId))
+                .map(bookingId -> assessmentService.assessmentsForOffenderIdAndBookingId(offenderId, bookingId))
+                .orElse(assessmentService.getOffenderAssessments(offenderId))
                 .map(assessments -> new ResponseEntity<>(assessments, HttpStatus.OK))
                 .orElse(new ResponseEntity<>(NOT_FOUND));
 
