@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @Data
 @Builder
 public class OffenderAssessment {
-    private Long offenderBookingId;
+    private Long bookingId;
     private Integer assessmentSequence;
     private Long offenderId;
     private LocalDate assessmentDate;

@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 @Data
 @Builder
 public class ExternalMovement {
-    private Long offenderBookingId;
+    private Long bookingId;
     private Long offenderId;
     private Long sequenceNumber;
     private LocalDateTime movementDateTime;

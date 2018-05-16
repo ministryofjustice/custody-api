@@ -38,7 +38,7 @@ public class AssessmentsTransformer {
                 .evaluationDate(typesTransformer.localDateOf(offenderAssessment.getEvaluationDate()))
                 .evaluationResultCode(offenderAssessment.getEvaluationResultCode())
                 .nextReviewDate(typesTransformer.localDateOf(offenderAssessment.getNextReviewDate()))
-                .offenderBookingId(offenderAssessment.getId().getOffenderBooking().getOffenderBookId())
+                .bookingId(offenderAssessment.getId().getOffenderBooking().getOffenderBookId())
                 .offenderId(offenderAssessment.getId().getOffenderBooking().getOffenderId())
                 .overrideComments(offenderAssessment.getOverrideCommentText())
                 .overridedSupLevelType(offenderAssessment.getOverridedSupLevelType())

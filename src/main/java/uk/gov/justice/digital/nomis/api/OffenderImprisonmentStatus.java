@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 @Data
 @Builder
 public class OffenderImprisonmentStatus {
-    private Long offenderBookId;
+    private Long bookingId;
     private Long imprisonStatusSeq;
     private ImprisonmentStatus imprisonmentStatuses;
     private LocalDateTime effectiveDateTime;

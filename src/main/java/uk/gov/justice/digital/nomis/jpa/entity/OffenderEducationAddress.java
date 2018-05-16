@@ -24,6 +24,6 @@ public class OffenderEducationAddress extends Address {
 
     @Override
     public IdPair getRelationship() {
-        return IdPair.builder().key("offenderBookId").value(getOffenderBookId()).build();
+        return IdPair.builder().key("bookingId").value(getOffenderBookId()).build();
     }
 }

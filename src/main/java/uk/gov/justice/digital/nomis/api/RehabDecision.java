@@ -11,7 +11,7 @@ import java.util.List;
 @Builder(toBuilder = true)
 public class RehabDecision {
     private Long offenderRehabDecisionId;
-    private Long offenderBookId;
+    private Long bookingId;
     private String decisionCode;
     private LocalDate decisionDate;
     private String comments;

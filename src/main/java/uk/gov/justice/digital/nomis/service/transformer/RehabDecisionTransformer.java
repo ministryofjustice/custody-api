@@ -26,7 +26,7 @@ public class RehabDecisionTransformer {
                         .comments(ord.getCommentText())
                         .decisionCode(ord.getDecisionCode())
                         .decisionDate(typesTransformer.localDateOf(ord.getDecisionDate()))
-                        .offenderBookId(ord.getOffenderBookId())
+                        .bookingId(ord.getOffenderBookId())
                         .offenderRehabDecisionId(ord.getOffenderRehabDecisionId())
                         .recordDateTime(typesTransformer.localDateTimeOf(ord.getRecordDatetime()))
                         .staffId(ord.getStaffId())

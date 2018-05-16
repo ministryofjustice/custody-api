@@ -37,6 +37,7 @@ public class CourtEventsTransformer {
                 .courtEventCharges(courtEventChargesOf(courtEvent.getCourtEventCharges()))
                 .courtEventType(courtEvent.getCourtEventType())
                 .directionCode(courtEvent.getDirectionCode())
+                .startDateTime(typesTransformer.localDateTimeOf(courtEvent.getEventDate(), courtEvent.getStartTime()))
                 .endDateTime(typesTransformer.localDateTimeOf(courtEvent.getEventDate(), courtEvent.getEndTime()))
                 .eventId(courtEvent.getEventId())
                 .eventOutcome(courtEvent.getEventOutcome())
@@ -51,7 +52,6 @@ public class CourtEventsTransformer {
                 .outcomeReasonCode(courtEvent.getOutcomeReasonCode())
                 .parentEventId(courtEvent.getParentEventId())
                 .resultCode(courtEvent.getResultCode())
-                .startDateTime(typesTransformer.localDateTimeOf(courtEvent.getEventDate(), courtEvent.getStartTime()))
                 .build();
     }
 

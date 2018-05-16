@@ -41,7 +41,7 @@ public class ImprisonStatusTransformer {
                 .imprisonmentStatuses(imprisonmentStatusesOf(ois.getImprisonmentStatus()).orElse(null))
                 .imprisonStatusSeq(ois.getImprisonStatusSeq())
                 .latestStatus(typesTransformer.ynToBoolean(ois.getLatestStatus()))
-                .offenderBookId(ois.getOffenderBookId())
+                .bookingId(ois.getOffenderBookId())
                 .build();
     }
 

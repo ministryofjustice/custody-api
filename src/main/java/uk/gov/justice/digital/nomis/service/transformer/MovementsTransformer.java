@@ -30,7 +30,7 @@ public class MovementsTransformer {
                 .movementDirection(em.getDirectionCode())
                 .movementReasonCode(movementReason.getMovementReasonCode())
                 .movementTypeCode(movementReason.getMovementType())
-                .offenderBookingId(em.getId().getOffenderBooking().getOffenderBookId())
+                .bookingId(em.getId().getOffenderBooking().getOffenderBookId())
                 .offenderId(em.getId().getOffenderBooking().getRootOffenderId())
                 .sequenceNumber(em.getId().getMovementSeq())
                 .movementDateTime(typesTransformer.localDateTimeOf(em.getMovementDate(), em.getMovementTime()))

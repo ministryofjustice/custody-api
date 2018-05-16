@@ -10,7 +10,7 @@ import java.util.Optional;
 @Data
 @Builder
 public class Booking {
-    private Long offenderBookingId;
+    private Long bookingId;
     private String bookingNo;
     private Long offenderId;
     private Long rootOffenderId;
@@ -24,4 +24,5 @@ public class Booking {
     private Optional<LocalDate> endDate;
     private LocalDateTime caseDateTime;
     private Long bookingSequence;
+    private ExternalMovement lastMovement;
 }

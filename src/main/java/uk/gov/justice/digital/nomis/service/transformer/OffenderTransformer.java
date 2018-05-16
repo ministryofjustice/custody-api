@@ -4,10 +4,12 @@ import com.google.common.collect.ImmutableList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.justice.digital.nomis.api.Booking;
+import uk.gov.justice.digital.nomis.api.ExternalMovement;
 import uk.gov.justice.digital.nomis.api.Identifier;
 import uk.gov.justice.digital.nomis.api.OffenderAlias;
 import uk.gov.justice.digital.nomis.jpa.entity.Offender;
 import uk.gov.justice.digital.nomis.jpa.entity.OffenderBooking;
+import uk.gov.justice.digital.nomis.jpa.entity.OffenderExternalMovement;
 import uk.gov.justice.digital.nomis.jpa.entity.OffenderIdentifier;
 
 import java.sql.Timestamp;
@@ -22,10 +24,12 @@ import java.util.stream.Stream;
 public class OffenderTransformer {
 
     private final TypesTransformer typesTransformer;
+    private MovementsTransformer movementsTransformer;
 
     @Autowired
-    public OffenderTransformer(TypesTransformer typesTransformer) {
+    public OffenderTransformer(TypesTransformer typesTransformer, MovementsTransformer movementsTransformer) {
         this.typesTransformer = typesTransformer;
+        this.movementsTransformer = movementsTransformer;
     }
 
     public List<OffenderAlias> aliasesOf(List<Offender> offenderList) {
@@ -80,10 +84,11 @@ public class OffenderTransformer {
                 .inOutStatus(booking.getInOutStatus())
                 .livingUnitId(booking.getLivingUnitId())
                 .offenderId(booking.getOffenderId())
-                .offenderBookingId(booking.getOffenderBookId())
+                .bookingId(booking.getOffenderBookId())
                 .rootOffenderId(booking.getRootOffenderId())
                 .statusReason(booking.getStatusReason())
                 .caseDateTime(typesTransformer.localDateTimeOf(booking.getCaseDate(), booking.getCaseTime()))
+                .lastMovement(booking.getOffenderExternalMovements().stream().sorted(byOffenderExternalMovementDate()).findFirst().map(movementsTransformer::movementOf).orElse(null))
                 .build();
     }
 
@@ -121,6 +126,12 @@ public class OffenderTransformer {
     private Comparator<Booking> byBookingSequence() {
         return Comparator
                 .comparingLong(Booking::getBookingSequence)
-                .thenComparingLong(Booking::getOffenderBookingId);
+                .thenComparingLong(Booking::getBookingId);
+    }
+
+    private Comparator<OffenderExternalMovement> byOffenderExternalMovementDate() {
+        return Comparator.comparing(OffenderExternalMovement::getMovementDate).reversed()
+                .thenComparing(OffenderExternalMovement::getMovementTime).reversed()
+                .thenComparingLong(em -> em.getId().getMovementSeq()).reversed();
     }
 }

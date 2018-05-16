@@ -39,6 +39,7 @@ public class CourtEventsService {
 
     private Comparator<uk.gov.justice.digital.nomis.jpa.entity.CourtEvent> byCourtEventDate() {
         return Comparator.comparing(uk.gov.justice.digital.nomis.jpa.entity.CourtEvent::getEventDate).reversed()
+                .thenComparing(uk.gov.justice.digital.nomis.jpa.entity.CourtEvent::getStartTime).reversed()
                 .thenComparing(uk.gov.justice.digital.nomis.jpa.entity.CourtEvent::getEventId).reversed();
     }
 }
