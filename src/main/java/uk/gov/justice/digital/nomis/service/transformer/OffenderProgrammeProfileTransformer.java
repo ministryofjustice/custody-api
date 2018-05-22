@@ -31,7 +31,7 @@ public class OffenderProgrammeProfileTransformer {
         return ProgrammeProfile.builder()
                 .agencyLocationId(offenderProgramProfile.getAgyLocId())
                 .bookingId(offenderProgramProfile.getOffenderBookId())
-                .courseActivity(activityOf(offenderProgramProfile.getCourseActivity()))
+                .courseActivity(activityAndSchedulesOf(offenderProgramProfile.getCourseActivity()))
                 .offenderEndDate(typesTransformer.localDateOf(offenderProgramProfile.getOffenderEndDate()))
                 .offenderProgramStatus(offenderProgramProfile.getOffenderProgramStatus())
                 .offenderStartDate(typesTransformer.localDateOf(offenderProgramProfile.getOffenderStartDate()))
@@ -41,28 +41,44 @@ public class OffenderProgrammeProfileTransformer {
                 .build();
     }
 
-    private Activity activityOf(CourseActivity courseActivity) {
+    public Activity activityAndSchedulesOf(CourseActivity courseActivity) {
+        return Optional.ofNullable(courseActivity).map(
+                ca -> activityOf(ca)
+                        .toBuilder()
+                        .schedules(schedulesOf(ca.getCourseSchedules()))
+                        .build())
+                .orElse(null);
+    }
+
+    public Activity activityOf(CourseActivity courseActivity) {
         return Optional.ofNullable(courseActivity).map(
                 ca -> Activity.builder()
                         .courseActivityId(ca.getCrsActyId())
                         .description(ca.getDescription())
                         .active(typesTransformer.ynToBoolean(ca.getActiveFlag()))
-                        .scheduledEndDate(typesTransformer.localDateOf(ca.getScheduleEndDate()))
-                        .schedules(schedulesOf(ca.getCourseSchedules()))
-                        .build()).orElse(null);
+                        .scheduledEndDate(typesTransformer.localDateOf(ca.getScheduleEndDate())).build())
+                .orElse(null);
     }
 
-    private List<Schedule> schedulesOf(List<CourseSchedule> courseSchedules) {
+    public List<Schedule> schedulesOf(List<CourseSchedule> courseSchedules) {
         return Optional.ofNullable(courseSchedules).map(
-                css -> css.stream().map(
-                        cs -> Schedule.builder()
-                                .catchUpCourseScheduleId(cs.getCatchUpCrsSchId())
-                                .courseScheduleId(cs.getCrsSchId())
-                                .endTime(typesTransformer.localDateTimeOf(cs.getEndTime()).toLocalTime())
-                                .scheduleDay(typesTransformer.localDateOf(cs.getScheduleDate()).getDayOfWeek().getDisplayName(TextStyle.SHORT, Locale.ENGLISH))
-                                .scheduledDate(typesTransformer.localDateOf(cs.getScheduleDate()))
-                                .sessionNo(cs.getSessionNo())
-                                .startTime(typesTransformer.localDateTimeOf(cs.getStartTime()).toLocalTime())
-                                .build()).collect(Collectors.toList())).orElse(Collections.emptyList());
+                css -> css
+                        .stream()
+                        .map(this::courseScheduleOf)
+                        .collect(Collectors.toList()))
+                .orElse(Collections.emptyList());
+    }
+
+    public Schedule courseScheduleOf(CourseSchedule courseSchedule) {
+        return Optional.ofNullable(courseSchedule).map(
+                cs -> Schedule.builder()
+                        .catchUpCourseScheduleId(cs.getCatchUpCrsSchId())
+                        .courseScheduleId(cs.getCrsSchId())
+                        .endTime(typesTransformer.localDateTimeOf(cs.getEndTime()).toLocalTime())
+                        .scheduleDay(typesTransformer.localDateOf(cs.getScheduleDate()).getDayOfWeek().getDisplayName(TextStyle.SHORT, Locale.ENGLISH))
+                        .scheduledDate(typesTransformer.localDateOf(cs.getScheduleDate()))
+                        .sessionNo(cs.getSessionNo())
+                        .startTime(typesTransformer.localDateTimeOf(cs.getStartTime()).toLocalTime())
+                        .build()).orElse(null);
     }
 }

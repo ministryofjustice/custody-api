@@ -6,6 +6,7 @@ import java.sql.Date;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Optional;
 
 @Component
@@ -26,6 +27,13 @@ public class TypesTransformer {
     public LocalDateTime localDateTimeOf(Timestamp timestamp) {
         return Optional.ofNullable(timestamp)
                 .map(Timestamp::toLocalDateTime)
+                .orElse(null);
+    }
+
+    public LocalTime localTimeOf(Timestamp timestamp) {
+        return Optional.ofNullable(timestamp)
+                .map(Timestamp::toLocalDateTime)
+                .map(LocalDateTime::toLocalTime)
                 .orElse(null);
     }
 

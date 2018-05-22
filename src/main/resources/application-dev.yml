@@ -33,6 +33,7 @@ spring:
           classpath:R__5_4__OFFENDER_PROGRAM_PROFILES.sql,
           classpath:R__5_6__ORDERS.sql,
           classpath:R__6_1__OFFENDER_COURSE_ATTENDANCES.sql,
+          classpath:R__6_2__OFFENDER_EXCLUDES_ACTS_SCHDS.sql,
           classpath:R__6_3__OFFENDER_SENTENCES.sql,
           classpath:some_health_problems.sql,
           classpath:some_address_usages.sql,

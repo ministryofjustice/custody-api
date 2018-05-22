@@ -18,9 +18,9 @@ import java.sql.Timestamp;
 public class OffenderCourseAttendance {
     @Id
     @Column(name = "EVENT_ID")
-    private Integer eventId;
+    private Long eventId;
     @Column(name = "OFFENDER_BOOK_ID")
-    private Integer offenderBookId;
+    private Long offenderBookId;
     @Column(name = "EVENT_DATE")
     private Timestamp eventDate;
     @Column(name = "START_TIME")
@@ -36,7 +36,7 @@ public class OffenderCourseAttendance {
     @Column(name = "HIDDEN_COMMENT_TEXT")
     private String hiddenCommentText;
     @Column(name = "TO_INTERNAL_LOCATION_ID")
-    private Integer toInternalLocationId;
+    private Long toInternalLocationId;
     @Column(name = "CRS_SCH_ID")
     private Integer crsSchId;
     @Column(name = "OUTCOME_REASON_CODE")
@@ -64,7 +64,7 @@ public class OffenderCourseAttendance {
     @Column(name = "SICK_NOTE_EXPIRY_DATE")
     private Timestamp sickNoteExpiryDate;
     @Column(name = "OFF_PRGREF_ID")
-    private Integer offPrgrefId;
+    private Long offPrgrefId;
     @Column(name = "IN_TIME")
     private Timestamp inTime;
     @Column(name = "OUT_TIME")
@@ -72,23 +72,26 @@ public class OffenderCourseAttendance {
     @Column(name = "PERFORMANCE_CODE")
     private String performanceCode;
     @Column(name = "REFERENCE_ID")
-    private Integer referenceId;
+    private Long referenceId;
     @Column(name = "TO_ADDRESS_OWNER_CLASS")
     private String toAddressOwnerClass;
     @Column(name = "TO_ADDRESS_ID")
-    private Integer toAddressId;
+    private Long toAddressId;
     @Column(name = "EVENT_OUTCOME")
     private String eventOutcome;
     @Column(name = "OFF_CRS_SCH_REF_ID")
     private Integer offCrsSchRefId;
     @Column(name = "SUPERVISOR_STAFF_ID")
-    private Integer supervisorStaffId;
+    private Long supervisorStaffId;
     @Column(name = "CRS_APPT_ID")
-    private Integer crsApptId;
+    private Long crsApptId;
     @Column(name = "OFFENDER_COURSE_APPT_RULE_ID")
-    private Integer offenderCourseApptRuleId;
-    @Column(name = "CRS_ACTY_ID")
-    private Integer crsActyId;
+    private Long offenderCourseApptRuleId;
+
+    @OneToOne
+    @JoinColumn(name = "CRS_ACTY_ID")
+    private CourseActivity courseActivity;
+
     @Column(name = "EVENT_TYPE")
     private String eventType;
     @Column(name = "CREATE_DATETIME")
@@ -124,9 +127,9 @@ public class OffenderCourseAttendance {
     @Column(name = "SESSION_NO")
     private Integer sessionNo;
     @Column(name = "OFFENDER_PRG_OBLIGATION_ID")
-    private Integer offenderPrgObligationId;
+    private Long offenderPrgObligationId;
     @Column(name = "PROGRAM_ID")
-    private Integer programId;
+    private Long programId;
     @Column(name = "BONUS_PAY")
     private BigDecimal bonusPay;
     @Column(name = "TXN_ID")
