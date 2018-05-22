@@ -215,4 +215,14 @@ public class OffenderBooking {
     @JoinColumn(name = "OFFENDER_BOOK_ID", referencedColumnName = "OFFENDER_BOOK_ID")
     private List<OffenderIndSchedule> offenderIndSchedules;
 
+    @OneToMany
+    @BatchSize(size = 1000)
+    @JoinColumn(name = "OFFENDER_BOOK_ID", referencedColumnName = "OFFENDER_BOOK_ID")
+    private List<OffenderProgramProfile> offenderProgramProfiles;
+
+    @OneToMany
+    @BatchSize(size = 1000)
+    @JoinColumn(name = "OFFENDER_BOOK_ID", referencedColumnName = "OFFENDER_BOOK_ID")
+    private List<OffenderCourseAttendance> offenderCourseAttendances;
+
 }
