@@ -20,7 +20,7 @@ public class OffenderAlert {
     @Column(name = "OFFENDER_BOOK_ID")
     private Long offenderBookId;
     @Column(name = "ROOT_OFFENDER_ID")
-    private Integer rootOffenderId;
+    private Long rootOffenderId;
     @Id
     @Column(name = "ALERT_SEQ")
     private Integer alertSeq;

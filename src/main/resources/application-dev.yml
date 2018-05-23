@@ -17,6 +17,7 @@ spring:
           classpath:R__3_6_1__OFFENDER_BOOKINGS.sql,
           classpath:R__3_7__OFFENDER_IDENTIFIERS.sql,
           classpath:R__4_2__COURSE_SCHEDULES.sql,
+          classpath:R__4_3__OFFENDER_ALERTS.sql,
           classpath:R__4_4__OFFENDER_ASSESSMENTS.sql,
           classpath:R__4_5__OFFENDER_CASES.sql,
           classpath:R__4_6__OFFENDER_CONTACT_PERSONS.sql,
