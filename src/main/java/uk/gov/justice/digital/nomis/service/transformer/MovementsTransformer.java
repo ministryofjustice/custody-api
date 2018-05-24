@@ -21,7 +21,7 @@ public class MovementsTransformer {
         MovementReason movementReason = em.getMovementReason();
 
         return ExternalMovement.builder()
-                .active(em.getActiveFlag())
+                .active(typesTransformer.ynToBoolean(em.getActiveFlag()))
                 .comments(em.getCommentText())
                 .fromAddressId(em.getFromAddressId())
                 .toAddressId(em.getToAddressId())

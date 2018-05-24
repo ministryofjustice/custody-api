@@ -77,7 +77,7 @@ public class DiaryDetailService {
     }
 
     private Comparator<DiaryDetail> byCourtEventDate() {
-        return Comparator.comparing(DiaryDetail::getMovementDateTime).reversed();
+        return Comparator.comparing(DiaryDetail::getMovementDateTime, Comparator.nullsLast(Comparator.naturalOrder())).reversed();
     }
 
 }

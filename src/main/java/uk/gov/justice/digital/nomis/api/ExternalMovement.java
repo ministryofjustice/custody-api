@@ -16,7 +16,7 @@ public class ExternalMovement {
     private String movementReasonCode;
     private String description;
     private String movementDirection;
-    private String active;
+    private Boolean active;
     private String fromAgencyLocationId;
     private String toAgencyCodeLocationId;
     private Long fromAddressId;
