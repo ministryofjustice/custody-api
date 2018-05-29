@@ -26,7 +26,7 @@ public class MovementsTransformer {
                 .fromAddressId(em.getFromAddressId())
                 .toAddressId(em.getToAddressId())
                 .fromAgencyLocationId(em.getFromAgyLocId())
-                .toAgencyCodeLocationId(em.getToAgyLocId())
+                .toAgencyLocationId(em.getToAgyLocId())
                 .movementDirection(em.getDirectionCode())
                 .movementReasonCode(movementReason.getMovementReasonCode())
                 .movementTypeCode(movementReason.getMovementType())

@@ -30,7 +30,7 @@ public class CourtEventsTransformer {
 
     public CourtEvent courtEventOf(uk.gov.justice.digital.nomis.jpa.entity.CourtEvent courtEvent) {
         return CourtEvent.builder()
-                .agyLocId(courtEvent.getAgyLocId())
+                .agencyLocationId(courtEvent.getAgyLocId())
                 .bookingId(courtEvent.getOffenderBookId())
                 .caseId(courtEvent.getCaseId())
                 .comments(courtEvent.getCommentText())

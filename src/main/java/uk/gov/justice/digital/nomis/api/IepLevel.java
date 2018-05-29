@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @Builder
 public class IepLevel {
     private String iepLevel;
-    private String agyLocId;
+    private String agencyLocationId;
     private Boolean active;
     private LocalDateTime expiryDate;
     private Boolean isDefault;

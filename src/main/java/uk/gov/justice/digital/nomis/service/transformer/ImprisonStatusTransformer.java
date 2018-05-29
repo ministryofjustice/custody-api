@@ -34,7 +34,7 @@ public class ImprisonStatusTransformer {
 
     public OffenderImprisonmentStatus offenderImprisonStatusOf(uk.gov.justice.digital.nomis.jpa.entity.OffenderImprisonStatus ois) {
         return OffenderImprisonmentStatus.builder()
-                .agyLocId(ois.getAgyLocId())
+                .agencyLocationId(ois.getAgyLocId())
                 .commentText(ois.getCommentText())
                 .effectiveDateTime(typesTransformer.localDateTimeOf(ois.getEffectiveDate(), ois.getEffectiveTime()))
                 .expiryDate(typesTransformer.localDateOf(ois.getExpiryDate()))

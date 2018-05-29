@@ -46,8 +46,8 @@ public class CourseAttendance {
     private Long crsApptId;
     private Long offenderCourseApptRuleId;
     private String eventType;
-    private String agyLocId;
-    private String toAgyLocId;
+    private String agencyLocationId;
+    private String toAgencyLocationId;
     private Boolean unexcusedAbsence;
     private Integer sessionNo;
     private Long offenderPrgObligationId;

@@ -14,7 +14,7 @@ public class OffenderImprisonmentStatus {
     private ImprisonmentStatus imprisonmentStatuses;
     private LocalDateTime effectiveDateTime;
     private LocalDate expiryDate;
-    private String agyLocId;
+    private String agencyLocationId;
     private String commentText;
     private Boolean latestStatus;
 }

@@ -33,7 +33,7 @@ public class IEPTransformer {
         return Optional.ofNullable(iep)
                 .map(iepLevel -> IepLevel.builder()
                         .active(typesTransformer.ynToBoolean(iep.getActiveFlag()))
-                        .agyLocId(iep.getAgyLocId())
+                        .agencyLocationId(iep.getAgyLocId())
                         .convictedSpendLimit(iep.getConvictedSpendLimit())
                         .convictedTransferLimit(iep.getConvictedTransferLimit())
                         .expiryDate(typesTransformer.localDateTimeOf(iep.getExpiryDate()))

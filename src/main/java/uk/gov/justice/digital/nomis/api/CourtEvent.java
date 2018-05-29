@@ -19,7 +19,7 @@ public class CourtEvent {
     private String judgeName;
     private String eventStatus;
     private Long parentEventId;
-    private String agyLocId;
+    private String agencyLocationId;
     private String outcomeReasonCode;
     private String comments;
     private String eventOutcome;

@@ -18,7 +18,7 @@ public class ExternalMovement {
     private String movementDirection;
     private Boolean active;
     private String fromAgencyLocationId;
-    private String toAgencyCodeLocationId;
+    private String toAgencyLocationId;
     private Long fromAddressId;
     private Long toAddressId;
     private String comments;
