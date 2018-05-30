@@ -58,13 +58,17 @@ public class AddressService {
         return Optional.ofNullable(offenderRepository.findOne(offenderId))
                 .map(offender -> offender.getOffenderAddresses()
                         .stream()
-                        .sorted(Comparator.comparing(OffenderAddress::getPrimaryFlag)
-                                .thenComparing(a -> Optional.ofNullable(a.getEndDate()).orElse(new Timestamp(0)))
-                                .thenComparing(a -> Optional.ofNullable(a.getAddressUsage()).map(AddressUsage::getActiveFlag).orElse("N"))
-                                .thenComparing(this::getLastModifiedDate)
-                                .reversed())
+                        .sorted(byAddressModified())
                         .map(addressesTransformer::addressOf)
                         .collect(Collectors.toList()));
+    }
+
+    private Comparator<OffenderAddress> byAddressModified() {
+        return Comparator.comparing(OffenderAddress::getPrimaryFlag)
+                .thenComparing(OffenderAddress::getEndDate, Comparator.nullsLast(Comparator.naturalOrder()))
+                .thenComparing(a -> Optional.ofNullable(a.getAddressUsage()).map(AddressUsage::getActiveFlag).orElse("N"))
+                .thenComparing(this::getLastModifiedDate)
+                .reversed();
     }
 
     private Timestamp getLastModifiedDate(OffenderAddress address) {

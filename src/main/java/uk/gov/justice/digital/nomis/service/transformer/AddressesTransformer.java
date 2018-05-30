@@ -32,6 +32,7 @@ public class AddressesTransformer {
                 .cityName(address.getCityName())
                 .comments(address.getCommentText())
                 .contactPersonName(address.getContactPersonName())
+                .countyCode(address.getCountyCode())
                 .countryCode(address.getCountryCode())
                 .flat(address.getFlat())
                 .relationship(address.getRelationship())
@@ -58,6 +59,7 @@ public class AddressesTransformer {
     private List<Phone> phonesOf(List<AddressPhone> phones) {
         return phones
                 .stream()
+                //todo: sort phones
                 .map(phone -> Phone.builder()
                         .extNo(phone.getExtNo())
                         .ownerClass(phone.getOwnerClass())
@@ -68,7 +70,6 @@ public class AddressesTransformer {
                         .phoneType(phone.getPhoneType())
                         .relationship(phone.getRelationship())
                         .build())
-                //todo: sort phones
                 .collect(Collectors.toList());
     }
 }
