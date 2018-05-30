@@ -7,6 +7,8 @@ import org.springframework.stereotype.Component;
 import uk.gov.justice.digital.nomis.api.Case;
 import uk.gov.justice.digital.nomis.api.Charge;
 import uk.gov.justice.digital.nomis.api.Order;
+import uk.gov.justice.digital.nomis.jpa.entity.Offence;
+import uk.gov.justice.digital.nomis.jpa.entity.OffenceIndicator;
 import uk.gov.justice.digital.nomis.jpa.entity.OffenderCase;
 import uk.gov.justice.digital.nomis.jpa.entity.OffenderCharge;
 
@@ -39,7 +41,7 @@ public class ChargesTransformer {
                 .numberOfOffences(oc.getNoOfOffences())
                 .offenceCode(oc.getOffenceCode())
                 .statuteCode(oc.getStatuteCode())
-                .offenceSeverityRanking(Optional.ofNullable(oc.getOffence()).map(o -> o.getSeverityRanking()).orElse(null))
+                .offenceSeverityRanking(Optional.ofNullable(oc.getOffence()).map(Offence::getSeverityRanking).orElse(null))
                 .offenceDate(Optional.ofNullable(oc.getOffenceDate()).map(d -> d.toLocalDateTime().toLocalDate()).orElse(null))
                 .offenceRangeDate(Optional.ofNullable(oc.getOffenceRangeDate()).map(d -> d.toLocalDateTime().toLocalDate()).orElse(null))
                 .order(orderOf(oc))
@@ -55,7 +57,7 @@ public class ChargesTransformer {
         return Optional.ofNullable(oc.getOffence())
                 .map(o ->o.getOffenceIndicators()
                         .stream()
-                        .map(oi -> oi.getIndicatorCode())
+                        .map(OffenceIndicator::getIndicatorCode)
                         .collect(Collectors.toList()))
                 .orElse(null);
     }

@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.justice.digital.nomis.api.Address;
+import uk.gov.justice.digital.nomis.jpa.entity.AddressUsage;
 import uk.gov.justice.digital.nomis.jpa.entity.OffenderAddress;
 import uk.gov.justice.digital.nomis.jpa.repository.AddressRepository;
 import uk.gov.justice.digital.nomis.jpa.repository.OffenderRepository;
@@ -24,6 +25,11 @@ import static java.util.Comparator.comparing;
 @Service
 public class AddressService {
 
+    private static final Comparator<uk.gov.justice.digital.nomis.jpa.entity.Address> BY_ADDRESS_PRIORITY = Comparator.comparing(uk.gov.justice.digital.nomis.jpa.entity.Address::getPrimaryFlag)
+            .thenComparing(a -> Optional.ofNullable(a.getModifyDatetime()).orElse(new Timestamp(0)))
+            .thenComparing(a -> Optional.ofNullable(a.getCreateDatetime()).orElse(new Timestamp(0)))
+            .reversed();
+
     private final AddressRepository addressRepository;
     private final OffenderRepository offenderRepository;
     private final AddressesTransformer addressesTransformer;
@@ -40,6 +46,7 @@ public class AddressService {
         Page<uk.gov.justice.digital.nomis.jpa.entity.Address> rawAddressPage = addressRepository.findAll(pageable);
 
         List<Address> addresses = rawAddressPage.getContent().stream()
+                .sorted(BY_ADDRESS_PRIORITY)
                 .map(addressesTransformer::addressOf)
                 .collect(Collectors.toList());
 
@@ -51,24 +58,21 @@ public class AddressService {
         return Optional.ofNullable(offenderRepository.findOne(offenderId))
                 .map(offender -> offender.getOffenderAddresses()
                         .stream()
-                        .sorted(byOffenderAddressPriority())
+                        .sorted(Comparator.comparing(OffenderAddress::getPrimaryFlag)
+                                .thenComparing(a -> Optional.ofNullable(a.getEndDate()).orElse(new Timestamp(0)))
+                                .thenComparing(a -> Optional.ofNullable(a.getAddressUsage()).map(AddressUsage::getActiveFlag).orElse("N"))
+                                .thenComparing(this::getLastModifiedDate)
+                                .reversed())
                         .map(addressesTransformer::addressOf)
                         .collect(Collectors.toList()));
-    }
-
-    private Comparator<OffenderAddress> byOffenderAddressPriority() {
-        return Comparator.comparing(OffenderAddress::getPrimaryFlag)
-                .thenComparing(a -> Optional.ofNullable(a.getEndDate()).orElse(new Timestamp(0))).reversed()
-                .thenComparing(a -> Optional.ofNullable(a.getAddressUsage()).map(x -> x.getActiveFlag()).orElse("N"))
-                .thenComparing(this::getLastModifiedDate);
     }
 
     private Timestamp getLastModifiedDate(OffenderAddress address) {
         return Stream.of(
                 Optional.ofNullable(address.getModifyDatetime()).orElse(new Timestamp(0)),
                 Optional.ofNullable(address.getCreateDatetime()).orElse(new Timestamp(0)),
-                Optional.ofNullable(address.getAddressUsage()).map(x -> x.getModifyDatetime()).orElse(new Timestamp(0)),
-                Optional.ofNullable(address.getAddressUsage()).map(x -> x.getCreateDatetime()).orElse(new Timestamp(0))
+                Optional.ofNullable(address.getAddressUsage()).map(AddressUsage::getModifyDatetime).orElse(new Timestamp(0)),
+                Optional.ofNullable(address.getAddressUsage()).map(AddressUsage::getCreateDatetime).orElse(new Timestamp(0))
         ).max(comparing(Timestamp::getTime)).get();
     }
 

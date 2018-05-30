@@ -6,7 +6,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import uk.gov.justice.digital.nomis.api.ExternalMovement;
 import uk.gov.justice.digital.nomis.api.OffenderAssessment;
 import uk.gov.justice.digital.nomis.jpa.entity.Offender;
 import uk.gov.justice.digital.nomis.jpa.entity.OffenderBooking;
@@ -14,6 +13,7 @@ import uk.gov.justice.digital.nomis.jpa.repository.OffenderAssessmentRepository;
 import uk.gov.justice.digital.nomis.jpa.repository.OffenderRepository;
 import uk.gov.justice.digital.nomis.service.transformer.AssessmentsTransformer;
 
+import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
@@ -23,6 +23,11 @@ import java.util.stream.Collectors;
 @Service
 public class AssessmentService {
 
+    private static final Comparator<uk.gov.justice.digital.nomis.jpa.entity.OffenderAssessment> BY_ASSESSMENT_PRIORITY =
+            Comparator
+                        .comparing((uk.gov.justice.digital.nomis.jpa.entity.OffenderAssessment oa) -> Optional.ofNullable(oa.getModifyDatetime()).orElse(new Timestamp(0)))
+                    .thenComparing(oa -> Optional.ofNullable(oa.getCreateDatetime()).orElse(new Timestamp(0)))
+                    .reversed();
     private final OffenderAssessmentRepository offenderAssessmentRepository;
     private final OffenderRepository offenderRepository;
     private final AssessmentsTransformer assessmentsTransformer;
@@ -40,6 +45,7 @@ public class AssessmentService {
 
         List<OffenderAssessment> assessments = rawOffenderAssessmentsPage.getContent()
                 .stream()
+                .sorted(BY_ASSESSMENT_PRIORITY)
                 .map(assessmentsTransformer::assessmentOf)
                 .collect(Collectors.toList());
 
@@ -85,7 +91,7 @@ public class AssessmentService {
     private Comparator<OffenderAssessment> byAssessmentDate() {
         return Comparator
                 .comparing(OffenderAssessment::getAssessStatus)
-                .thenComparing(OffenderAssessment::getAssessmentDate).reversed() // DESC
+                .thenComparing(OffenderAssessment::getAssessmentDate, Comparator.reverseOrder()) // DESC
                 .thenComparingInt(OffenderAssessment::getAssessmentSequence); // ASC
     }
 
