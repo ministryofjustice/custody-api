@@ -85,9 +85,9 @@ public class ChargesService {
     }
 
     private Comparator<Charge> byOffenceRank() {
-        return Comparator
-                .comparing(Charge::getMostSeriousCharge)
-                .thenComparingLong(Charge::getOffenceSeverityRanking).reversed()
-                .thenComparingLong(Charge::getChargeId).reversed();
+        return Comparator.comparing(Charge::getMostSeriousCharge)
+                .thenComparing(Charge::getOffenceSeverityRanking)
+                .thenComparing(Charge::getChargeId)
+                .reversed();
     }
 }
