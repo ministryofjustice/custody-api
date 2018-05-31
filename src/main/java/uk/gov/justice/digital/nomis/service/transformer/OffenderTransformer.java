@@ -124,9 +124,8 @@ public class OffenderTransformer {
     }
 
     private Comparator<Booking> byBookingSequence() {
-        return Comparator
-                .comparingLong(Booking::getBookingSequence)
-                .thenComparingLong(Booking::getBookingId);
+        return Comparator.comparingLong(Booking::getBookingId)
+                .thenComparingLong(Booking::getBookingSequence);
     }
 
     private Comparator<OffenderExternalMovement> byOffenderExternalMovementDate() {
