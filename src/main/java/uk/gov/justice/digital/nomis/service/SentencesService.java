@@ -15,6 +15,7 @@ import uk.gov.justice.digital.nomis.jpa.repository.OffenderSentencesRepository;
 import uk.gov.justice.digital.nomis.service.transformer.SentenceTransformer;
 
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -40,6 +41,7 @@ public class SentencesService {
 
         List<Sentence> sentencesList = offenderSentences.getContent()
                 .stream()
+                .sorted(byCreatedDate())
                 .map(sentenceTransformer::sentenceOf)
                 .collect(Collectors.toList());
 
@@ -57,6 +59,7 @@ public class SentencesService {
 
         return maybeOffenderSentences.map(offenderSentences -> offenderSentences
                 .stream()
+                .sorted(byCreatedDate())
                 .map(sentenceTransformer::sentenceOf)
                 .collect(Collectors.toList()));
     }
@@ -76,8 +79,14 @@ public class SentencesService {
 
         return maybeOffenderBooking.map(ob -> ob.getOffenderSentences()
                 .stream()
+                .sorted(byCreatedDate())
                 .map(sentenceTransformer::sentenceOf)
                 .collect(Collectors.toList()));
+    }
+
+    private Comparator<OffenderSentence> byCreatedDate() {
+        return Comparator.comparing(OffenderSentence::getSentenceStatus)
+            .thenComparing(OffenderSentence::getCreateDatetime, Comparator.nullsLast(Comparator.reverseOrder()));
     }
 
 }

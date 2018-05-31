@@ -40,6 +40,7 @@ public class CourtEventsService {
     private Comparator<uk.gov.justice.digital.nomis.jpa.entity.CourtEvent> byCourtEventDateNewestFirst() {
         return Comparator.comparing(uk.gov.justice.digital.nomis.jpa.entity.CourtEvent::getEventDate)
                 .thenComparing(uk.gov.justice.digital.nomis.jpa.entity.CourtEvent::getStartTime)
-                .thenComparing(uk.gov.justice.digital.nomis.jpa.entity.CourtEvent::getEventId);
+                .thenComparing(uk.gov.justice.digital.nomis.jpa.entity.CourtEvent::getEventId)
+                .reversed();
     }
 }

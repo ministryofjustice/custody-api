@@ -83,7 +83,7 @@ public class SentenceCalculationsService {
     }
 
     private Comparator<SentenceCalculation> byCalculationDate() {
-        return Comparator.comparing(SentenceCalculation::getCalculationDate).reversed();
+        return Comparator.comparing(SentenceCalculation::getCalculationDate, Comparator.nullsLast(Comparator.reverseOrder()));
         // return Comparator.comparing(SentenceCalculation::getSentenceCalculationId).reversed();
     }
 
