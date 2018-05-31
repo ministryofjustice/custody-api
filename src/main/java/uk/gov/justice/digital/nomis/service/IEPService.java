@@ -6,6 +6,7 @@ import uk.gov.justice.digital.nomis.api.OffenderIepLevel;
 import uk.gov.justice.digital.nomis.jpa.repository.OffenderRepository;
 import uk.gov.justice.digital.nomis.service.transformer.IEPTransformer;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -13,6 +14,9 @@ import java.util.stream.Collectors;
 @Service
 public class IEPService {
 
+    public static final Comparator<uk.gov.justice.digital.nomis.jpa.entity.OffenderIepLevel> BY_IEP_SEQ_REVERSED = Comparator
+            .comparing(uk.gov.justice.digital.nomis.jpa.entity.OffenderIepLevel::getIepLevelSeq)
+            .reversed();
     private final IEPTransformer iepTransformer;
     private final OffenderRepository offenderRepository;
 
@@ -26,12 +30,13 @@ public class IEPService {
     public Optional<List<OffenderIepLevel>> iepsForOffenderId(Long offenderId) {
 
         return Optional.ofNullable(offenderRepository.findOne(offenderId))
-                .map(offender ->
-                        offender.getOffenderBookings()
-                                .stream()
-                                .flatMap(offenderBooking -> offenderBooking.getOffenderIepLevels().stream())
-                                .map(iepTransformer::offenderIepLevelOf)
-                                .collect(Collectors.toList()));
+                .map(offender -> offender.getOffenderBookings()
+                        .stream()
+                        .flatMap(offenderBooking -> offenderBooking.getOffenderIepLevels().stream())
+                        .sorted(BY_IEP_SEQ_REVERSED)
+                        .map(iepTransformer::offenderIepLevelOf)
+                        .collect(Collectors.toList()));
 
     }
+
 }
