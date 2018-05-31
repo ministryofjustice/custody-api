@@ -10,14 +10,12 @@ import java.util.Optional;
 @Component
 public class ContactPersonsTransformer {
 
-    private final AddressesTransformer addressesTransformer;
     private final TypesTransformer typesTransformer;
     private final PersonTransformer personTransformer;
 
 
     @Autowired
-    public ContactPersonsTransformer(AddressesTransformer addressesTransformer, TypesTransformer typesTransformer, PersonTransformer personTransformer) {
-        this.addressesTransformer = addressesTransformer;
+    public ContactPersonsTransformer(TypesTransformer typesTransformer, PersonTransformer personTransformer) {
         this.typesTransformer = typesTransformer;
         this.personTransformer = personTransformer;
     }

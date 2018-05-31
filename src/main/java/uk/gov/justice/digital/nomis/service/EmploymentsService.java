@@ -14,6 +14,13 @@ import java.util.stream.Collectors;
 @Service
 public class EmploymentsService {
 
+    private static final Comparator<Employment> BY_EMPLOYMENT_SEQUENCE =
+            Comparator
+                    .comparing(Employment::getModifiedDateTime)
+                    .thenComparing(Employment::getCreatedDateTime)
+                    .thenComparing(Employment::getEmploymentSequence)
+                    .reversed();
+
     private final EmploymentsTransformer employmentsTransformer;
     private final OffenderRepository offenderRepository;
 
@@ -29,13 +36,8 @@ public class EmploymentsService {
                 .map(offender -> offender.getOffenderBookings().stream()
                         .flatMap(offenderBooking -> offenderBooking.getOffenderEmployments().stream())
                         .map(employmentsTransformer::employmentOf)
-                        .sorted(byEmploymentSequence())
+                        .sorted(BY_EMPLOYMENT_SEQUENCE)
                         .collect(Collectors.toList()));
     }
 
-    private Comparator<Employment> byEmploymentSequence() {
-        return Comparator.comparing(Employment::getModifiedDateTime).reversed()
-                .thenComparing(Employment::getCreatedDateTime).reversed()
-                .thenComparing(Employment::getEmploymentSequence);
-    }
 }

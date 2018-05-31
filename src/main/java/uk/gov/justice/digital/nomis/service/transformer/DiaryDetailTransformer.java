@@ -35,7 +35,7 @@ public class DiaryDetailTransformer {
                 .movementDateTime(typesTransformer.localDateTimeOf(offenderIndSchedule.getEventDate(), offenderIndSchedule.getStartTime()))
                 .movementReasonCode(offenderIndSchedule.getEventSubType())
                 .comments(offenderIndSchedule.getCommentText())
-                .escortType(Optional.ofNullable(escort).map(e -> e.getDescription()).orElse(null))
+                .escortType(Optional.ofNullable(escort).map(ReferenceCode::getDescription).orElse(null))
                 .build();
     }
 

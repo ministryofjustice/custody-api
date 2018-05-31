@@ -13,6 +13,12 @@ import java.util.stream.Collectors;
 
 @Service
 public class CourtEventsService {
+
+    private static final Comparator<uk.gov.justice.digital.nomis.jpa.entity.CourtEvent> BY_COURT_EVENT_DATE_NEWEST_FIRST = Comparator.comparing(uk.gov.justice.digital.nomis.jpa.entity.CourtEvent::getEventDate)
+            .thenComparing(uk.gov.justice.digital.nomis.jpa.entity.CourtEvent::getStartTime)
+            .thenComparing(uk.gov.justice.digital.nomis.jpa.entity.CourtEvent::getEventId)
+            .reversed();
+
     private final CourtEventsTransformer courtEventsTransformer;
     private final OffenderRepository offenderRepository;
 
@@ -27,20 +33,13 @@ public class CourtEventsService {
     public Optional<List<CourtEvent>> courtEventsForOffenderId(Long offenderId) {
 
         return Optional.ofNullable(offenderRepository.findOne(offenderId))
-                .map(offender ->
-                        offender.getOffenderBookings()
-                                .stream()
-                                .flatMap(offenderBooking -> offenderBooking.getCourtEvents().stream())
-                                .sorted(byCourtEventDateNewestFirst())
-                                .map(courtEventsTransformer::courtEventOf)
-                                .collect(Collectors.toList()));
+                .map(offender -> offender.getOffenderBookings()
+                        .stream()
+                        .flatMap(offenderBooking -> offenderBooking.getCourtEvents().stream())
+                        .sorted(BY_COURT_EVENT_DATE_NEWEST_FIRST)
+                        .map(courtEventsTransformer::courtEventOf)
+                        .collect(Collectors.toList()));
 
     }
 
-    private Comparator<uk.gov.justice.digital.nomis.jpa.entity.CourtEvent> byCourtEventDateNewestFirst() {
-        return Comparator.comparing(uk.gov.justice.digital.nomis.jpa.entity.CourtEvent::getEventDate)
-                .thenComparing(uk.gov.justice.digital.nomis.jpa.entity.CourtEvent::getStartTime)
-                .thenComparing(uk.gov.justice.digital.nomis.jpa.entity.CourtEvent::getEventId)
-                .reversed();
-    }
 }
