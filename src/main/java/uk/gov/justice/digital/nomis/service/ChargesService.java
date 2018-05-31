@@ -23,6 +23,11 @@ import java.util.stream.Collectors;
 @Service
 public class ChargesService {
 
+    private static final Comparator<OffenderCharge> BY_OFFENCE_RANK = Comparator
+            .comparing(OffenderCharge::getMostSeriousFlag, Comparator.reverseOrder())
+            .thenComparing((OffenderCharge oc) -> oc.getOffence().getSeverityRanking())
+            .thenComparing(OffenderCharge::getOffenderChargeId, Comparator.reverseOrder());
+
     private final OffenderChargesRepository offenderChargesRepository;
     private final OffenderRepository offenderRepository;
     private final ChargesTransformer chargesTransformer;
@@ -60,8 +65,8 @@ public class ChargesService {
 
         return maybeOffenderCharges.map(offenderCharges ->
                 offenderCharges.stream()
+                        .sorted(BY_OFFENCE_RANK)
                         .map(chargesTransformer::chargeOf)
-                        .sorted(byOffenceRank())
                         .collect(Collectors.toList()));
     }
 
@@ -79,15 +84,9 @@ public class ChargesService {
 
         return maybeOffenderBooking.map(ob -> ob.getOffenderCharges()
                 .stream()
+                .sorted(BY_OFFENCE_RANK)
                 .map(chargesTransformer::chargeOf)
-                .sorted(byOffenceRank())
                 .collect(Collectors.toList()));
     }
 
-    private Comparator<Charge> byOffenceRank() {
-        return Comparator
-                .comparing(Charge::getMostSeriousCharge)
-                .thenComparingLong(Charge::getOffenceSeverityRanking).reversed()
-                .thenComparingLong(Charge::getChargeId).reversed();
-    }
 }

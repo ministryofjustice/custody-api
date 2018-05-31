@@ -6,9 +6,14 @@ import uk.gov.justice.digital.nomis.api.CourseAttendance;
 import uk.gov.justice.digital.nomis.api.Exclusion;
 import uk.gov.justice.digital.nomis.jpa.entity.Offender;
 import uk.gov.justice.digital.nomis.jpa.entity.OffenderBooking;
+import uk.gov.justice.digital.nomis.jpa.entity.OffenderCourseAttendance;
+import uk.gov.justice.digital.nomis.jpa.entity.OffenderExcludeActsSchds;
 import uk.gov.justice.digital.nomis.jpa.repository.OffenderRepository;
 import uk.gov.justice.digital.nomis.service.transformer.AttendanceAndExclusionTransformer;
+import uk.gov.justice.digital.nomis.service.transformer.TypesTransformer;
 
+import java.sql.Timestamp;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -16,13 +21,19 @@ import java.util.stream.Collectors;
 @Service
 public class AttendancesAndExclusionsService {
 
+    private static final Comparator<OffenderExcludeActsSchds> BY_EXCLUSION_PRIORITY = Comparator
+            .comparing((OffenderExcludeActsSchds oe) -> Optional.ofNullable(oe.getModifyDatetime()).orElse(new Timestamp(0)))
+            .thenComparing((OffenderExcludeActsSchds oe) -> Optional.ofNullable(oe.getCreateDatetime()).orElse(new Timestamp(0)))
+            .reversed();
     private final OffenderRepository offenderRepository;
     private final AttendanceAndExclusionTransformer attendanceAndExclusionTransformer;
+    private final TypesTransformer typesTransformer;
 
     @Autowired
-    public AttendancesAndExclusionsService(OffenderRepository offenderRepository, AttendanceAndExclusionTransformer attendanceAndExclusionTransformer) {
+    public AttendancesAndExclusionsService(OffenderRepository offenderRepository, AttendanceAndExclusionTransformer attendanceAndExclusionTransformer, TypesTransformer typesTransformer) {
         this.offenderRepository = offenderRepository;
         this.attendanceAndExclusionTransformer = attendanceAndExclusionTransformer;
+        this.typesTransformer = typesTransformer;
     }
 
     public Optional<List<CourseAttendance>> offenderCourseAttendancessForOffenderId(Long offenderId) {
@@ -34,8 +45,15 @@ public class AttendancesAndExclusionsService {
         return maybeOffenderBookings.map(bookings -> bookings
                 .stream()
                 .flatMap(booking -> booking.getOffenderCourseAttendances().stream())
+                .sorted(byCourseAttendancePriority())
                 .map(attendanceAndExclusionTransformer::courseAttendanceOf)
                 .collect(Collectors.toList()));
+    }
+
+    private Comparator<? super OffenderCourseAttendance> byCourseAttendancePriority() {
+        return Comparator
+                .comparing((OffenderCourseAttendance oca) -> typesTransformer.localDateTimeOf(oca.getEventDate(), oca.getStartTime()))
+                .reversed();
     }
 
     public Optional<List<CourseAttendance>> offenderCourseAttendancessForOffenderIdAndBookingId(Long offenderId, Long bookingId) {
@@ -52,6 +70,7 @@ public class AttendancesAndExclusionsService {
 
         return maybeOffenderBooking.map(ob -> ob.getOffenderCourseAttendances()
                 .stream()
+                .sorted(byCourseAttendancePriority())
                 .map(attendanceAndExclusionTransformer::courseAttendanceOf)
                 .collect(Collectors.toList()));
     }
@@ -70,6 +89,7 @@ public class AttendancesAndExclusionsService {
 
         return maybeOffenderBooking.map(ob -> ob.getOffenderExcludeActsSchds()
                 .stream()
+                .sorted(BY_EXCLUSION_PRIORITY)
                 .map(attendanceAndExclusionTransformer::exclusionOf)
                 .collect(Collectors.toList()));
 
@@ -83,6 +103,8 @@ public class AttendancesAndExclusionsService {
         return maybeOffenderBookings.map(bookings -> bookings
                 .stream()
                 .flatMap(booking -> booking.getOffenderExcludeActsSchds().stream())
+                .sorted(BY_EXCLUSION_PRIORITY)
                 .map(attendanceAndExclusionTransformer::exclusionOf)
-                .collect(Collectors.toList()));    }
+                .collect(Collectors.toList()));
+    }
 }
