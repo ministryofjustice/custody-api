@@ -14,10 +14,11 @@ import java.util.stream.Collectors;
 @Service
 public class CourtEventsService {
 
-    private static final Comparator<uk.gov.justice.digital.nomis.jpa.entity.CourtEvent> BY_COURT_EVENT_DATE_NEWEST_FIRST = Comparator.comparing(uk.gov.justice.digital.nomis.jpa.entity.CourtEvent::getEventDate)
-            .thenComparing(uk.gov.justice.digital.nomis.jpa.entity.CourtEvent::getStartTime)
-            .thenComparing(uk.gov.justice.digital.nomis.jpa.entity.CourtEvent::getEventId)
-            .reversed();
+    private static final Comparator<uk.gov.justice.digital.nomis.jpa.entity.CourtEvent> BY_COURT_EVENT_DATE_NEWEST_FIRST =
+            Comparator.comparing(uk.gov.justice.digital.nomis.jpa.entity.CourtEvent::getEventDate)
+                .thenComparing(uk.gov.justice.digital.nomis.jpa.entity.CourtEvent::getStartTime)
+                .thenComparing(uk.gov.justice.digital.nomis.jpa.entity.CourtEvent::getEventId)
+                .reversed();
 
     private final CourtEventsTransformer courtEventsTransformer;
     private final OffenderRepository offenderRepository;

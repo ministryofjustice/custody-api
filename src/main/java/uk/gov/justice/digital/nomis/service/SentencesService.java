@@ -86,7 +86,7 @@ public class SentencesService {
 
     private Comparator<OffenderSentence> byCreatedDate() {
         return Comparator.comparing(OffenderSentence::getSentenceStatus)
-            .thenComparing(OffenderSentence::getCreateDatetime, Comparator.nullsLast(Comparator.reverseOrder()));
+            .thenComparing(OffenderSentence::getSentenceSeq);
     }
 
 }
