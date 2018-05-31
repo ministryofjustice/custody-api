@@ -39,8 +39,11 @@ public class MovementsService {
     public Page<ExternalMovement> getMovements(Pageable pageable, MovementsFilter movementsFilter) {
         Page<OffenderExternalMovement> externalMovements = externalMovementsRepository.findAll(movementsFilter, pageable);
 
-        List<ExternalMovement> movementList = externalMovements.getContent().stream().map(
-                movementsTransformer::movementOf).collect(Collectors.toList());
+        List<ExternalMovement> movementList = externalMovements.getContent()
+                .stream()
+                .sorted(byMovementDate())
+                .map(movementsTransformer::movementOf)
+                .collect(Collectors.toList());
 
         return new PageImpl<>(movementList, pageable, externalMovements.getTotalElements());
     }
@@ -56,8 +59,8 @@ public class MovementsService {
 
         return maybeOffenderMovements.map(externalMovements -> externalMovements
                 .stream()
-                .map(movementsTransformer::movementOf)
                 .sorted(byMovementDate())
+                .map(movementsTransformer::movementOf)
                 .collect(Collectors.toList()));
     }
 
@@ -75,13 +78,19 @@ public class MovementsService {
 
         return maybeOffenderBooking.map(ob -> ob.getOffenderExternalMovements()
                 .stream()
+                .sorted(byMovementDate())
                 .map(movementsTransformer::movementOf)
                 .collect(Collectors.toList()));
     }
 
-    private Comparator<ExternalMovement> byMovementDate() {
-        return Comparator.comparing(ExternalMovement::getMovementDateTime).reversed()
-                .thenComparingLong(ExternalMovement::getSequenceNumber).reversed();
+    private Comparator<OffenderExternalMovement> byMovementDate() {
+        return Comparator.comparing(OffenderExternalMovement::getMovementDate)
+                .thenComparingLong(this::getMovementSeq)
+                .reversed();
+    }
+
+    private long getMovementSeq(OffenderExternalMovement oem) {
+        return oem.getId().getMovementSeq();
     }
 
 }

@@ -14,12 +14,10 @@ import java.util.stream.Collectors;
 public class ImprisonStatusTransformer {
 
     private final TypesTransformer typesTransformer;
-    private final ImprisonmentStatusesRepository imprisonmentStatusesRepository;
 
     @Autowired
-    public ImprisonStatusTransformer(TypesTransformer typesTransformer, ImprisonmentStatusesRepository imprisonmentStatusesRepository) {
+    public ImprisonStatusTransformer(TypesTransformer typesTransformer) {
         this.typesTransformer = typesTransformer;
-        this.imprisonmentStatusesRepository = imprisonmentStatusesRepository;
     }
 
     public List<OffenderImprisonmentStatus> offenderImprisonStatusesOf(List<uk.gov.justice.digital.nomis.jpa.entity.OffenderImprisonStatus> offenderImprisonStatuses) {
@@ -38,24 +36,10 @@ public class ImprisonStatusTransformer {
                 .commentText(ois.getCommentText())
                 .effectiveDateTime(typesTransformer.localDateTimeOf(ois.getEffectiveDate(), ois.getEffectiveTime()))
                 .expiryDate(typesTransformer.localDateOf(ois.getExpiryDate()))
-                .imprisonmentStatuses(imprisonmentStatusesOf(ois.getImprisonmentStatus()).orElse(null))
+                .imprisonmentStatusCode(ois.getImprisonmentStatus())
                 .imprisonStatusSeq(ois.getImprisonStatusSeq())
                 .latestStatus(typesTransformer.ynToBoolean(ois.getLatestStatus()))
                 .bookingId(ois.getOffenderBookId())
                 .build();
-    }
-
-    private Optional<ImprisonmentStatus> imprisonmentStatusesOf(String imprisonmentStatus) {
-        return imprisonmentStatusesRepository.findByImprisonmentStatus(imprisonmentStatus)
-                .stream()
-                .map(is -> ImprisonmentStatus.builder()
-                        .bandCode(is.getBandCode())
-                        .description(is.getDescription())
-                        .imprisonmentStatus(is.getImprisonmentStatus())
-                        .imprisonmentStatusId(is.getImprisonmentStatusId())
-                        .imprisonmentStatusSeq(is.getImprisonmentStatusSeq())
-                        .rankValue(is.getRankValue())
-                        .build())
-                .findFirst();
     }
 }

@@ -9,15 +9,19 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.gov.justice.digital.nomis.api.OffenderImprisonmentStatus;
 import uk.gov.justice.digital.nomis.jpa.entity.Offender;
 import uk.gov.justice.digital.nomis.jpa.entity.OffenderBooking;
+import uk.gov.justice.digital.nomis.jpa.entity.OffenderImprisonStatus;
 import uk.gov.justice.digital.nomis.jpa.repository.OffenderImprisonStatusesRepository;
 import uk.gov.justice.digital.nomis.jpa.repository.OffenderRepository;
 import uk.gov.justice.digital.nomis.service.transformer.ImprisonStatusTransformer;
+import uk.gov.justice.digital.nomis.service.transformer.TypesTransformer;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class ImprisonStatusService {
@@ -26,11 +30,14 @@ public class ImprisonStatusService {
     private final OffenderImprisonStatusesRepository offenderImprisonStatusesRepository;
     private final OffenderRepository offenderRepository;
 
+    private final TypesTransformer typesTransformer;
+
     @Autowired
-    public ImprisonStatusService(ImprisonStatusTransformer imprisonStatusTransformer, OffenderImprisonStatusesRepository offenderImprisonStatusesRepository, OffenderRepository offenderRepository) {
+    public ImprisonStatusService(ImprisonStatusTransformer imprisonStatusTransformer, OffenderImprisonStatusesRepository offenderImprisonStatusesRepository, OffenderRepository offenderRepository, TypesTransformer typesTransformer) {
         this.imprisonStatusTransformer = imprisonStatusTransformer;
         this.offenderImprisonStatusesRepository = offenderImprisonStatusesRepository;
         this.offenderRepository = offenderRepository;
+        this.typesTransformer = typesTransformer;
     }
 
 
@@ -38,9 +45,11 @@ public class ImprisonStatusService {
     public Page<OffenderImprisonmentStatus> getOffenderImprisonStatuses(Pageable pageable) {
         Page<uk.gov.justice.digital.nomis.jpa.entity.OffenderImprisonStatus> rawImprisonStatusesPage = offenderImprisonStatusesRepository.findAll(pageable);
 
-        List<OffenderImprisonmentStatus> offenderImprisonmentStatuses = rawImprisonStatusesPage.getContent().stream().map(
-                imprisonStatusTransformer::offenderImprisonStatusOf
-        ).collect(Collectors.toList());
+        List<OffenderImprisonmentStatus> offenderImprisonmentStatuses = rawImprisonStatusesPage.getContent()
+                .stream()
+                .sorted(byEffectiveStatus())
+                .map(imprisonStatusTransformer::offenderImprisonStatusOf)
+                .collect(Collectors.toList());
 
         return new PageImpl<>(offenderImprisonmentStatuses, pageable, rawImprisonStatusesPage.getTotalElements());
     }
@@ -48,18 +57,15 @@ public class ImprisonStatusService {
     @Transactional
     public Optional<List<OffenderImprisonmentStatus>> offenderImprisonStatusForOffenderId(Long offenderId) {
 
-        Optional<List<uk.gov.justice.digital.nomis.jpa.entity.OffenderImprisonStatus>> maybeImprisonStatuses = Optional.ofNullable(offenderRepository.findOne(offenderId))
-                .map(offender ->
-                        offender.getOffenderBookings()
-                                .stream()
-                                .map(OffenderBooking::getOffenderImprisonStatuses)
-                                .flatMap(Collection::stream)
-                                .collect(Collectors.toList()));
+        Optional<Stream<OffenderImprisonStatus>> maybeImprisonStatuses = Optional.ofNullable(offenderRepository.findOne(offenderId))
+                .map(offender -> offender.getOffenderBookings()
+                        .stream()
+                        .map(OffenderBooking::getOffenderImprisonStatuses)
+                        .flatMap(Collection::stream));
 
         return maybeImprisonStatuses.map(imprisonStatuses -> imprisonStatuses
-                .stream()
-                .map(imprisonStatusTransformer::offenderImprisonStatusOf)
                 .sorted(byEffectiveStatus())
+                .map(imprisonStatusTransformer::offenderImprisonStatusOf)
                 .collect(Collectors.toList()));
     }
 
@@ -77,15 +83,20 @@ public class ImprisonStatusService {
 
         return maybeOffenderBooking.map(ob -> ob.getOffenderImprisonStatuses()
                 .stream()
-                .map(imprisonStatusTransformer::offenderImprisonStatusOf)
                 .sorted(byEffectiveStatus())
+                .map(imprisonStatusTransformer::offenderImprisonStatusOf)
                 .collect(Collectors.toList()));
     }
 
-    private Comparator<OffenderImprisonmentStatus> byEffectiveStatus() {
-        return Comparator.comparing(OffenderImprisonmentStatus::getLatestStatus)
-                .thenComparing(OffenderImprisonmentStatus::getEffectiveDateTime).reversed()
-                .thenComparing(OffenderImprisonmentStatus::getImprisonStatusSeq);
+    private Comparator<OffenderImprisonStatus> byEffectiveStatus() {
+        return Comparator.comparing(OffenderImprisonStatus::getLatestStatus, Comparator.nullsLast(Comparator.naturalOrder()))
+                .thenComparing(this::getEffectiveDateTime)
+                .thenComparing(OffenderImprisonStatus::getImprisonStatusSeq)
+                .reversed();
+    }
+
+    private LocalDateTime getEffectiveDateTime(OffenderImprisonStatus ois) {
+        return typesTransformer.localDateTimeOf(ois.getEffectiveDate(), ois.getEffectiveTime());
     }
 
 }
