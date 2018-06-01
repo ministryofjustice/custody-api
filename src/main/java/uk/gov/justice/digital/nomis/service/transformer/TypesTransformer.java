@@ -20,7 +20,7 @@ public class TypesTransformer {
 
     public LocalDate localDateOf(Date date) {
         return Optional.ofNullable(date)
-                .map(d -> d.toLocalDate())
+                .map(Date::toLocalDate)
                 .orElse(null);
     }
 
@@ -39,7 +39,7 @@ public class TypesTransformer {
 
     public LocalDateTime localDateTimeOf(Timestamp date, Timestamp time) {
         return Optional.ofNullable(date)
-                .map(d -> d.toLocalDateTime())
+                .map(Timestamp::toLocalDateTime)
                 .map(dateTime ->
                         Optional.ofNullable(time)
                             .map(t -> t.toLocalDateTime().toLocalTime().atDate(dateTime.toLocalDate()))

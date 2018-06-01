@@ -23,6 +23,10 @@ import java.util.stream.Collectors;
 @Service
 public class SentencesService {
 
+    private static final Comparator<OffenderSentence> BY_SENTENCE_PRIORITY =
+            Comparator
+                    .comparing(OffenderSentence::getSentenceStatus)
+                    .thenComparing(OffenderSentence::getSentenceSeq);
     private final OffenderSentencesRepository offenderSentencesRepository;
     private final OffenderRepository offenderRepository;
     private final SentenceTransformer sentenceTransformer;
@@ -41,7 +45,8 @@ public class SentencesService {
 
         List<Sentence> sentencesList = offenderSentences.getContent()
                 .stream()
-                .sorted(byCreatedDate())
+                .sorted(Comparator.comparing(OffenderSentence::getSentenceStatus)
+                        .thenComparing(OffenderSentence::getSentenceSeq))
                 .map(sentenceTransformer::sentenceOf)
                 .collect(Collectors.toList());
 
@@ -59,7 +64,7 @@ public class SentencesService {
 
         return maybeOffenderSentences.map(offenderSentences -> offenderSentences
                 .stream()
-                .sorted(byCreatedDate())
+                .sorted(BY_SENTENCE_PRIORITY)
                 .map(sentenceTransformer::sentenceOf)
                 .collect(Collectors.toList()));
     }
@@ -79,14 +84,9 @@ public class SentencesService {
 
         return maybeOffenderBooking.map(ob -> ob.getOffenderSentences()
                 .stream()
-                .sorted(byCreatedDate())
+                .sorted(BY_SENTENCE_PRIORITY)
                 .map(sentenceTransformer::sentenceOf)
                 .collect(Collectors.toList()));
-    }
-
-    private Comparator<OffenderSentence> byCreatedDate() {
-        return Comparator.comparing(OffenderSentence::getSentenceStatus)
-            .thenComparing(OffenderSentence::getSentenceSeq);
     }
 
 }
