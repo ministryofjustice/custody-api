@@ -67,8 +67,8 @@ public class OffenderTransformer {
 
     public List<Booking> bookingsOf(List<OffenderBooking> offenderBookings) {
         return offenderBookings.stream()
-                .map(this::bookingOf)
                 .sorted(byBookingSequence())
+                .map(this::bookingOf)
                 .collect(Collectors.toList());
     }
 
@@ -123,9 +123,9 @@ public class OffenderTransformer {
                 .build();
     }
 
-    private Comparator<Booking> byBookingSequence() {
-        return Comparator.comparingLong(Booking::getBookingId)
-                .thenComparingLong(Booking::getBookingSequence);
+    private Comparator<OffenderBooking> byBookingSequence() {
+        return Comparator.comparing(OffenderBooking::getBookingBeginDate, Comparator.reverseOrder())
+                .thenComparing(OffenderBooking::getBookingSeq);
     }
 
     private Comparator<OffenderExternalMovement> byOffenderExternalMovementDate() {

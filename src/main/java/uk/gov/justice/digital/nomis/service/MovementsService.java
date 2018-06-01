@@ -85,6 +85,7 @@ public class MovementsService {
 
     private Comparator<OffenderExternalMovement> byMovementDate() {
         return Comparator.comparing(OffenderExternalMovement::getMovementDate)
+                .thenComparing((OffenderExternalMovement::getMovementTime))
                 .thenComparingLong(this::getMovementSeq)
                 .reversed();
     }
