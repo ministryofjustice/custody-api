@@ -80,16 +80,17 @@ public class PersonTransformer {
     private Comparator<PersonAddress> byPersonAddressPriority() {
         return Comparator.comparing(PersonAddress::getPrimaryFlag)
                 .thenComparing(a -> Optional.ofNullable(a.getEndDate()).orElse(new Timestamp(0))).reversed()
-                .thenComparing(a -> Optional.ofNullable(a.getAddressUsage()).map(x -> x.getActiveFlag()).orElse("N"))
+//                .thenComparing(a -> Optional.ofNullable(a.getAddressUsage()).map(x -> x.getActiveFlag()).orElse("N"))
                 .thenComparing(this::getLastModifiedDate);
     }
 
     private Timestamp getLastModifiedDate(PersonAddress address) {
         return Stream.of(
                 Optional.ofNullable(address.getModifyDatetime()).orElse(new Timestamp(0)),
-                Optional.ofNullable(address.getCreateDatetime()).orElse(new Timestamp(0)),
-                Optional.ofNullable(address.getAddressUsage()).map(x -> x.getModifyDatetime()).orElse(new Timestamp(0)),
-                Optional.ofNullable(address.getAddressUsage()).map(x -> x.getCreateDatetime()).orElse(new Timestamp(0))
+                Optional.ofNullable(address.getCreateDatetime()).orElse(new Timestamp(0))
+//                ,
+//                Optional.ofNullable(address.getAddressUsage()).map(x -> x.getModifyDatetime()).orElse(new Timestamp(0)),
+//                Optional.ofNullable(address.getAddressUsage()).map(x -> x.getCreateDatetime()).orElse(new Timestamp(0))
         ).max(comparing(Timestamp::getTime)).get();
     }
 }

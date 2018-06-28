@@ -25,7 +25,7 @@ public class AddressesTransformer {
         return Address.builder()
                 .addressId(address.getAddressId())
                 .addressType(address.getAddressType())
-                .addressUsage(Optional.ofNullable(address.getAddressUsage()).map(AddressUsage::getAddressUsage).orElse(null))
+                .addressUsages(addressUsagesOf(address.getAddressUsages()))
                 .businessHour(address.getBusinessHour())
                 .capacity(address.getCapacity())
                 .cityCode(address.getCityCode())
@@ -51,9 +51,18 @@ public class AddressesTransformer {
                 .validatedPaf(typesTransformer.ynToBoolean(address.getValidatedPafFlag()))
                 .startDate(typesTransformer.localDateOf(address.getStartDate()))
                 .endDate(typesTransformer.localDateOf(address.getEndDate()))
-                .active(typesTransformer.ynToBoolean(Optional.ofNullable(address.getAddressUsage()).map(AddressUsage::getActiveFlag).orElse(null)))
                 .phones(phonesOf(address.getPhones()))
                 .build();
+    }
+
+    private List<uk.gov.justice.digital.nomis.api.AddressUsage> addressUsagesOf(List<AddressUsage> addressUsages) {
+        return Optional.ofNullable(addressUsages).map(
+                usages -> usages.stream().map(
+                        usage -> uk.gov.justice.digital.nomis.api.AddressUsage.builder()
+                                .active(typesTransformer.ynToBoolean(usage.getActiveFlag()))
+                                .usage(usage.getAddressUsage())
+                                .build()
+                ).collect(Collectors.toList())).orElse(null);
     }
 
     private List<Phone> phonesOf(List<AddressPhone> phones) {

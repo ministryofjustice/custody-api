@@ -23,11 +23,9 @@ public class Address {
     }
 
     private String addressType;
-    private String addressUsage;
+    private List<AddressUsage> addressUsages;
     private String ownerClass;
-    //    private Long ownerId;
     private Integer ownerSeq;
-    //    private String ownerCode;
     private String flat;
     private String premise;
     private String street;
