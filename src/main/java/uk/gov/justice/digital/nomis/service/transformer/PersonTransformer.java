@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.justice.digital.nomis.api.Address;
 import uk.gov.justice.digital.nomis.api.Person;
+import uk.gov.justice.digital.nomis.jpa.entity.AddressUsage;
 import uk.gov.justice.digital.nomis.jpa.entity.PersonAddress;
 
 import java.sql.Timestamp;
@@ -11,6 +12,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -18,6 +20,26 @@ import static java.util.Comparator.comparing;
 
 @Component
 public class PersonTransformer {
+
+    private static final Timestamp EARLIEST = new Timestamp(0);
+
+    private static final Function<List<AddressUsage>, Timestamp> LATEST_CREATED_DATE_OF = (List<AddressUsage> usages) ->
+            usages.stream().
+                    map(x -> Optional.ofNullable(x.getCreateDatetime()).orElse(EARLIEST))
+                    .max(comparing(Timestamp::getTime)).orElse(EARLIEST);
+
+    private static final Function<List<AddressUsage>, Timestamp> LATEST_MODIFIED_DATE_OF = (List<AddressUsage> usages) ->
+            usages.stream().
+                    map(x -> Optional.ofNullable(x.getModifyDatetime()).orElse(EARLIEST))
+                    .max(comparing(Timestamp::getTime)).orElse(EARLIEST);
+
+    private static Function<PersonAddress, Timestamp> LAST_MODIFIED_DATE_OF = (PersonAddress address) ->
+            Stream.of(
+                    Optional.ofNullable(address.getModifyDatetime()).orElse(EARLIEST),
+                    Optional.ofNullable(address.getCreateDatetime()).orElse(EARLIEST),
+                    LATEST_MODIFIED_DATE_OF.apply(address.getAddressUsages()),
+                    LATEST_CREATED_DATE_OF.apply(address.getAddressUsages()))
+                    .max(comparing(Timestamp::getTime)).get();
 
     private final AddressesTransformer addressesTransformer;
     private final TypesTransformer typesTransformer;
@@ -79,18 +101,7 @@ public class PersonTransformer {
 
     private Comparator<PersonAddress> byPersonAddressPriority() {
         return Comparator.comparing(PersonAddress::getPrimaryFlag)
-                .thenComparing(a -> Optional.ofNullable(a.getEndDate()).orElse(new Timestamp(0))).reversed()
-//                .thenComparing(a -> Optional.ofNullable(a.getAddressUsage()).map(x -> x.getActiveFlag()).orElse("N"))
-                .thenComparing(this::getLastModifiedDate);
-    }
-
-    private Timestamp getLastModifiedDate(PersonAddress address) {
-        return Stream.of(
-                Optional.ofNullable(address.getModifyDatetime()).orElse(new Timestamp(0)),
-                Optional.ofNullable(address.getCreateDatetime()).orElse(new Timestamp(0))
-//                ,
-//                Optional.ofNullable(address.getAddressUsage()).map(x -> x.getModifyDatetime()).orElse(new Timestamp(0)),
-//                Optional.ofNullable(address.getAddressUsage()).map(x -> x.getCreateDatetime()).orElse(new Timestamp(0))
-        ).max(comparing(Timestamp::getTime)).get();
+                .thenComparing(a -> Optional.ofNullable(a.getEndDate()).orElse(EARLIEST)).reversed()
+                .thenComparing(a -> LAST_MODIFIED_DATE_OF.apply(a));
     }
 }
