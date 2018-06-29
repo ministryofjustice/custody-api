@@ -8,11 +8,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.justice.digital.nomis.api.Offender;
-import uk.gov.justice.digital.nomis.jpa.entity.OffenderBooking;
 import uk.gov.justice.digital.nomis.jpa.repository.OffenderRepository;
 import uk.gov.justice.digital.nomis.service.transformer.OffenderTransformer;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -44,9 +42,21 @@ public class OffenderService {
     }
 
     @Transactional
-    public Optional<Offender> getOffender(Long offenderId) {
+    public Optional<Offender> getOffenderByOffenderId(Long offenderId) {
         Optional<uk.gov.justice.digital.nomis.jpa.entity.Offender> maybeOffender = Optional.of(offenderRepository.findOne(offenderId));
 
         return maybeOffender.map(offenderTransformer::offenderOf);
     }
+
+    @Transactional
+    public Optional<Offender> getOffenderByNomsId(String nomsId) {
+
+        final Optional<uk.gov.justice.digital.nomis.jpa.entity.Offender> maybeOffender = offenderRepository.findByOffenderIdDisplay(nomsId)
+                .stream()
+                .filter(o -> o.getOffenderId().equals(o.getRootOffenderId()))
+                .findFirst();
+
+        return maybeOffender.map(offenderTransformer::offenderOf);
+    }
+
 }

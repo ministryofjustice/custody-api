@@ -7,10 +7,14 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import uk.gov.justice.digital.nomis.jpa.entity.Offender;
 
+import java.util.List;
+
 @Repository
 public interface OffenderRepository extends JpaRepository<Offender, Long> {
 
     @Query("select o from Offender o where o.offenderId = o.rootOffenderId")
     Page<Offender> findAllRootOffenders(Pageable pageable);
+
+    List<Offender> findByOffenderIdDisplay(String nomsId);
 
 }

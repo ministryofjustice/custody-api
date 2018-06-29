@@ -55,7 +55,7 @@ public class OffenderControllerTest {
     }
 
     @Test
-    public void canGetOffender() {
+    public void canGetOffenderByOffenderId() {
         Offender offender = given()
                 .when()
                 .auth().oauth2(validOauthToken)
@@ -86,5 +86,30 @@ public class OffenderControllerTest {
                 .then()
                 .statusCode(401);
     }
+
+    @Test
+    public void canGetOffenderByNomsId() {
+        Offender offender = given()
+                .when()
+                .auth().oauth2(validOauthToken)
+                .get("/offenders/nomsId/A1234AA")
+                .then()
+                .statusCode(200)
+                .extract()
+                .body()
+                .as(Offender.class);
+
+        assertThat(offender).extracting("offenderId").containsOnly(-1001L);
+    }
+
+    @Test
+    public void offenderByNomsIdIsAuthorized() {
+        given()
+                .when()
+                .get("/offenders/nomsId/A1234AA")
+                .then()
+                .statusCode(401);
+    }
+
 
 }

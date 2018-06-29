@@ -54,8 +54,20 @@ public class OffenderController {
             @ApiResponse(code = 200, message = "OK")})
     public ResponseEntity<Offender> getOffender(@PathVariable("offenderId") Long offenderId) {
 
-        return offenderService.getOffender(offenderId)
+        return offenderService.getOffenderByOffenderId(offenderId)
                 .map(offender -> new ResponseEntity<>(offender, HttpStatus.OK))
                 .orElse(new ResponseEntity<>(NOT_FOUND));
     }
+
+    @RequestMapping(path = "/offenders/nomsId/{nomsId}", method = RequestMethod.GET)
+    @ApiResponses({
+            @ApiResponse(code = 404, message = "Offender or booking not found"),
+            @ApiResponse(code = 200, message = "OK")})
+    public ResponseEntity<Offender> getOffender(@PathVariable("nomsId") String nomsId) {
+
+        return offenderService.getOffenderByNomsId(nomsId)
+                .map(offender -> new ResponseEntity<>(offender, HttpStatus.OK))
+                .orElse(new ResponseEntity<>(NOT_FOUND));
+    }
+
 }
