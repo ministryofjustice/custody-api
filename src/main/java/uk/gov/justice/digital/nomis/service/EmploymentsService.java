@@ -15,8 +15,7 @@ import java.util.stream.Collectors;
 public class EmploymentsService {
 
     private static final Comparator<Employment> BY_EMPLOYMENT_SEQUENCE =
-            Comparator
-                    .comparing(Employment::getModifiedDateTime)
+                    Comparator.comparing(Employment::getModifiedDateTime, Comparator.nullsFirst(Comparator.naturalOrder()))
                     .thenComparing(Employment::getCreatedDateTime)
                     .thenComparing(Employment::getEmploymentSequence)
                     .reversed();
