@@ -31,7 +31,6 @@ public class EmploymentsService {
     }
 
     public Optional<List<Employment>> employmentsForOffenderId(Long offenderId) {
-
         return Optional.ofNullable(offenderRepository.findOne(offenderId))
                 .map(offender -> offender.getOffenderBookings().stream()
                         .flatMap(offenderBooking -> offenderBooking.getOffenderEmployments().stream()
