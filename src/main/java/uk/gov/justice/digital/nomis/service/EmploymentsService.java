@@ -34,8 +34,8 @@ public class EmploymentsService {
         return Optional.ofNullable(offenderRepository.findOne(offenderId))
                 .map(offender -> offender.getOffenderBookings().stream()
                         .flatMap(offenderBooking -> offenderBooking.getOffenderEmployments().stream()
-                                .map(employmentsTransformer::employmentOf)
-                                .sorted(BY_EMPLOYMENT_SEQUENCE))
+                                .map(employmentsTransformer::employmentOf))
+                                .sorted(BY_EMPLOYMENT_SEQUENCE)
                         .collect(Collectors.toList()));
     }
 
