@@ -50,11 +50,7 @@ public class OffenderService {
 
     @Transactional
     public Optional<Offender> getOffenderByNomsId(String nomsId) {
-
-        final Optional<uk.gov.justice.digital.nomis.jpa.entity.Offender> maybeOffender = offenderRepository.findByOffenderIdDisplay(nomsId)
-                .stream()
-                .filter(o -> o.getOffenderId().equals(o.getRootOffenderId()))
-                .findFirst();
+        final Optional<uk.gov.justice.digital.nomis.jpa.entity.Offender> maybeOffender = offenderRepository.findByNomsId(nomsId);
 
         return maybeOffender.map(offenderTransformer::offenderOf);
     }

@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 import uk.gov.justice.digital.nomis.jpa.entity.Offender;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface OffenderRepository extends JpaRepository<Offender, Long> {
@@ -16,5 +17,11 @@ public interface OffenderRepository extends JpaRepository<Offender, Long> {
     Page<Offender> findAllRootOffenders(Pageable pageable);
 
     List<Offender> findByOffenderIdDisplay(String nomsId);
+
+    default Optional<Offender> findByNomsId(String nomsId) {
+        return findByOffenderIdDisplay(nomsId).stream()
+                .filter(o -> o.getOffenderId().equals(o.getRootOffenderId()))
+                .findFirst();
+    }
 
 }
