@@ -64,21 +64,17 @@ public class AlertsService {
     public Optional<List<Alert>> offenderAlertsForOffenderIdAndBookingId(Long offenderId, Long bookingId, Optional<String> maybeAlertCode, Optional<String> maybeAlertStatus, Optional<String> maybeAlertType) {
         Optional<Offender> maybeOffender = Optional.ofNullable(offenderRepository.findOne(offenderId));
 
-        if (!maybeOffender.isPresent()) {
-            return Optional.empty();
-        }
-
-        Optional<OffenderBooking> maybeOffenderBooking = maybeOffender.get().getOffenderBookings()
-                .stream()
-                .filter(ob -> ob.getOffenderBookId().equals(bookingId))
-                .findFirst();
-
-        return maybeOffenderBooking.map(ob -> ob.getOffenderAlerts()
-                .stream()
-                .sorted(ALERTS_BY)
-                .filter(alert -> shouldInclude(alert, maybeAlertCode, maybeAlertStatus, maybeAlertType))
-                .map(alertsTransformer::alertOf)
-                .collect(Collectors.toList()));
+        return maybeOffender.flatMap(
+                offender -> offender.getOffenderBookings()
+                        .stream()
+                        .filter(ob -> ob.getOffenderBookId().equals(bookingId))
+                        .findFirst())
+                .map(ob -> ob.getOffenderAlerts()
+                        .stream()
+                        .sorted(ALERTS_BY)
+                        .filter(alert -> shouldInclude(alert, maybeAlertCode, maybeAlertStatus, maybeAlertType))
+                        .map(alertsTransformer::alertOf)
+                        .collect(Collectors.toList()));
     }
 
 }

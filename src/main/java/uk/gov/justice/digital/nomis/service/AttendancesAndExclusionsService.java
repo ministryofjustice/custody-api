@@ -59,39 +59,31 @@ public class AttendancesAndExclusionsService {
     public Optional<List<CourseAttendance>> offenderCourseAttendancessForOffenderIdAndBookingId(Long offenderId, Long bookingId) {
         Optional<Offender> maybeOffender = Optional.ofNullable(offenderRepository.findOne(offenderId));
 
-        if (!maybeOffender.isPresent()) {
-            return Optional.empty();
-        }
-
-        Optional<OffenderBooking> maybeOffenderBooking = maybeOffender.get().getOffenderBookings()
-                .stream()
-                .filter(ob -> ob.getOffenderBookId().equals(bookingId))
-                .findFirst();
-
-        return maybeOffenderBooking.map(ob -> ob.getOffenderCourseAttendances()
-                .stream()
-                .sorted(byCourseAttendancePriority())
-                .map(attendanceAndExclusionTransformer::courseAttendanceOf)
-                .collect(Collectors.toList()));
+        return maybeOffender.flatMap(
+                offender -> offender.getOffenderBookings()
+                        .stream()
+                        .filter(ob -> ob.getOffenderBookId().equals(bookingId))
+                        .findFirst())
+                .map(ob -> ob.getOffenderCourseAttendances()
+                        .stream()
+                        .sorted(byCourseAttendancePriority())
+                        .map(attendanceAndExclusionTransformer::courseAttendanceOf)
+                        .collect(Collectors.toList()));
     }
 
     public Optional<List<Exclusion>> exclusionsForOffenderIdAndBookingId(Long offenderId, Long bookingId) {
         Optional<Offender> maybeOffender = Optional.ofNullable(offenderRepository.findOne(offenderId));
 
-        if (!maybeOffender.isPresent()) {
-            return Optional.empty();
-        }
-
-        Optional<OffenderBooking> maybeOffenderBooking = maybeOffender.get().getOffenderBookings()
-                .stream()
-                .filter(ob -> ob.getOffenderBookId().equals(bookingId))
-                .findFirst();
-
-        return maybeOffenderBooking.map(ob -> ob.getOffenderExcludeActsSchds()
-                .stream()
-                .sorted(BY_EXCLUSION_PRIORITY)
-                .map(attendanceAndExclusionTransformer::exclusionOf)
-                .collect(Collectors.toList()));
+        return maybeOffender.flatMap(
+                offender -> offender.getOffenderBookings()
+                        .stream()
+                        .filter(ob -> ob.getOffenderBookId().equals(bookingId))
+                        .findFirst())
+                .map(ob -> ob.getOffenderExcludeActsSchds()
+                        .stream()
+                        .sorted(BY_EXCLUSION_PRIORITY)
+                        .map(attendanceAndExclusionTransformer::exclusionOf)
+                        .collect(Collectors.toList()));
 
     }
 

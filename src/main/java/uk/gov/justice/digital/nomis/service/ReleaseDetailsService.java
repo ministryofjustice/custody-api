@@ -58,19 +58,15 @@ public class ReleaseDetailsService {
     public Optional<List<ReleaseDetails>> releaseDetailsForOffenderIdAndBookingId(Long offenderId, Long bookingId) {
         Optional<Offender> maybeOffender = Optional.ofNullable(offenderRepository.findOne(offenderId));
 
-        if (!maybeOffender.isPresent()) {
-            return Optional.empty();
-        }
-
-        Optional<OffenderBooking> maybeOffenderBooking = maybeOffender.get().getOffenderBookings()
-                .stream()
-                .filter(ob -> ob.getOffenderBookId().equals(bookingId))
-                .findFirst();
-
-        return maybeOffenderBooking.map(ob -> ob.getOffenderReleaseDetails()
-                .stream()
-                .map(releaseDetailsTransformer::releaseDetailsOf)
-                .collect(Collectors.toList()));
+        return maybeOffender.flatMap(
+                offender -> offender.getOffenderBookings()
+                        .stream()
+                        .filter(ob -> ob.getOffenderBookId().equals(bookingId))
+                        .findFirst())
+                .map(ob -> ob.getOffenderReleaseDetails()
+                        .stream()
+                        .map(releaseDetailsTransformer::releaseDetailsOf)
+                        .collect(Collectors.toList()));
     }
 
 }

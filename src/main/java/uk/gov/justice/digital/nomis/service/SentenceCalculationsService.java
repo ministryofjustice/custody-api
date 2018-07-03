@@ -58,28 +58,23 @@ public class SentenceCalculationsService {
         return maybeSentenceCalculations
                 .map(sentCalculations ->
                         sentCalculations.stream()
-                            .map(sentenceCalculationsTransformer::sentenceCalculationOf)
-                            .sorted(byCalculationDate())
-                            .collect(Collectors.toList()));
+                                .map(sentenceCalculationsTransformer::sentenceCalculationOf)
+                                .sorted(byCalculationDate())
+                                .collect(Collectors.toList()));
     }
 
     public Optional<List<SentenceCalculation>> sentenceCalculationsForOffenderIdAndBookingId(Long offenderId, Long bookingId) {
         Optional<Offender> maybeOffender = Optional.ofNullable(offenderRepository.findOne(offenderId));
 
-        if (!maybeOffender.isPresent()) {
-            return Optional.empty();
-        }
-
-        Optional<OffenderBooking> maybeOffenderBooking = maybeOffender.get()
-                .getOffenderBookings().stream()
-                    .filter(ob -> ob.getOffenderBookId().equals(bookingId))
-                    .findFirst();
-
-        return maybeOffenderBooking.map(ob ->
-                ob.getOffenderSentCalculations().stream()
-                    .map(sentenceCalculationsTransformer::sentenceCalculationOf)
-                    .sorted(byCalculationDate())
-                    .collect(Collectors.toList()));
+        return maybeOffender.flatMap(
+                offender -> offender.getOffenderBookings()
+                        .stream()
+                        .filter(ob -> ob.getOffenderBookId().equals(bookingId))
+                        .findFirst()).
+                map(ob -> ob.getOffenderSentCalculations().stream()
+                        .map(sentenceCalculationsTransformer::sentenceCalculationOf)
+                        .sorted(byCalculationDate())
+                        .collect(Collectors.toList()));
     }
 
     private Comparator<SentenceCalculation> byCalculationDate() {

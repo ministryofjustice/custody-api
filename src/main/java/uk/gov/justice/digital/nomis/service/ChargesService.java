@@ -73,20 +73,16 @@ public class ChargesService {
     public Optional<List<Charge>> chargesForOffenderIdAndBookingId(Long offenderId, Long bookingId) {
         Optional<Offender> maybeOffender = Optional.ofNullable(offenderRepository.findOne(offenderId));
 
-        if (!maybeOffender.isPresent()) {
-            return Optional.empty();
-        }
-
-        Optional<OffenderBooking> maybeOffenderBooking = maybeOffender.get().getOffenderBookings()
-                .stream()
-                .filter(ob -> ob.getOffenderBookId().equals(bookingId))
-                .findFirst();
-
-        return maybeOffenderBooking.map(ob -> ob.getOffenderCharges()
-                .stream()
-                .sorted(BY_OFFENCE_RANK)
-                .map(chargesTransformer::chargeOf)
-                .collect(Collectors.toList()));
+        return maybeOffender.flatMap(
+                offender -> offender.getOffenderBookings()
+                        .stream()
+                        .filter(ob -> ob.getOffenderBookId().equals(bookingId))
+                        .findFirst())
+                .map(ob -> ob.getOffenderCharges()
+                        .stream()
+                        .sorted(BY_OFFENCE_RANK)
+                        .map(chargesTransformer::chargeOf)
+                        .collect(Collectors.toList()));
     }
 
 }

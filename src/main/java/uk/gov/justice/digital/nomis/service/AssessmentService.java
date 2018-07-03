@@ -25,7 +25,7 @@ public class AssessmentService {
 
     private static final Comparator<uk.gov.justice.digital.nomis.jpa.entity.OffenderAssessment> BY_ASSESSMENT_PRIORITY =
             Comparator
-                        .comparing((uk.gov.justice.digital.nomis.jpa.entity.OffenderAssessment oa) -> Optional.ofNullable(oa.getModifyDatetime()).orElse(new Timestamp(0)))
+                    .comparing((uk.gov.justice.digital.nomis.jpa.entity.OffenderAssessment oa) -> Optional.ofNullable(oa.getModifyDatetime()).orElse(new Timestamp(0)))
                     .thenComparing(oa -> Optional.ofNullable(oa.getCreateDatetime()).orElse(new Timestamp(0)))
                     .reversed();
     private final OffenderAssessmentRepository offenderAssessmentRepository;
@@ -72,20 +72,16 @@ public class AssessmentService {
     public Optional<List<OffenderAssessment>> assessmentsForOffenderIdAndBookingId(Long offenderId, Long bookingId) {
         Optional<Offender> maybeOffender = Optional.ofNullable(offenderRepository.findOne(offenderId));
 
-        if (!maybeOffender.isPresent()) {
-            return Optional.empty();
-        }
-
-        Optional<OffenderBooking> maybeOffenderBooking = maybeOffender.get().getOffenderBookings()
-                .stream()
-                .filter(ob -> ob.getOffenderBookId().equals(bookingId))
-                .findFirst();
-
-        return maybeOffenderBooking.map(ob -> ob.getOffenderAssessments()
-                .stream()
-                .map(assessmentsTransformer::assessmentOf)
-                .sorted(byAssessmentDate())
-                .collect(Collectors.toList()));
+        return maybeOffender.flatMap(
+                offender -> offender.getOffenderBookings()
+                        .stream()
+                        .filter(ob -> ob.getOffenderBookId().equals(bookingId))
+                        .findFirst())
+                .map(ob -> ob.getOffenderAssessments()
+                        .stream()
+                        .map(assessmentsTransformer::assessmentOf)
+                        .sorted(byAssessmentDate())
+                        .collect(Collectors.toList()));
     }
 
     private Comparator<OffenderAssessment> byAssessmentDate() {
