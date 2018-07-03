@@ -67,20 +67,17 @@ public class MovementsService {
     public Optional<List<ExternalMovement>> movementsForOffenderIdAndBookingId(Long offenderId, Long bookingId) {
         Optional<Offender> maybeOffender = Optional.ofNullable(offenderRepository.findOne(offenderId));
 
-        if (!maybeOffender.isPresent()) {
-            return Optional.empty();
-        }
+        return maybeOffender.flatMap(
+                offender -> offender.getOffenderBookings()
+                        .stream()
+                        .filter(ob -> ob.getOffenderBookId().equals(bookingId))
+                        .findFirst())
+                .map(ob -> ob.getOffenderExternalMovements()
+                        .stream()
+                        .sorted(byMovementDate())
+                        .map(movementsTransformer::movementOf)
+                        .collect(Collectors.toList()));
 
-        Optional<OffenderBooking> maybeOffenderBooking = maybeOffender.get().getOffenderBookings()
-                .stream()
-                .filter(ob -> ob.getOffenderBookId().equals(bookingId))
-                .findFirst();
-
-        return maybeOffenderBooking.map(ob -> ob.getOffenderExternalMovements()
-                .stream()
-                .sorted(byMovementDate())
-                .map(movementsTransformer::movementOf)
-                .collect(Collectors.toList()));
     }
 
     private Comparator<OffenderExternalMovement> byMovementDate() {
