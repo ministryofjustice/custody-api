@@ -19,7 +19,8 @@ public class AlertsService {
 
     private static final Comparator<OffenderAlert> ALERTS_BY = Comparator
             .comparing(OffenderAlert::getOffenderBookId)
-            .thenComparing(OffenderAlert::getAlertSeq)
+            .thenComparing(OffenderAlert::getAlertDate, Comparator.reverseOrder()) // Earliest first
+            .thenComparing(OffenderAlert::getAlertSeq, Comparator.reverseOrder()) // ASC
             .reversed();
 
     private final OffenderRepository offenderRepository;
