@@ -87,8 +87,7 @@ public class AssessmentService {
     private Comparator<OffenderAssessment> byAssessmentDate() {
         return Comparator
                 .comparing(OffenderAssessment::getAssessStatus)
-                .thenComparing(OffenderAssessment::getAssessmentDate, Comparator.reverseOrder()) // DESC
-                .thenComparingInt(OffenderAssessment::getAssessmentSequence); // ASC
+                .thenComparing(OffenderAssessment::getAssessmentSequence, Comparator.reverseOrder()); // DESC
     }
 
 }
