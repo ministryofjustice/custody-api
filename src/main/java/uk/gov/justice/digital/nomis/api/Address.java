@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Builder;
 import lombok.Data;
+import uk.gov.justice.digital.nomis.jpa.entity.ReferenceCode;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -32,9 +33,12 @@ public class Address {
     private String locality;
     private String cityName;
     private String cityCode;
+    private KeyValue city;
     private String countyCode;
+    private KeyValue county;
     private String postalCode;
     private String countryCode;
+    private KeyValue country;
     private Boolean validatedPaf;
     private Boolean primary;
     private Boolean mail;
