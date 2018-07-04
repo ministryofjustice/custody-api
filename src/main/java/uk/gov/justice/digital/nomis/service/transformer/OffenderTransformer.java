@@ -88,7 +88,7 @@ public class OffenderTransformer {
                 .rootOffenderId(booking.getRootOffenderId())
                 .statusReason(booking.getStatusReason())
                 .caseDateTime(typesTransformer.localDateTimeOf(booking.getCaseDate(), booking.getCaseTime()))
-                .lastMovement(booking.getOffenderExternalMovements().stream().sorted(byOffenderExternalMovementDate()).findFirst().map(movementsTransformer::movementOf).orElse(null))
+                .lastMovement(booking.getOffenderExternalMovements().stream().sorted(byMovementDate()).findFirst().map(movementsTransformer::movementOf).orElse(null))
                 .build();
     }
 
@@ -124,13 +124,19 @@ public class OffenderTransformer {
     }
 
     private Comparator<OffenderBooking> byBookingSequence() {
-        return Comparator.comparing(OffenderBooking::getBookingBeginDate, Comparator.reverseOrder())
-                .thenComparing(OffenderBooking::getBookingSeq);
+        return Comparator.comparing(OffenderBooking::getBookingSeq)
+                .thenComparing(OffenderBooking::getBookingBeginDate, Comparator.reverseOrder());
     }
 
-    private Comparator<OffenderExternalMovement> byOffenderExternalMovementDate() {
-        return Comparator.comparing(OffenderExternalMovement::getMovementDate).reversed()
-                .thenComparing(OffenderExternalMovement::getMovementTime).reversed()
-                .thenComparingLong(em -> em.getId().getMovementSeq()).reversed();
+    private Comparator<OffenderExternalMovement> byMovementDate() {
+        return Comparator.comparing(OffenderExternalMovement::getMovementDate)
+                .thenComparing((OffenderExternalMovement::getMovementTime))
+                .thenComparingLong(this::getMovementSeq)
+                .reversed();
     }
+
+    private long getMovementSeq(OffenderExternalMovement oem) {
+        return oem.getId().getMovementSeq();
+    }
+
 }
