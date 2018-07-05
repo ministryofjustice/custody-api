@@ -14,6 +14,7 @@ public class ExternalMovement {
     private LocalDateTime movementDateTime;
     private String movementTypeCode;
     private String movementReasonCode;
+    private String movementReasonDescription;
     private String description;
     private String movementDirection;
     private Boolean active;

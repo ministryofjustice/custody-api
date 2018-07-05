@@ -29,6 +29,7 @@ public class MovementsTransformer {
                 .toAgencyLocationId(em.getToAgyLocId())
                 .movementDirection(em.getDirectionCode())
                 .movementReasonCode(movementReason.getMovementReasonCode())
+                .movementReasonDescription(movementReason.getDescription())
                 .movementTypeCode(movementReason.getMovementType())
                 .bookingId(em.getId().getOffenderBooking().getOffenderBookId())
                 .offenderId(em.getId().getOffenderBooking().getRootOffenderId())
