@@ -9,6 +9,7 @@ spring:
           classpath:R__1_15__OFFENDERS.sql,
           classpath:R__1_19__PERSONS.sql,
           classpath:R__1_20__PHONES.sql,
+#          classpath:R__1_21__PROFILE_CODES.sql,
           classpath:R__1_26__STATUTES.sql,
           classpath:R__2_1__AGENCY_LOCATIONS.sql,
           classpath:R__2_2__OFFENCES.sql,
