@@ -37,10 +37,10 @@ public class PhysicalsTransformer {
                                 .caseloadType(det.getCaseloadType())
                                 .comments(det.getCommentText())
                                 .listSeq(det.getListSeq())
-                                //.profileCode(det.getProfileCode())
+                                .profileCode(det.getProfileCode())
                                 .profileSeq(det.getProfileSeq())
                                 .profileType(det.getProfileType())
-                                //.profileDescription(Optional.ofNullable(det.getProfile()).map(p->p.getDescription()).orElse(null))
+                                .profileDescription(Optional.ofNullable(det.getProfile()).map(p->p.getDescription()).orElse(null))
                                 .build())
                         .collect(Collectors.toList()))
                 .orElse(Collections.emptyList());
