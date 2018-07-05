@@ -9,6 +9,7 @@ import uk.gov.justice.digital.nomis.jpa.entity.OffenderBooking;
 import uk.gov.justice.digital.nomis.jpa.entity.OffenderIdentifyingMarks;
 import uk.gov.justice.digital.nomis.jpa.entity.OffenderPhysicalAttributes;
 import uk.gov.justice.digital.nomis.jpa.entity.OffenderProfileDetails;
+import uk.gov.justice.digital.nomis.jpa.entity.ProfileCode;
 
 import java.util.Collections;
 import java.util.List;
@@ -36,9 +37,10 @@ public class PhysicalsTransformer {
                                 .caseloadType(det.getCaseloadType())
                                 .comments(det.getCommentText())
                                 .listSeq(det.getListSeq())
-                                .profileCode(det.getProfileCode())
+                                //.profileCode(det.getProfileCode())
                                 .profileSeq(det.getProfileSeq())
                                 .profileType(det.getProfileType())
+                                //.profileDescription(Optional.ofNullable(det.getProfile()).map(p->p.getDescription()).orElse(null))
                                 .build())
                         .collect(Collectors.toList()))
                 .orElse(Collections.emptyList());

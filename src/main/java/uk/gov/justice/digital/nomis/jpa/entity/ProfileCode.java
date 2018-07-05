@@ -6,42 +6,44 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.IdClass;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinColumns;
-import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import java.sql.Timestamp;
+import java.util.List;
 
 @Data
 @Entity
-@Table(name = "OFFENDER_PROFILE_DETAILS")
-@IdClass(OffenderProfileDetailsPK.class)
-public class OffenderProfileDetails {
-    @Id
-    @Column(name = "OFFENDER_BOOK_ID")
-    private Long offenderBookId;
-    @Id
-    @Column(name = "PROFILE_SEQ")
-    private Long profileSeq;
+@Table(name = "PROFILE_CODES")
+@IdClass(ProfileCodePK.class)
+public class ProfileCode {
     @Id
     @Column(name = "PROFILE_TYPE")
     private String profileType;
+    @Id
     @Column(name = "PROFILE_CODE")
     private String profileCode;
+    @Column(name = "DESCRIPTION")
+    private String description;
     @Column(name = "LIST_SEQ")
-    private Long listSeq;
-    @Column(name = "COMMENT_TEXT")
-    private String commentText;
-    @Column(name = "CASELOAD_TYPE")
-    private String caseloadType;
+    private Integer listSeq;
+    @Column(name = "UPDATE_ALLOWED_FLAG")
+    private String updateAllowedFlag;
+    @Column(name = "ACTIVE_FLAG")
+    private String activeFlag;
+    @Column(name = "EXPIRED_DATE")
+    private Timestamp expiredDate;
+    @Column(name = "USER_ID")
+    private String userId;
+    private Timestamp modifiedDate;
+
     @Column(name = "MODIFY_USER_ID")
     private String modifyUserId;
-    @Column(name = "MODIFY_DATETIME")
-    private Timestamp modifyDatetime;
     @Column(name = "CREATE_DATETIME")
     private Timestamp createDatetime;
     @Column(name = "CREATE_USER_ID")
     private String createUserId;
+    @Column(name = "MODIFY_DATETIME")
+    private Timestamp modifyDatetime;
     @Column(name = "AUDIT_TIMESTAMP")
     private Timestamp auditTimestamp;
     @Column(name = "AUDIT_USER_ID")
@@ -56,12 +58,5 @@ public class OffenderProfileDetails {
     private String auditClientWorkstationName;
     @Column(name = "AUDIT_ADDITIONAL_INFO")
     private String auditAdditionalInfo;
-
-    @ManyToOne
-    @JoinColumns({
-            @JoinColumn(name = "PROFILE_TYPE", referencedColumnName = "PROFILE_TYPE", insertable = false, updatable = false),
-            @JoinColumn(name = "PROFILE_CODE", referencedColumnName = "PROFILE_CODE", insertable = false, updatable = false)
-    })
-    private ProfileCode profile;
 
 }
