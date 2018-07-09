@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 @Data
 @Builder
 public class IepLevel {
-    private String iepLevel;
+    private KeyValue iepLevel;
     private String agencyLocationId;
     private Boolean active;
     private LocalDateTime expiryDate;

@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 public class OffenderImprisonmentStatus {
     private Long bookingId;
     private Long imprisonStatusSeq;
-    private String imprisonmentStatusCode;
+    private ImprisonmentStatus imprisonmentStatus;
     private LocalDateTime effectiveDateTime;
     private LocalDate expiryDate;
     private String agencyLocationId;

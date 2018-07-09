@@ -32,7 +32,7 @@ public class ExternalMovement {
     private String internalScheduleReasonCode;
     private String arrestAgencyLocationId;
     private String toProvStatCode;
-    private String escortCode;
+    private KeyValue escortCode;
     private String escortText;
     private LocalDateTime reportingDateTime;
     private LocalDateTime applicationDateTime;

@@ -3,24 +3,30 @@ package uk.gov.justice.digital.nomis.service.transformer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.justice.digital.nomis.api.Alert;
+import uk.gov.justice.digital.nomis.api.KeyValue;
 import uk.gov.justice.digital.nomis.jpa.entity.OffenderAlert;
+import uk.gov.justice.digital.nomis.jpa.entity.ReferenceCodePK;
+import uk.gov.justice.digital.nomis.jpa.repository.ReferenceCodesRepository;
 
 import java.util.Optional;
 
 @Component
 public class AlertsTransformer {
+    private static final String ALERT_CODE = "ALERT_CODE";
 
     private final TypesTransformer typesTransformer;
+    private final ReferenceCodesRepository referenceCodesRepository;
 
     @Autowired
-    public AlertsTransformer(TypesTransformer typesTransformer) {
+    public AlertsTransformer(TypesTransformer typesTransformer, ReferenceCodesRepository referenceCodesRepository) {
         this.typesTransformer = typesTransformer;
+        this.referenceCodesRepository = referenceCodesRepository;
     }
 
     public Alert alertOf(OffenderAlert offenderAlert) {
         return Optional.ofNullable(offenderAlert).map(
                 alert -> Alert.builder()
-                        .alertCode(alert.getAlertCode())
+                        .alertCode(alertCodeOf(alert))
                         .alertDate(typesTransformer.localDateOf(alert.getAlertDate()))
                         .alertSeq(alert.getAlertSeq())
                         .alertStatus(alert.getAlertStatus())
@@ -34,5 +40,15 @@ public class AlertsTransformer {
                         .rootOffenderId(alert.getRootOffenderId())
                         .verified(typesTransformer.ynToBoolean(alert.getVerifiedFlag()))
                         .build()).orElse(null);
+    }
+
+    private KeyValue alertCodeOf(OffenderAlert alert) {
+        return Optional.ofNullable(alert.getAlertCode() != null ?
+                referenceCodesRepository.findOne(ReferenceCodePK.builder()
+                        .code(alert.getAlertCode())
+                        .domain(ALERT_CODE)
+                        .build()) : null)
+                .map(rc -> KeyValue.builder().code(rc.getCode()).description(rc.getDescription()).build())
+                .orElse(null);
     }
 }

@@ -10,6 +10,8 @@ import uk.gov.justice.digital.nomis.jpa.entity.OffenderIdentifyingMarks;
 import uk.gov.justice.digital.nomis.jpa.entity.OffenderPhysicalAttributes;
 import uk.gov.justice.digital.nomis.jpa.entity.OffenderProfileDetails;
 import uk.gov.justice.digital.nomis.jpa.entity.ProfileCode;
+import uk.gov.justice.digital.nomis.jpa.entity.ProfileCodePK;
+import uk.gov.justice.digital.nomis.jpa.repository.ProfileCodesRepository;
 
 import java.util.Collections;
 import java.util.List;
@@ -19,6 +21,11 @@ import java.util.stream.Collectors;
 @Component
 public class PhysicalsTransformer {
 
+    private final ProfileCodesRepository profileCodesRepository;
+
+    public PhysicalsTransformer(ProfileCodesRepository profileCodesRepository) {
+        this.profileCodesRepository = profileCodesRepository;
+    }
 
     public Physicals physicalsOf(OffenderBooking offenderBooking) {
         return Physicals.builder()
@@ -33,15 +40,23 @@ public class PhysicalsTransformer {
         return Optional.ofNullable(offenderProfileDetails)
                 .map(dets -> dets
                         .stream()
-                        .map(det -> ProfileDetails.builder()
-                                .caseloadType(det.getCaseloadType())
-                                .comments(det.getCommentText())
-                                .listSeq(det.getListSeq())
-                                .profileCode(det.getProfileCode())
-                                .profileSeq(det.getProfileSeq())
-                                .profileType(det.getProfileType())
-                                .profileDescription(Optional.ofNullable(det.getProfile()).map(p->p.getDescription()).orElse(null))
-                                .build())
+                        .map(det -> {
+                            Optional<ProfileCode> pc = Optional.ofNullable(det.getProfileCode() != null && det.getProfileType() != null ?
+                                    profileCodesRepository.findOne(ProfileCodePK.builder()
+                                    .profileCode(det.getProfileCode())
+                                    .profileType(det.getProfileType())
+                                    .build()) : null);
+
+                            return ProfileDetails.builder()
+                                    .caseloadType(det.getCaseloadType())
+                                    .comments(det.getCommentText())
+                                    .listSeq(det.getListSeq())
+                                    .profileCode(det.getProfileCode())
+                                    .profileSeq(det.getProfileSeq())
+                                    .profileType(det.getProfileType())
+                                    .profileDescription(pc.map(ProfileCode::getDescription).orElse(null))
+                                    .build();
+                        })
                         .collect(Collectors.toList()))
                 .orElse(Collections.emptyList());
     }

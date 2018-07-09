@@ -3,18 +3,28 @@ package uk.gov.justice.digital.nomis.service.transformer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.justice.digital.nomis.api.ExternalMovement;
+import uk.gov.justice.digital.nomis.api.KeyValue;
 import uk.gov.justice.digital.nomis.jpa.entity.MovementReason;
 import uk.gov.justice.digital.nomis.jpa.entity.OffenderExternalMovement;
+import uk.gov.justice.digital.nomis.jpa.entity.ReferenceCodePK;
+import uk.gov.justice.digital.nomis.jpa.repository.ReferenceCodesRepository;
+
+import java.util.Optional;
 
 @Component
 public class MovementsTransformer {
 
+    private static final String ESCORT = "ESCORT";
+
     private final TypesTransformer typesTransformer;
+    private final ReferenceCodesRepository referenceCodesRepository;
 
     @Autowired
-    public MovementsTransformer(TypesTransformer typesTransformer) {
+    public MovementsTransformer(TypesTransformer typesTransformer, ReferenceCodesRepository referenceCodesRepository) {
         this.typesTransformer = typesTransformer;
+        this.referenceCodesRepository = referenceCodesRepository;
     }
+
 
     public ExternalMovement movementOf(OffenderExternalMovement em) {
 
@@ -44,7 +54,7 @@ public class MovementsTransformer {
                 .internalScheduleReasonCode(em.getInternalScheduleReasonCode())
                 .arrestAgencyLocationId(em.getArrestAgencyLocId())
                 .toProvStatCode(em.getToProvStatCode())
-                .escortCode(em.getEscortCode())
+                .escortCode(getEscortCodeOf(em))
                 .escortText(em.getEscortText())
                 .reportingDateTime(typesTransformer.localDateTimeOf(em.getReportingDate(), em.getReportingTime()))
                 .applicationDateTime(typesTransformer.localDateTimeOf(em.getApplicationDate(), em.getApplicationTime()))
@@ -53,6 +63,16 @@ public class MovementsTransformer {
                 .toCountryCode(em.getToCountryCode())
                 .ojLocationCode(em.getOjLocationCode())
                 .build();
+    }
+
+    private KeyValue getEscortCodeOf(OffenderExternalMovement em) {
+        return Optional.ofNullable(em.getEscortCode() != null ?
+                referenceCodesRepository.findOne(ReferenceCodePK.builder()
+                        .code(em.getEscortCode())
+                        .domain(ESCORT)
+                        .build()) : null)
+                .map(rc -> KeyValue.builder().code(rc.getCode()).description(rc.getDescription()).build())
+                .orElse(null);
     }
 
 }

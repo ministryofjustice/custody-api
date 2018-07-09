@@ -15,7 +15,7 @@ public class Alert {
     private String caseloadType;
     private LocalDate alertDate;
     private String alertType;
-    private String alertCode;
+    private KeyValue alertCode;
     private String authorizePersonText;
     private String alertStatus;
     private Boolean verified;

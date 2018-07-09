@@ -12,7 +12,7 @@ public class HealthProblem {
     private Long bookingId;
     private Long offenderId;
     private String problemType;
-    private String problemCode;
+    private KeyValue problemCode;
     private LocalDate startDate;
     private LocalDate endDate;
     private String caseloadType;

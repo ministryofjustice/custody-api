@@ -30,8 +30,8 @@ public class ProfileCode {
     private String updateAllowedFlag;
     @Column(name = "ACTIVE_FLAG")
     private String activeFlag;
-    @Column(name = "EXPIRED_DATE")
-    private Timestamp expiredDate;
+    @Column(name = "EXPIRY_DATE")
+    private Timestamp expiryDate;
     @Column(name = "USER_ID")
     private String userId;
     private Timestamp modifiedDate;

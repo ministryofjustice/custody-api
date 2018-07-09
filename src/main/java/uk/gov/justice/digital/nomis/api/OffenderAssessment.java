@@ -28,7 +28,7 @@ public class OffenderAssessment {
     private LocalDate evaluationDate;
     private LocalDate nextReviewDate;
     private String evaluationResultCode;
-    private String reviewSupLevelType;
+    private KeyValue reviewSupLevelType;
     private String reviewPlacementText;
     private String reviewCommitteeCode;
     private String committeeComments;

@@ -3,16 +3,26 @@ package uk.gov.justice.digital.nomis.service.transformer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.justice.digital.nomis.api.Employment;
+import uk.gov.justice.digital.nomis.api.KeyValue;
 import uk.gov.justice.digital.nomis.jpa.entity.OffenderEmployment;
+import uk.gov.justice.digital.nomis.jpa.entity.ReferenceCodePK;
+import uk.gov.justice.digital.nomis.jpa.repository.ReferenceCodesRepository;
+
+import java.util.Optional;
 
 @Component
 public class EmploymentsTransformer {
 
+    private static final String OCCUPATION = "OCCUPATION";
+    private static final String EMPLOY_STS = "EMPLOY_STS";
+
     private final TypesTransformer typesTransformer;
+    private final ReferenceCodesRepository referenceCodesRepository;
 
     @Autowired
-    public EmploymentsTransformer(TypesTransformer typesTransformer) {
+    public EmploymentsTransformer(TypesTransformer typesTransformer, ReferenceCodesRepository referenceCodesRepository) {
         this.typesTransformer = typesTransformer;
+        this.referenceCodesRepository = referenceCodesRepository;
     }
 
     public Employment employmentOf(OffenderEmployment offenderEmployment) {
@@ -27,12 +37,12 @@ public class EmploymentsTransformer {
                 .employerAware(typesTransformer.ynToBoolean(offenderEmployment.getEmployerAwareFlag()))
                 .employerName(offenderEmployment.getEmployerName())
                 .employmentDate(typesTransformer.localDateOf(offenderEmployment.getEmploymentDate()))
-                .employmentPostCode(offenderEmployment.getEmploymentPostCode())
+                .employmentPostCode(employmentPostCodeOf(offenderEmployment))
                 .employmentSchedule(offenderEmployment.getEmploymentSchedule())
                 .employmentSequence(offenderEmployment.getEmploySeq())
                 .employmentType(offenderEmployment.getEmploymentType())
                 .hoursWeek(offenderEmployment.getHoursWeek())
-                .occupationsCode(offenderEmployment.getOccupationsCode())
+                .occupationsCode(occupationCodeOf(offenderEmployment))
                 .offenderEmploymentId(offenderEmployment.getOffenderEmploymentId())
                 .partialEmploymentDate(typesTransformer.ynToBoolean(offenderEmployment.getPartialEmploymentDateFlag()))
                 .partialTerminationDate(typesTransformer.ynToBoolean(offenderEmployment.getPartialTerminationDateFlag()))
@@ -47,5 +57,25 @@ public class EmploymentsTransformer {
                 .createdDateTime(typesTransformer.localDateTimeOf(offenderEmployment.getCreateDatetime()))
                 .modifiedDateTime(typesTransformer.localDateTimeOf(offenderEmployment.getModifyDatetime()))
                 .build();
+    }
+
+    private KeyValue employmentPostCodeOf(OffenderEmployment offenderEmployment) {
+        return Optional.ofNullable(offenderEmployment.getOccupationsCode() != null ?
+                referenceCodesRepository.findOne(ReferenceCodePK.builder()
+                        .code(offenderEmployment.getOccupationsCode())
+                        .domain(EMPLOY_STS)
+                        .build()) : null)
+                .map(rc -> KeyValue.builder().code(rc.getCode()).description(rc.getDescription()).build())
+                .orElse(null);
+    }
+
+    private KeyValue occupationCodeOf(OffenderEmployment offenderEmployment) {
+        return Optional.ofNullable(offenderEmployment.getOccupationsCode() != null ?
+                referenceCodesRepository.findOne(ReferenceCodePK.builder()
+                        .code(offenderEmployment.getEmploymentPostCode())
+                        .domain(OCCUPATION)
+                        .build()) : null)
+                .map(rc -> KeyValue.builder().code(rc.getCode()).description(rc.getDescription()).build())
+                .orElse(null);
     }
 }

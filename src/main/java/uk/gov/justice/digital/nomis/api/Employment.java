@@ -13,7 +13,7 @@ public class Employment {
     private Long bookingId;
     private Long employmentSequence;
     private LocalDate employmentDate;
-    private String employmentPostCode;
+    private KeyValue employmentPostCode;
     private String employmentType;
     private LocalDate terminationDate;
     private String employerName;
@@ -22,7 +22,7 @@ public class Employment {
     private String terminationReason;
     private BigDecimal wage;
     private String wagePeriodCode;
-    private String occupationsCode;
+    private KeyValue occupationsCode;
     private String comments;
     private String caseloadType;
     private String contactType;

@@ -3,19 +3,26 @@ package uk.gov.justice.digital.nomis.service.transformer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.justice.digital.nomis.api.AssessmentType;
+import uk.gov.justice.digital.nomis.api.KeyValue;
 import uk.gov.justice.digital.nomis.api.OffenderAssessment;
 import uk.gov.justice.digital.nomis.jpa.entity.Assessment;
+import uk.gov.justice.digital.nomis.jpa.entity.ReferenceCodePK;
+import uk.gov.justice.digital.nomis.jpa.repository.ReferenceCodesRepository;
 
 import java.util.Optional;
 
 @Component
 public class AssessmentsTransformer {
 
+    private static final String SUP_LVL_TYPE = "SUP_LVL_TYPE";
+
     private final TypesTransformer typesTransformer;
+    private final ReferenceCodesRepository referenceCodesRepository;
 
     @Autowired
-    public AssessmentsTransformer(TypesTransformer typesTransformer) {
+    public AssessmentsTransformer(TypesTransformer typesTransformer, ReferenceCodesRepository referenceCodesRepository) {
         this.typesTransformer = typesTransformer;
+        this.referenceCodesRepository = referenceCodesRepository;
     }
 
     public OffenderAssessment assessmentOf(uk.gov.justice.digital.nomis.jpa.entity.OffenderAssessment offenderAssessment) {
@@ -50,14 +57,24 @@ public class AssessmentsTransformer {
                 .reviewCommitteeCode(offenderAssessment.getReviewCommitteCode())
                 .reviewPlacementText(offenderAssessment.getReviewPlacementText())
                 .reviewSupLevelText(offenderAssessment.getReviewSupLevelText())
-                .reviewSupLevelType(offenderAssessment.getReviewSupLevelType())
+                .reviewSupLevelType(getSecurityCategoryOf(offenderAssessment))
                 .reviewPlaceAgencyLocationId(offenderAssessment.getReviewPlaceAgyLocId())
                 .score(offenderAssessment.getScore())
                 .build();
 
     }
 
-    public AssessmentType assessmentTypeOf(Assessment assessment) {
+    private KeyValue getSecurityCategoryOf(uk.gov.justice.digital.nomis.jpa.entity.OffenderAssessment oa) {
+        return Optional.ofNullable(oa.getReviewSupLevelType() != null ?
+                referenceCodesRepository.findOne(ReferenceCodePK.builder()
+                        .code(oa.getReviewSupLevelType())
+                        .domain(SUP_LVL_TYPE)
+                        .build()) : null)
+                .map(rc -> KeyValue.builder().code(rc.getCode()).description(rc.getDescription()).build())
+                .orElse(null);
+    }
+
+    private AssessmentType assessmentTypeOf(Assessment assessment) {
         return Optional.ofNullable(assessment)
                 .map(a -> AssessmentType.builder()
                         .assessmentClass(a.getAssessmentClass())
