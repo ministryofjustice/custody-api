@@ -14,8 +14,10 @@ import java.util.stream.Collectors;
 @Service
 public class IEPService {
 
-    public static final Comparator<uk.gov.justice.digital.nomis.jpa.entity.OffenderIepLevel> BY_IEP_SEQ_REVERSED = Comparator
-            .comparing(uk.gov.justice.digital.nomis.jpa.entity.OffenderIepLevel::getIepLevelSeq)
+    private static final Comparator<uk.gov.justice.digital.nomis.jpa.entity.OffenderIepLevel> BY_IEP_SEQ_REVERSED = Comparator
+            .comparing(uk.gov.justice.digital.nomis.jpa.entity.OffenderIepLevel::getIepDate)
+            .thenComparing(uk.gov.justice.digital.nomis.jpa.entity.OffenderIepLevel::getIepTime)
+            .thenComparing(uk.gov.justice.digital.nomis.jpa.entity.OffenderIepLevel::getIepLevelSeq)
             .reversed();
     private final IEPTransformer iepTransformer;
     private final OffenderRepository offenderRepository;
@@ -28,7 +30,6 @@ public class IEPService {
 
 
     public Optional<List<OffenderIepLevel>> iepsForOffenderId(Long offenderId) {
-
         return Optional.ofNullable(offenderRepository.findOne(offenderId))
                 .map(offender -> offender.getOffenderBookings()
                         .stream()
