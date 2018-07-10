@@ -19,7 +19,7 @@ public class Sentence {
     private Integer numberOfUnexcusedAbsences;
     private String terminationReason;
     private String sentenceCategory;
-    private String sentenceCalcType;
+    private SentenceCalculationType sentenceCalculationType;
     private String sentenceText;
     private BigDecimal fineAmount;
     private Integer breachLevel;

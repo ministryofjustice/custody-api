@@ -12,6 +12,7 @@ public class OffenderImprisonmentStatus {
     private Long bookingId;
     private Long imprisonStatusSeq;
     private ImprisonmentStatus imprisonmentStatus;
+    private String imprisonmentStatusCode;
     private LocalDateTime effectiveDateTime;
     private LocalDate expiryDate;
     private String agencyLocationId;

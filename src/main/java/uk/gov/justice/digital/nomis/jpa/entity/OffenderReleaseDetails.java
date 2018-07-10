@@ -5,6 +5,9 @@ import lombok.Data;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinColumns;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import java.sql.Timestamp;
 
@@ -19,10 +22,7 @@ public class OffenderReleaseDetails {
     private Timestamp releaseDate;
     @Column(name = "COMMENT_TEXT")
     private String commentText;
-    @Column(name = "MOVEMENT_TYPE")
-    private String movementType;
-    @Column(name = "MOVEMENT_REASON_CODE")
-    private String movementReasonCode;
+    
     @Column(name = "CREATE_DATETIME")
     private Timestamp createDatetime;
     @Column(name = "CREATE_USER_ID")
@@ -59,5 +59,12 @@ public class OffenderReleaseDetails {
     private Timestamp dtoMidTermDate;
     @Column(name = "VERIFIED_FLAG")
     private String verifiedFlag;
+
+    @ManyToOne
+    @JoinColumns({
+            @JoinColumn(name = "MOVEMENT_REASON_CODE", referencedColumnName = "MOVEMENT_REASON_CODE"),
+            @JoinColumn(name = "MOVEMENT_TYPE", referencedColumnName = "MOVEMENT_TYPE")
+    })
+    private MovementReason movementReason;
 
 }

@@ -21,6 +21,7 @@ public class DiaryDetail {
     private Long bookingId;
     private LocalDateTime movementDateTime;
     private String movementReasonCode;
+    private String movementReasonDescription;
     private String comments;
     private String escortType;
     private Boolean notForReleaseAlert;

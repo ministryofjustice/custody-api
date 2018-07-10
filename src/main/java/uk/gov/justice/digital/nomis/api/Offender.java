@@ -17,8 +17,8 @@ public class Offender {
     private String middleNames;
     private String surname;
     private LocalDate dateOfBirth;
-    private String sexCode;
-    private String raceCode;
+    private KeyValue gender;
+    private KeyValue ethnicity;
     private List<OffenderAlias> aliases;
     private List<Booking> bookings;
     private List<Identifier> identifiers;

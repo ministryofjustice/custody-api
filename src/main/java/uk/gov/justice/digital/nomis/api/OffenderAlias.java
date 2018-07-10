@@ -14,8 +14,8 @@ public class OffenderAlias {
     private String middleNames;
     private String surname;
     private LocalDate dateOfBirth;
-    private String sexCode;
-    private String raceCode;
+    private KeyValue gender;
+    private KeyValue ethnicity;
     private Long offenderId;
     private List<Identifier> identifiers;
 

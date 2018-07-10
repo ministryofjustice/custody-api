@@ -4,13 +4,15 @@ import com.google.common.collect.ImmutableList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.justice.digital.nomis.api.Booking;
-import uk.gov.justice.digital.nomis.api.ExternalMovement;
 import uk.gov.justice.digital.nomis.api.Identifier;
+import uk.gov.justice.digital.nomis.api.KeyValue;
 import uk.gov.justice.digital.nomis.api.OffenderAlias;
 import uk.gov.justice.digital.nomis.jpa.entity.Offender;
 import uk.gov.justice.digital.nomis.jpa.entity.OffenderBooking;
 import uk.gov.justice.digital.nomis.jpa.entity.OffenderExternalMovement;
 import uk.gov.justice.digital.nomis.jpa.entity.OffenderIdentifier;
+import uk.gov.justice.digital.nomis.jpa.entity.ReferenceCodePK;
+import uk.gov.justice.digital.nomis.jpa.repository.ReferenceCodesRepository;
 
 import java.sql.Timestamp;
 import java.util.Collections;
@@ -23,12 +25,17 @@ import java.util.stream.Stream;
 @Component
 public class OffenderTransformer {
 
+    private static final String ETHNICITY = "ETHNICITY";
+    private static final String SEX = "SEX";
+
     private final TypesTransformer typesTransformer;
+    private final ReferenceCodesRepository referenceCodesRepository;
     private MovementsTransformer movementsTransformer;
 
     @Autowired
-    public OffenderTransformer(TypesTransformer typesTransformer, MovementsTransformer movementsTransformer) {
+    public OffenderTransformer(TypesTransformer typesTransformer, ReferenceCodesRepository referenceCodesRepository, MovementsTransformer movementsTransformer) {
         this.typesTransformer = typesTransformer;
+        this.referenceCodesRepository = referenceCodesRepository;
         this.movementsTransformer = movementsTransformer;
     }
 
@@ -44,8 +51,8 @@ public class OffenderTransformer {
                                 .dateOfBirth(offender.getBirthDate().toLocalDateTime().toLocalDate())
                                 .identifiers(identifiersOf(offender.getOffenderIdentifiers()))
                                 .nomsId(offender.getOffenderIdDisplay())
-                                .sexCode(offender.getSexCode())
-                                .raceCode(offender.getRaceCode())
+                                .gender(genderOf(offender))
+                                .ethnicity(ethnicityOf(offender))
                                 .build())
                         .collect(Collectors.toList()))
                 .orElse(Collections.emptyList());
@@ -118,9 +125,29 @@ public class OffenderTransformer {
                 .offenderId(offender.getOffenderId())
                 .aliases(aliasesOf(offender.getOffenderAliases()))
                 .nomsId(offender.getOffenderIdDisplay())
-                .sexCode(offender.getSexCode())
-                .raceCode(offender.getRaceCode())
+                .gender(genderOf(offender))
+                .ethnicity(ethnicityOf(offender))
                 .build();
+    }
+
+    private KeyValue ethnicityOf(Offender o) {
+        return Optional.ofNullable(o.getRaceCode() != null ?
+                referenceCodesRepository.findOne(ReferenceCodePK.builder()
+                        .code(o.getRaceCode())
+                        .domain(ETHNICITY)
+                        .build()) : null)
+                .map(rc -> KeyValue.builder().code(rc.getCode()).description(rc.getDescription()).build())
+                .orElse(null);
+    }
+
+    private KeyValue genderOf(Offender o) {
+        return Optional.ofNullable(o.getSexCode() != null ?
+                referenceCodesRepository.findOne(ReferenceCodePK.builder()
+                        .code(o.getSexCode())
+                        .domain(SEX)
+                        .build()) : null)
+                .map(rc -> KeyValue.builder().code(rc.getCode()).description(rc.getDescription()).build())
+                .orElse(null);
     }
 
     private Comparator<OffenderBooking> byBookingSequence() {

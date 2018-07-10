@@ -3,17 +3,24 @@ package uk.gov.justice.digital.nomis.service.transformer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.justice.digital.nomis.api.Sentence;
+import uk.gov.justice.digital.nomis.api.SentenceCalculationType;
 import uk.gov.justice.digital.nomis.jpa.entity.OffenderBooking;
 import uk.gov.justice.digital.nomis.jpa.entity.OffenderSentence;
+import uk.gov.justice.digital.nomis.jpa.entity.SentenceCalcTypePK;
+import uk.gov.justice.digital.nomis.jpa.repository.SentenceCalcTypeRepository;
+
+import java.util.Optional;
 
 @Component
 public class SentenceTransformer {
 
     private final TypesTransformer typesTransformer;
+    private final SentenceCalcTypeRepository sentenceCalcTypeRepository;
 
     @Autowired
-    public SentenceTransformer(TypesTransformer typesTransformer) {
+    public SentenceTransformer(TypesTransformer typesTransformer, SentenceCalcTypeRepository sentenceCalcTypeRepository) {
         this.typesTransformer = typesTransformer;
+        this.sentenceCalcTypeRepository = sentenceCalcTypeRepository;
     }
 
     public Sentence sentenceOf(OffenderSentence offenderSentence) {
@@ -53,7 +60,7 @@ public class SentenceTransformer {
                 .revokedDate(typesTransformer.localDateOf(offenderSentence.getRevokedDate()))
                 .sedCalculatedDate(typesTransformer.localDateOf(offenderSentence.getSedCalculatedDate()))
                 .sentenceCategory(offenderSentence.getSentenceCategory())
-                .sentenceCalcType(offenderSentence.getSentenceCalcType())
+                .sentenceCalculationType(sentenceCalculationTypeOf(offenderSentence))
                 .sentenceLevel(offenderSentence.getSentenceLevel())
                 .isActive(typesTransformer.isActiveOf(offenderSentence.getSentenceStatus()))
                 .sentenceText(offenderSentence.getSentenceText())
@@ -65,5 +72,24 @@ public class SentenceTransformer {
                 .terminationReason(offenderSentence.getTerminationReason())
                 .tusedCalculatedDate(typesTransformer.localDateOf(offenderSentence.getTusedCalculatedDate()))
                 .build();
+    }
+
+    private SentenceCalculationType sentenceCalculationTypeOf(OffenderSentence os) {
+        return Optional.ofNullable(os.getSentenceCategory() != null && os.getSentenceCalcType() != null ?
+        sentenceCalcTypeRepository.findOne(SentenceCalcTypePK.builder()
+                .sentenceCalcType(os.getSentenceCalcType())
+                .sentenceCategory(os.getSentenceCategory())
+                .build()): null)
+                .map(sct -> SentenceCalculationType.builder()
+                        .active(typesTransformer.isActiveOf(sct.getActiveFlag()))
+                        .description(sct.getDescription())
+                        .expiryDate(typesTransformer.localDateTimeOf(sct.getExpiryDate()))
+                        .functionType(sct.getFunctionType())
+                        .ProgramMethod(sct.getProgramMethod())
+                        .sentenceCategory(sct.getSentenceCategory())
+                        .sentenceType(sct.getSentenceType())
+                        .sentenceCalculationType(sct.getSentenceCalcType())
+                        .build())
+                .orElse(null);
     }
 }

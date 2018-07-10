@@ -60,9 +60,9 @@ public class EmploymentsTransformer {
     }
 
     private KeyValue employmentPostCodeOf(OffenderEmployment offenderEmployment) {
-        return Optional.ofNullable(offenderEmployment.getOccupationsCode() != null ?
+        return Optional.ofNullable(offenderEmployment.getEmploymentPostCode() != null ?
                 referenceCodesRepository.findOne(ReferenceCodePK.builder()
-                        .code(offenderEmployment.getOccupationsCode())
+                        .code(offenderEmployment.getEmploymentPostCode())
                         .domain(EMPLOY_STS)
                         .build()) : null)
                 .map(rc -> KeyValue.builder().code(rc.getCode()).description(rc.getDescription()).build())
@@ -72,7 +72,7 @@ public class EmploymentsTransformer {
     private KeyValue occupationCodeOf(OffenderEmployment offenderEmployment) {
         return Optional.ofNullable(offenderEmployment.getOccupationsCode() != null ?
                 referenceCodesRepository.findOne(ReferenceCodePK.builder()
-                        .code(offenderEmployment.getEmploymentPostCode())
+                        .code(offenderEmployment.getOccupationsCode())
                         .domain(OCCUPATION)
                         .build()) : null)
                 .map(rc -> KeyValue.builder().code(rc.getCode()).description(rc.getDescription()).build())

@@ -47,17 +47,17 @@ public class ImprisonStatusTransformer {
     }
 
     private ImprisonmentStatus imprisonmentStatusOf(OffenderImprisonStatus ois) {
-        return Optional.ofNullable(ois.getImprisonmentStatus() == null ?
+        return Optional.ofNullable(ois.getImprisonmentStatus() != null ?
                 imprisonmentStatusesRepository.findByImprisonmentStatus(ois.getImprisonmentStatus())
                         .stream().findFirst().orElse(null) : null)
                 .map(is -> ImprisonmentStatus.builder()
                         .bandCode(is.getBandCode())
-                        .description(is.getDescription())
-                        .imprisonmentStatus(is.getImprisonmentStatus())
-                        .imprisonmentStatusId(is.getImprisonmentStatusId())
-                        .imprisonmentStatusSeq(is.getImprisonmentStatusSeq())
-                        .rankValue(is.getRankValue())
-                        .build())
+                    .description(is.getDescription())
+                    .imprisonmentStatus(is.getImprisonmentStatus())
+                    .imprisonmentStatusId(is.getImprisonmentStatusId())
+                    .imprisonmentStatusSeq(is.getImprisonmentStatusSeq())
+                    .rankValue(is.getRankValue())
+                .build())
                 .orElse(null);
     }
 }

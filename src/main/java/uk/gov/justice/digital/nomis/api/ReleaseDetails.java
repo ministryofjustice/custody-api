@@ -13,6 +13,7 @@ public class ReleaseDetails {
     private String comments;
     private String movementType;
     private String movementReasonCode;
+    private String movementReasonDescription;
     private Long eventId;
     private String eventStatus;
     private LocalDate approvedReleaseDate;
