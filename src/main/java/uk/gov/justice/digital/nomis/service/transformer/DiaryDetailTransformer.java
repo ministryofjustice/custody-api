@@ -41,13 +41,14 @@ public class DiaryDetailTransformer {
     }
 
     public DiaryDetail diaryDetailOf(OffenderReleaseDetails offenderReleaseDetails) {
-        MovementReason movementReason = offenderReleaseDetails.getMovementReason();
+        Optional<MovementReason> maybeMovementReason = Optional.ofNullable(offenderReleaseDetails.getMovementReason());
 
         return DiaryDetail.builder()
                 .bookingId(offenderReleaseDetails.getOffenderBookId())
                 .movementDateTime(typesTransformer.localDateTimeOf(offenderReleaseDetails.getReleaseDate()))
-                .movementReasonCode(movementReason.getMovementReasonCode())
-                .movementReasonDescription(movementReason.getDescription())
+                .movementReasonCode(maybeMovementReason.map(mr -> mr.getMovementReasonCode()).orElse(null))
+                .movementReasonDescription(maybeMovementReason.map(mr -> mr.getDescription()).orElse(null))
+                .movementReasonType(maybeMovementReason.map(mr -> mr.getMovementType()).orElse(null))
                 .comments(offenderReleaseDetails.getCommentText())
                 .build();
     }

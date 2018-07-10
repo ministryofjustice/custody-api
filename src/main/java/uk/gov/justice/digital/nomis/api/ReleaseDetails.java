@@ -11,7 +11,7 @@ public class ReleaseDetails {
     private Long bookingId;
     private LocalDate releaseDate;
     private String comments;
-    private String movementType;
+    private String movementReasonType;
     private String movementReasonCode;
     private String movementReasonDescription;
     private Long eventId;

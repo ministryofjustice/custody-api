@@ -26,7 +26,7 @@ public class ChargesService {
     private static final Comparator<OffenderCharge> BY_OFFENCE_RANK = Comparator
             .comparing(OffenderCharge::getMostSeriousFlag, Comparator.reverseOrder())
             .thenComparing((OffenderCharge oc) -> oc.getOffence().getSeverityRanking())
-            .thenComparing(OffenderCharge::getOffenderChargeId, Comparator.reverseOrder());
+            .thenComparing(OffenderCharge::getOffenderChargeId);
 
     private final OffenderChargesRepository offenderChargesRepository;
     private final OffenderRepository offenderRepository;

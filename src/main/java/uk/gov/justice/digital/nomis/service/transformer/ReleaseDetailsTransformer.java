@@ -6,6 +6,8 @@ import uk.gov.justice.digital.nomis.api.ReleaseDetails;
 import uk.gov.justice.digital.nomis.jpa.entity.MovementReason;
 import uk.gov.justice.digital.nomis.jpa.entity.OffenderReleaseDetails;
 
+import java.util.Optional;
+
 @Component
 public class ReleaseDetailsTransformer {
 
@@ -18,7 +20,7 @@ public class ReleaseDetailsTransformer {
 
     public ReleaseDetails releaseDetailsOf(OffenderReleaseDetails ord) {
 
-        MovementReason movementReason = ord.getMovementReason();
+        Optional<MovementReason> maybeMovementReason = Optional.ofNullable(ord.getMovementReason());
 
         return ReleaseDetails.builder()
                 .approvedReleaseDate(typesTransformer.localDateOf(ord.getApprovedReleaseDate()))
@@ -29,9 +31,9 @@ public class ReleaseDetailsTransformer {
                 .dtoMidTermDate(typesTransformer.localDateOf(ord.getDtoMidTermDate()))
                 .eventId(ord.getEventId())
                 .eventStatus(ord.getEventStatus())
-                .movementReasonCode(movementReason.getMovementReasonCode())
-                .movementReasonDescription(movementReason.getDescription())
-                .movementType(movementReason.getMovementType())
+                .movementReasonCode(maybeMovementReason.map(mr -> mr.getMovementReasonCode()).orElse(null))
+                .movementReasonDescription(maybeMovementReason.map(mr -> mr.getDescription()).orElse(null))
+                .movementReasonType(maybeMovementReason.map(mr -> mr.getMovementType()).orElse(null))
                 .releaseDate(typesTransformer.localDateOf(ord.getReleaseDate()))
                 .verified(typesTransformer.ynToBoolean(ord.getVerifiedFlag()))
                 .build();

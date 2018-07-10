@@ -22,6 +22,7 @@ public class DiaryDetail {
     private LocalDateTime movementDateTime;
     private String movementReasonCode;
     private String movementReasonDescription;
+    private String movementReasonType;
     private String comments;
     private String escortType;
     private Boolean notForReleaseAlert;
