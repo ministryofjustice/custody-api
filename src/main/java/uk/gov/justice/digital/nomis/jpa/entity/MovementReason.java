@@ -34,8 +34,6 @@ public class MovementReason {
     private String updateAllowedFlag;
     @Column(name = "EXPIRY_DATE")
     private Timestamp expiryDate;
-    @Column(name = "CREATE_USER_ID")
-    private String createUserId;
     @Column(name = "NOTIFICATION_TYPE")
     private String notificationType;
     @Column(name = "NOTIFICATION_FLAG")
@@ -52,6 +50,8 @@ public class MovementReason {
     private String inMovementReasonCode;
     @Column(name = "ESC_RECAP_FLAG")
     private String escRecapFlag;
+    @Column(name = "CREATE_USER_ID")
+    private String createUserId;
     @Column(name = "CREATE_DATETIME")
     private Timestamp createDatetime;
     @Column(name = "MODIFY_DATETIME")

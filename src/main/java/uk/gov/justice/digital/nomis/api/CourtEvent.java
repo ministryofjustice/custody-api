@@ -21,6 +21,7 @@ public class CourtEvent {
     private Long parentEventId;
     private String agencyLocationId;
     private String outcomeReasonCode;
+    private OutcomeReason outcomeReason;
     private String comments;
     private String eventOutcome;
     private Boolean nextEventRequest;

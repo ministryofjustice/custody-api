@@ -4,10 +4,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.justice.digital.nomis.api.Charge;
 import uk.gov.justice.digital.nomis.api.CourtEvent;
+import uk.gov.justice.digital.nomis.api.OutcomeReason;
 import uk.gov.justice.digital.nomis.api.Sentence;
 import uk.gov.justice.digital.nomis.jpa.entity.CourtEventCharge;
 import uk.gov.justice.digital.nomis.jpa.entity.OffenderCharge;
 import uk.gov.justice.digital.nomis.jpa.entity.OffenderSentence;
+import uk.gov.justice.digital.nomis.jpa.repository.OffenceResultsCodeRepository;
 
 import java.util.Collections;
 import java.util.List;
@@ -20,12 +22,14 @@ public class CourtEventsTransformer {
     private final TypesTransformer typesTransformer;
     private final ChargesTransformer chargesTransformer;
     private final SentenceTransformer sentenceTransformer;
+    private final OffenceResultsCodeRepository offenceResultsCodeRepository;
 
     @Autowired
-    public CourtEventsTransformer(TypesTransformer typesTransformer, ChargesTransformer chargesTransformer, SentenceTransformer sentenceTransformer) {
+    public CourtEventsTransformer(TypesTransformer typesTransformer, ChargesTransformer chargesTransformer, SentenceTransformer sentenceTransformer, OffenceResultsCodeRepository offenceResultsCodeRepository) {
         this.typesTransformer = typesTransformer;
         this.chargesTransformer = chargesTransformer;
         this.sentenceTransformer = sentenceTransformer;
+        this.offenceResultsCodeRepository = offenceResultsCodeRepository;
     }
 
     public CourtEvent courtEventOf(uk.gov.justice.digital.nomis.jpa.entity.CourtEvent courtEvent) {
@@ -50,9 +54,25 @@ public class CourtEventsTransformer {
                 .orderRequested(typesTransformer.ynToBoolean(courtEvent.getOrderRequestedFlag()))
                 .outcomeDate(typesTransformer.localDateOf(courtEvent.getOutcomeDate()))
                 .outcomeReasonCode(courtEvent.getOutcomeReasonCode())
+                .outcomeReason(outcomeReasonOf(courtEvent))
                 .parentEventId(courtEvent.getParentEventId())
                 .resultCode(courtEvent.getResultCode())
                 .build();
+    }
+
+    private OutcomeReason outcomeReasonOf(uk.gov.justice.digital.nomis.jpa.entity.CourtEvent ce) {
+        return Optional.ofNullable(ce.getOutcomeReasonCode() != null ?
+            offenceResultsCodeRepository.findOne(ce.getOutcomeReasonCode()): null)
+                .map(orc -> OutcomeReason.builder()
+                        .Code(orc.getResultCode())
+                        .Description(orc.getDescription())
+                        .Active(typesTransformer.isActiveOf(orc.getActiveFlag()))
+                        .ChargeStatus(typesTransformer.isActiveOf(orc.getChargeStatus()))
+                        .DispositionCode(orc.getDispositionCode())
+                        .ExpiryDate(typesTransformer.localDateTimeOf(orc.getExpiryDate()))
+                        .Conviction(typesTransformer.ynToBoolean(orc.getConvictionFlag()))
+                        .build())
+                .orElse(null);
     }
 
     private List<Charge> courtEventChargesOf(List<CourtEventCharge> charges) {

@@ -6,11 +6,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.justice.digital.nomis.api.Case;
 import uk.gov.justice.digital.nomis.api.Charge;
+import uk.gov.justice.digital.nomis.api.OffenceResult;
 import uk.gov.justice.digital.nomis.api.Order;
+import uk.gov.justice.digital.nomis.api.OutcomeReason;
 import uk.gov.justice.digital.nomis.jpa.entity.Offence;
 import uk.gov.justice.digital.nomis.jpa.entity.OffenceIndicator;
 import uk.gov.justice.digital.nomis.jpa.entity.OffenderCase;
 import uk.gov.justice.digital.nomis.jpa.entity.OffenderCharge;
+import uk.gov.justice.digital.nomis.jpa.repository.OffenceResultsCodeRepository;
 
 import java.util.List;
 import java.util.Map;
@@ -21,10 +24,12 @@ import java.util.stream.Collectors;
 public class ChargesTransformer {
 
     private final TypesTransformer typesTransformer;
+    private OffenceResultsCodeRepository offenceResultsCodeRepository;
 
     @Autowired
-    public ChargesTransformer(TypesTransformer typesTransformer) {
+    public ChargesTransformer(TypesTransformer typesTransformer, OffenceResultsCodeRepository offenceResultsCodeRepository) {
         this.typesTransformer = typesTransformer;
+        this.offenceResultsCodeRepository = offenceResultsCodeRepository;
     }
 
     public Charge chargeOf(OffenderCharge oc) {
@@ -62,7 +67,7 @@ public class ChargesTransformer {
                 .orElse(null);
     }
 
-    public List<String> resultCodesOf(OffenderCharge oc) {
+    public List<OffenceResult> resultCodesOf(OffenderCharge oc) {
         String resultCode1 = oc.getResultCode1();
         String resultCode2 = oc.getResultCode2();
 
@@ -70,17 +75,32 @@ public class ChargesTransformer {
             return null;
         }
 
-        ImmutableList.Builder<String> builder = ImmutableList.builder();
+        ImmutableList.Builder<OffenceResult> builder = ImmutableList.builder();
 
         if (resultCode1 != null) {
-            builder.add(resultCode1);
+            builder.add(offenceResultOf(resultCode1));
         }
 
         if (resultCode2 != null) {
-            builder.add(resultCode2);
+            builder.add(offenceResultOf(resultCode2));
         }
 
         return builder.build();
+    }
+
+    private OffenceResult offenceResultOf(String rc) {
+        return Optional.ofNullable(rc != null ?
+                offenceResultsCodeRepository.findOne(rc): null)
+                .map(orc -> OffenceResult.builder()
+                        .Code(orc.getResultCode())
+                        .Description(orc.getDescription())
+                        .Active(typesTransformer.isActiveOf(orc.getActiveFlag()))
+                        .ChargeStatus(typesTransformer.isActiveOf(orc.getChargeStatus()))
+                        .DispositionCode(orc.getDispositionCode())
+                        .ExpiryDate(typesTransformer.localDateTimeOf(orc.getExpiryDate()))
+                        .Conviction(typesTransformer.ynToBoolean(orc.getConvictionFlag()))
+                        .build())
+                .orElse(null);
     }
 
     public Order orderOf(OffenderCharge oc) {

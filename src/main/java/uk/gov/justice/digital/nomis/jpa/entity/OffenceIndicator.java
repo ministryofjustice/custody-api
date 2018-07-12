@@ -1,11 +1,13 @@
 package uk.gov.justice.digital.nomis.jpa.entity;
 
 import lombok.Data;
+import oracle.sql.CHAR;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import java.sql.Timestamp;
 
 @Entity
 @Data
@@ -21,3 +23,4 @@ public class OffenceIndicator {
     @Column(name = "INDICATOR_CODE")
     private String indicatorCode;
 }
+
