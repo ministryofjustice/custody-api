@@ -33,7 +33,7 @@ public class ResourceServerConfiguration extends ResourceServerConfigurerAdapter
                 .authorizeRequests()
                 .antMatchers("/h2-console/**", "/v2/api-docs", "/configuration/ui", "/swagger-resources", "/configuration/security",
                         "/swagger-ui.html", "/webjars/**", "/swagger-resources/configuration/ui", "/swagger-ui.html",
-                        "/swagger-resources/configuration/security").permitAll()
+                        "/swagger-resources/configuration/security", "/health", "/info").permitAll()
                 .antMatchers("/{apiBasePath}/**").hasRole("REPORTING")
                 .anyRequest()
                 .permitAll();

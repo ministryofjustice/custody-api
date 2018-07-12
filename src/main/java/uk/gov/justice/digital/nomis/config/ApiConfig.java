@@ -1,7 +1,10 @@
 package uk.gov.justice.digital.nomis.config;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.actuate.endpoint.HealthEndpoint;
+import org.springframework.boot.actuate.endpoint.mvc.HealthMvcEndpoint;
 import org.springframework.boot.autoconfigure.web.WebMvcRegistrationsAdapter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -42,6 +45,19 @@ public class ApiConfig {
                 };
             }
         };
+    }
+
+    /**
+     * Override default health endpoint (defined in EndpointWebMvcManagementContextConfiguration) to disable restricted
+     * security mode but keep security for other endpoints such as /dump etc
+     */
+    @Bean
+    public HealthMvcEndpoint healthMvcEndpoint(@Autowired(required = false) HealthEndpoint delegate) {
+        if (delegate == null) {
+            // This happens in unit test environment
+            return null;
+        }
+        return new HealthMvcEndpoint(delegate, false, null);
     }
 
 }
