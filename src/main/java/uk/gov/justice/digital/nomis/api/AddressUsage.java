@@ -6,6 +6,6 @@ import lombok.Data;
 @Data
 @Builder
 public class AddressUsage {
-    private String usage;
+    private KeyValue usage;
     private Boolean active;
 }
