@@ -3,7 +3,6 @@ package uk.gov.justice.digital.nomis.api;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
-import uk.gov.justice.digital.nomis.jpa.entity.OffenceIndicator;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;

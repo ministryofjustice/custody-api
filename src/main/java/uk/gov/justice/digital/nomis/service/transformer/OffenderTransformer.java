@@ -30,7 +30,7 @@ public class OffenderTransformer {
 
     private final TypesTransformer typesTransformer;
     private final ReferenceCodesRepository referenceCodesRepository;
-    private MovementsTransformer movementsTransformer;
+    private final MovementsTransformer movementsTransformer;
 
     @Autowired
     public OffenderTransformer(TypesTransformer typesTransformer, ReferenceCodesRepository referenceCodesRepository, MovementsTransformer movementsTransformer) {
@@ -39,7 +39,7 @@ public class OffenderTransformer {
         this.movementsTransformer = movementsTransformer;
     }
 
-    public List<OffenderAlias> aliasesOf(List<Offender> offenderList) {
+    private List<OffenderAlias> aliasesOf(List<Offender> offenderList) {
         return Optional.ofNullable(offenderList)
                 .map(offenders -> offenders
                         .stream()
@@ -58,7 +58,7 @@ public class OffenderTransformer {
                 .orElse(Collections.emptyList());
     }
 
-    public List<Identifier> identifiersOf(List<OffenderIdentifier> offenderIdentifiers) {
+    private List<Identifier> identifiersOf(List<OffenderIdentifier> offenderIdentifiers) {
         return Optional.ofNullable(offenderIdentifiers)
                 .map(identifiers -> identifiers.stream()
                         .sorted(Comparator.comparing(OffenderIdentifier::getOffenderIdSeq).reversed())
@@ -72,14 +72,14 @@ public class OffenderTransformer {
                 .orElse(Collections.emptyList());
     }
 
-    public List<Booking> bookingsOf(List<OffenderBooking> offenderBookings) {
+    private List<Booking> bookingsOf(List<OffenderBooking> offenderBookings) {
         return offenderBookings.stream()
                 .sorted(byBookingSequence())
                 .map(this::bookingOf)
                 .collect(Collectors.toList());
     }
 
-    public Booking bookingOf(OffenderBooking booking) {
+    private Booking bookingOf(OffenderBooking booking) {
         return Booking.builder()
                 .bookingSequence(booking.getBookingSeq())
                 .startDate(booking.getBookingBeginDate().toLocalDateTime().toLocalDate())
@@ -95,16 +95,16 @@ public class OffenderTransformer {
                 .rootOffenderId(booking.getRootOffenderId())
                 .statusReason(booking.getStatusReason())
                 .caseDateTime(typesTransformer.localDateTimeOf(booking.getCaseDate(), booking.getCaseTime()))
-                .lastMovement(booking.getOffenderExternalMovements().stream().sorted(byMovementDate()).findFirst().map(movementsTransformer::movementOf).orElse(null))
+                .lastMovement(booking.getOffenderExternalMovements().stream().min(byMovementDate()).map(movementsTransformer::movementOf).orElse(null))
                 .build();
     }
 
-    public String combinedMiddlenamesOf(Offender offender) {
+    private String combinedMiddlenamesOf(Offender offender) {
         return middleNamesOf(offender.getMiddleName(), offender.getMiddleName2()).stream()
                 .collect(Collectors.joining(" "));
     }
 
-    public List<String> middleNamesOf(String secondName, String thirdName) {
+    private List<String> middleNamesOf(String secondName, String thirdName) {
         Optional<String> maybeSecondName = Optional.ofNullable(secondName);
         Optional<String> maybeThirdName = Optional.ofNullable(thirdName);
 

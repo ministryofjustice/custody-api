@@ -27,7 +27,9 @@ public class OffencesService {
     public Page<Offence> getOffences(Pageable pageable) {
         Page<uk.gov.justice.digital.nomis.jpa.entity.Offence> rawOffencesPage = offencesRepository.findAll(pageable);
 
-        List<Offence> offences = rawOffencesPage.getContent().stream().map(offenceTransformer::offenceOf).collect(Collectors.toList());
+        List<Offence> offences = rawOffencesPage.getContent().stream()
+                .map(offenceTransformer::offenceOf)
+                .collect(Collectors.toList());
 
         return new PageImpl<>(offences, pageable, rawOffencesPage.getTotalElements());
     }

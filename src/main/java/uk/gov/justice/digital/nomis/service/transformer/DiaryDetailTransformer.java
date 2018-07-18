@@ -46,9 +46,9 @@ public class DiaryDetailTransformer {
         return DiaryDetail.builder()
                 .bookingId(offenderReleaseDetails.getOffenderBookId())
                 .movementDateTime(typesTransformer.localDateTimeOf(offenderReleaseDetails.getReleaseDate()))
-                .movementReasonCode(maybeMovementReason.map(mr -> mr.getMovementReasonCode()).orElse(null))
-                .movementReasonDescription(maybeMovementReason.map(mr -> mr.getDescription()).orElse(null))
-                .movementReasonType(maybeMovementReason.map(mr -> mr.getMovementType()).orElse(null))
+                .movementReasonCode(maybeMovementReason.map(MovementReason::getMovementReasonCode).orElse(null))
+                .movementReasonDescription(maybeMovementReason.map(MovementReason::getDescription).orElse(null))
+                .movementReasonType(maybeMovementReason.map(MovementReason::getMovementType).orElse(null))
                 .comments(offenderReleaseDetails.getCommentText())
                 .build();
     }

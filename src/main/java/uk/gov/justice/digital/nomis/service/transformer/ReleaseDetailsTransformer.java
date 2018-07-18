@@ -31,9 +31,9 @@ public class ReleaseDetailsTransformer {
                 .dtoMidTermDate(typesTransformer.localDateOf(ord.getDtoMidTermDate()))
                 .eventId(ord.getEventId())
                 .eventStatus(ord.getEventStatus())
-                .movementReasonCode(maybeMovementReason.map(mr -> mr.getMovementReasonCode()).orElse(null))
-                .movementReasonDescription(maybeMovementReason.map(mr -> mr.getDescription()).orElse(null))
-                .movementReasonType(maybeMovementReason.map(mr -> mr.getMovementType()).orElse(null))
+                .movementReasonCode(maybeMovementReason.map(MovementReason::getMovementReasonCode).orElse(null))
+                .movementReasonDescription(maybeMovementReason.map(MovementReason::getDescription).orElse(null))
+                .movementReasonType(maybeMovementReason.map(MovementReason::getMovementType).orElse(null))
                 .releaseDate(typesTransformer.localDateOf(ord.getReleaseDate()))
                 .verified(typesTransformer.ynToBoolean(ord.getVerifiedFlag()))
                 .build();

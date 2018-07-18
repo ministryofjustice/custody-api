@@ -5,7 +5,6 @@ import org.springframework.stereotype.Component;
 import uk.gov.justice.digital.nomis.api.HealthProblem;
 import uk.gov.justice.digital.nomis.api.KeyValue;
 import uk.gov.justice.digital.nomis.jpa.entity.OffenderHealthProblem;
-import uk.gov.justice.digital.nomis.jpa.entity.ReferenceCode;
 import uk.gov.justice.digital.nomis.jpa.entity.ReferenceCodePK;
 import uk.gov.justice.digital.nomis.jpa.repository.ReferenceCodesRepository;
 

@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Builder;
 import lombok.Data;
-import uk.gov.justice.digital.nomis.jpa.entity.ReferenceCode;
 
 import java.time.LocalDate;
 import java.util.List;

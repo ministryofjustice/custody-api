@@ -8,7 +8,6 @@ import uk.gov.justice.digital.nomis.api.Case;
 import uk.gov.justice.digital.nomis.api.Charge;
 import uk.gov.justice.digital.nomis.api.OffenceResult;
 import uk.gov.justice.digital.nomis.api.Order;
-import uk.gov.justice.digital.nomis.api.OutcomeReason;
 import uk.gov.justice.digital.nomis.jpa.entity.Offence;
 import uk.gov.justice.digital.nomis.jpa.entity.OffenceIndicator;
 import uk.gov.justice.digital.nomis.jpa.entity.OffenderCase;
@@ -24,7 +23,7 @@ import java.util.stream.Collectors;
 public class ChargesTransformer {
 
     private final TypesTransformer typesTransformer;
-    private OffenceResultsCodeRepository offenceResultsCodeRepository;
+    private final OffenceResultsCodeRepository offenceResultsCodeRepository;
 
     @Autowired
     public ChargesTransformer(TypesTransformer typesTransformer, OffenceResultsCodeRepository offenceResultsCodeRepository) {
@@ -67,7 +66,7 @@ public class ChargesTransformer {
                 .orElse(null);
     }
 
-    public List<OffenceResult> resultCodesOf(OffenderCharge oc) {
+    private List<OffenceResult> resultCodesOf(OffenderCharge oc) {
         String resultCode1 = oc.getResultCode1();
         String resultCode2 = oc.getResultCode2();
 
@@ -103,7 +102,7 @@ public class ChargesTransformer {
                 .orElse(null);
     }
 
-    public Order orderOf(OffenderCharge oc) {
+    private Order orderOf(OffenderCharge oc) {
         return Optional.ofNullable(oc.getOrder())
                 .map(o -> Order.builder()
                         .comments(o.getCommentText())
@@ -125,7 +124,7 @@ public class ChargesTransformer {
                 .orElse(null);
     }
 
-    public Map<String, String> cjitOffenceCodesMapOf(OffenderCharge oc) {
+    private Map<String, String> cjitOffenceCodesMapOf(OffenderCharge oc) {
         ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
         String cjitOffenceCode1 = oc.getCjitOffenceCode1();
         String cjitOffenceCode2 = oc.getCjitOffenceCode2();
@@ -150,7 +149,7 @@ public class ChargesTransformer {
         return builder.build();
     }
 
-    public Case caseOf(OffenderCase offenderCase) {
+    private Case caseOf(OffenderCase offenderCase) {
         return Optional.ofNullable(offenderCase)
                 .map(oc -> Case.builder()
                         .agencyLocationId(oc.getAgyLocId())

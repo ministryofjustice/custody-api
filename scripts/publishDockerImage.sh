@@ -16,14 +16,14 @@ cd $PWD
 IMAGE_TAG="mojdigitalstudio/$APPLICATION_NAME:$BUILD_VERSION"
 
 docker build . \
-  --tag $IMAGE_TAG \
+  --tag ${IMAGE_TAG} \
   --label "maintainer=noms-studio-webops@digital.justice.gov.uk" \
   --label "build.number=$CIRCLE_BUILD_NUM" \
   --label "build.url=$CIRCLE_BUILD_URL" \
   --label "build.gitref=$CIRCLE_SHA1"
 
-docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}
 
-docker push $IMAGE_TAG
-docker tag $IMAGE_TAG mojdigitalstudio/$APPLICATION_NAME:latest
-docker push mojdigitalstudio/$APPLICATION_NAME:latest
+docker push ${IMAGE_TAG}
+docker tag ${IMAGE_TAG} mojdigitalstudio/${APPLICATION_NAME}:latest
+docker push mojdigitalstudio/${APPLICATION_NAME}:latest

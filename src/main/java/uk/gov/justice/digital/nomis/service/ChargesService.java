@@ -24,9 +24,9 @@ import java.util.stream.Collectors;
 public class ChargesService {
 
     private static final Comparator<OffenderCharge> BY_OFFENCE_RANK = Comparator
-            .comparing(OffenderCharge::getMostSeriousFlag, Comparator.reverseOrder())
-            .thenComparing((OffenderCharge oc) -> oc.getOffence().getSeverityRanking())
-            .thenComparing(OffenderCharge::getOffenderChargeId);
+            .comparing((OffenderCharge oc) -> oc.getOffence().getSeverityRanking())
+            .thenComparing(OffenderCharge::getOffenderChargeId)
+            .reversed();
 
     private final OffenderChargesRepository offenderChargesRepository;
     private final OffenderRepository offenderRepository;

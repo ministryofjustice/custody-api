@@ -95,7 +95,7 @@ public class CourtEventsTransformer {
     private List<Sentence> sentencesOf(List<OffenderSentence> sentences) {
         return Optional.ofNullable(sentences).map(
                 ss -> ss.stream()
-                        .map(s -> sentenceTransformer.sentenceOf(s))
+                        .map(sentenceTransformer::sentenceOf)
                         .collect(Collectors.toList())).orElse(Collections.emptyList());
     }
 }

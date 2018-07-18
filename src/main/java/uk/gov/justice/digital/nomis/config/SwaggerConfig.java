@@ -17,6 +17,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.Collections;
+import java.util.Date;
 import java.util.Optional;
 import java.util.Properties;
 
@@ -36,14 +37,15 @@ public class SwaggerConfig {
                 .apiInfo(apiInfo())
                 .select()
                 .apis(RequestHandlerSelectors.any())
-                .paths(Predicates.or(regex("(\\/info.*)"),
+                .paths(Predicates
+                        .or(regex("(\\/info.*)"),
                         regex("(\\/health.*)"),
                         regex("(\\/api.*)")))
                 .build();
 
         docket.genericModelSubstitutes(Optional.class);
-        docket.directModelSubstitute(ZonedDateTime.class, java.util.Date.class);
-        docket.directModelSubstitute(LocalDateTime.class, java.util.Date.class);
+        docket.directModelSubstitute(ZonedDateTime.class, Date.class);
+        docket.directModelSubstitute(LocalDateTime.class, Date.class);
 
         return docket;
     }
