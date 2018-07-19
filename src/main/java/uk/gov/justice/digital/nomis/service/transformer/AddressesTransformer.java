@@ -7,7 +7,6 @@ import uk.gov.justice.digital.nomis.api.KeyValue;
 import uk.gov.justice.digital.nomis.api.Phone;
 import uk.gov.justice.digital.nomis.jpa.entity.AddressPhone;
 import uk.gov.justice.digital.nomis.jpa.entity.AddressUsage;
-import uk.gov.justice.digital.nomis.jpa.entity.ReferenceCode;
 import uk.gov.justice.digital.nomis.jpa.entity.ReferenceCodePK;
 import uk.gov.justice.digital.nomis.jpa.repository.ReferenceCodesRepository;
 
@@ -21,6 +20,7 @@ public class AddressesTransformer {
     private static final String CITY = "CITY";
     private static final String COUNTY = "COUNTY";
     private static final String COUNTRY = "COUNTRY";
+    private static final String ADDRESS_TYPE = "ADDRESS_TYPE";
 
     private final TypesTransformer typesTransformer;
     private final ReferenceCodesRepository referenceCodesRepository;
@@ -68,30 +68,12 @@ public class AddressesTransformer {
                 .build();
     }
 
-    private KeyValue cityOf(uk.gov.justice.digital.nomis.jpa.entity.Address address) {
-        return referenceOf(address.getCityCode(), CITY);
-    }
-
-    private KeyValue countyOf(uk.gov.justice.digital.nomis.jpa.entity.Address address) {
-        return referenceOf(address.getCountyCode(), COUNTY);
-    }
-
-    private KeyValue countryOf(uk.gov.justice.digital.nomis.jpa.entity.Address address) {
-        return referenceOf(address.getCountryCode(), COUNTRY);
-    }
-
-    private KeyValue referenceOf(String code, String domain) {
-        return Optional.ofNullable(referenceCodesRepository.findOne(ReferenceCodePK.builder().code(code).domain(domain).build()))
-                .map(rc -> KeyValue.builder().code(rc.getCode()).description(rc.getDescription()).build())
-                .orElse(null);
-    }
-
     private List<uk.gov.justice.digital.nomis.api.AddressUsage> addressUsagesOf(List<AddressUsage> addressUsages) {
         return Optional.ofNullable(addressUsages).map(
                 usages -> usages.stream().map(
                         usage -> uk.gov.justice.digital.nomis.api.AddressUsage.builder()
                                 .active(typesTransformer.ynToBoolean(usage.getActiveFlag()))
-                                .usage(usage.getAddressUsage())
+                                .usage(addressUsageOf(usage))
                                 .build()
                 ).collect(Collectors.toList())).orElse(null);
     }
@@ -111,5 +93,27 @@ public class AddressesTransformer {
                         .relationship(phone.getRelationship())
                         .build())
                 .collect(Collectors.toList());
+    }
+
+    private KeyValue addressUsageOf(AddressUsage au) {
+        return referenceOf(au.getAddressUsage(), ADDRESS_TYPE);
+    }
+
+    private KeyValue cityOf(uk.gov.justice.digital.nomis.jpa.entity.Address address) {
+        return referenceOf(address.getCityCode(), CITY);
+    }
+
+    private KeyValue countyOf(uk.gov.justice.digital.nomis.jpa.entity.Address address) {
+        return referenceOf(address.getCountyCode(), COUNTY);
+    }
+
+    private KeyValue countryOf(uk.gov.justice.digital.nomis.jpa.entity.Address address) {
+        return referenceOf(address.getCountryCode(), COUNTRY);
+    }
+
+    private KeyValue referenceOf(String code, String domain) {
+        return Optional.ofNullable(referenceCodesRepository.findOne(ReferenceCodePK.builder().code(code).domain(domain).build()))
+                .map(rc -> KeyValue.builder().code(rc.getCode()).description(rc.getDescription()).build())
+                .orElse(null);
     }
 }
