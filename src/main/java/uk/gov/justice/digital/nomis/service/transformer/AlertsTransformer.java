@@ -28,6 +28,7 @@ public class AlertsTransformer {
                 alert -> Alert.builder()
                         .alertCode(alertCodeOf(alert))
                         .alertDate(typesTransformer.localDateOf(alert.getAlertDate()))
+                        .createdDate(typesTransformer.localDateOf(alert.getCreateDate()))
                         .alertSeq(alert.getAlertSeq())
                         .alertStatus(alert.getAlertStatus())
                         .alertType(alert.getAlertType())
@@ -37,7 +38,7 @@ public class AlertsTransformer {
                         .caseloadType(alert.getCaseloadType())
                         .comments(alert.getCommentText())
                         .expiryDate(typesTransformer.localDateOf(alert.getExpiryDate()))
-                        .rootOffenderId(alert.getRootOffenderId())
+                        .offenderId(alert.getRootOffenderId())
                         .verified(typesTransformer.ynToBoolean(alert.getVerifiedFlag()))
                         .build()).orElse(null);
     }

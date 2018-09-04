@@ -2,6 +2,8 @@ spring:
   datasource:
     url: 'jdbc:h2:mem:testdb;Mode=Oracle'
     type: com.zaxxer.hikari.HikariDataSource
+    hikari:
+      maximum-pool-size: 23
 
   h2:
     console:
@@ -17,6 +19,6 @@ jwt.public.key: LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS1NSUlCSWpBTkJna3Foa2lHOXcwQkFR
 
 management:
   security:
-    enabled: true
+    enabled: false
 
 logging.level.uk.gov: INFO

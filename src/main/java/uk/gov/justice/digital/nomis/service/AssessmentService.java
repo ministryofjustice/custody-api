@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.gov.justice.digital.nomis.api.OffenderAssessment;
 import uk.gov.justice.digital.nomis.jpa.entity.Offender;
 import uk.gov.justice.digital.nomis.jpa.entity.OffenderBooking;
+import uk.gov.justice.digital.nomis.jpa.filters.AssessmentsFilter;
 import uk.gov.justice.digital.nomis.jpa.repository.OffenderAssessmentRepository;
 import uk.gov.justice.digital.nomis.jpa.repository.OffenderRepository;
 import uk.gov.justice.digital.nomis.service.transformer.AssessmentsTransformer;
@@ -28,6 +29,10 @@ public class AssessmentService {
                     .comparing((uk.gov.justice.digital.nomis.jpa.entity.OffenderAssessment oa) -> Optional.ofNullable(oa.getModifyDatetime()).orElse(new Timestamp(0)))
                     .thenComparing(oa -> Optional.ofNullable(oa.getCreateDatetime()).orElse(new Timestamp(0)))
                     .reversed();
+    private static final Comparator<OffenderAssessment> BY_ASSESSMENT_STATUS_SEQUENCE =
+            Comparator
+                .comparing(OffenderAssessment::getAssessStatus)
+                .thenComparing(OffenderAssessment::getAssessmentSequence, Comparator.reverseOrder()); // DESC
     private final OffenderAssessmentRepository offenderAssessmentRepository;
     private final OffenderRepository offenderRepository;
     private final AssessmentsTransformer assessmentsTransformer;
@@ -40,8 +45,8 @@ public class AssessmentService {
     }
 
     @Transactional
-    public Page<OffenderAssessment> getAssessments(Pageable pageable) {
-        Page<uk.gov.justice.digital.nomis.jpa.entity.OffenderAssessment> rawOffenderAssessmentsPage = offenderAssessmentRepository.findAll(pageable);
+    public Page<OffenderAssessment> getAssessments(Pageable pageable, AssessmentsFilter assessmentsFilter) {
+        Page<uk.gov.justice.digital.nomis.jpa.entity.OffenderAssessment> rawOffenderAssessmentsPage = offenderAssessmentRepository.findAll(assessmentsFilter, pageable);
 
         List<OffenderAssessment> assessments = rawOffenderAssessmentsPage.getContent()
                 .stream()
@@ -65,7 +70,7 @@ public class AssessmentService {
         return maybeOffenderAssessments.map(offenderAssessments -> offenderAssessments
                 .stream()
                 .map(assessmentsTransformer::assessmentOf)
-                .sorted(byAssessmentDate())
+                .sorted(BY_ASSESSMENT_STATUS_SEQUENCE)
                 .collect(Collectors.toList()));
     }
 
@@ -80,14 +85,8 @@ public class AssessmentService {
                 .map(ob -> ob.getOffenderAssessments()
                         .stream()
                         .map(assessmentsTransformer::assessmentOf)
-                        .sorted(byAssessmentDate())
+                        .sorted(BY_ASSESSMENT_STATUS_SEQUENCE)
                         .collect(Collectors.toList()));
-    }
-
-    private Comparator<OffenderAssessment> byAssessmentDate() {
-        return Comparator
-                .comparing(OffenderAssessment::getAssessStatus)
-                .thenComparing(OffenderAssessment::getAssessmentSequence, Comparator.reverseOrder()); // DESC
     }
 
 }

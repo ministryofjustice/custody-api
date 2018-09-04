@@ -15,7 +15,6 @@ import uk.gov.justice.digital.nomis.jpa.repository.OffenderRepository;
 import uk.gov.justice.digital.nomis.service.transformer.ImprisonStatusTransformer;
 import uk.gov.justice.digital.nomis.service.transformer.TypesTransformer;
 
-import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
@@ -29,6 +28,13 @@ public class ImprisonStatusService {
     private final ImprisonStatusTransformer imprisonStatusTransformer;
     private final OffenderImprisonStatusesRepository offenderImprisonStatusesRepository;
     private final OffenderRepository offenderRepository;
+
+    private static final Comparator<OffenderImprisonStatus> BY_EFFECTIVE_STATUS = Comparator
+            .comparing(OffenderImprisonStatus::getLatestStatus, Comparator.nullsLast(Comparator.naturalOrder()))
+            .thenComparing(OffenderImprisonStatus::getEffectiveDate)
+            .thenComparing(OffenderImprisonStatus::getEffectiveTime)
+            .thenComparing(OffenderImprisonStatus::getImprisonStatusSeq)
+            .reversed();
 
     private final TypesTransformer typesTransformer;
 
@@ -47,7 +53,7 @@ public class ImprisonStatusService {
 
         List<OffenderImprisonmentStatus> offenderImprisonmentStatuses = rawImprisonStatusesPage.getContent()
                 .stream()
-                .sorted(byEffectiveStatus())
+                .sorted(BY_EFFECTIVE_STATUS)
                 .map(imprisonStatusTransformer::offenderImprisonStatusOf)
                 .collect(Collectors.toList());
 
@@ -64,7 +70,7 @@ public class ImprisonStatusService {
                         .flatMap(Collection::stream));
 
         return maybeImprisonStatuses.map(imprisonStatuses -> imprisonStatuses
-                .sorted(byEffectiveStatus())
+                .sorted(BY_EFFECTIVE_STATUS)
                 .map(imprisonStatusTransformer::offenderImprisonStatusOf)
                 .collect(Collectors.toList()));
     }
@@ -79,20 +85,9 @@ public class ImprisonStatusService {
                         .findFirst())
                 .map(ob -> ob.getOffenderImprisonStatuses()
                         .stream()
-                        .sorted(byEffectiveStatus())
+                        .sorted(BY_EFFECTIVE_STATUS)
                         .map(imprisonStatusTransformer::offenderImprisonStatusOf)
                         .collect(Collectors.toList()));
-    }
-
-    private Comparator<OffenderImprisonStatus> byEffectiveStatus() {
-        return Comparator.comparing(OffenderImprisonStatus::getLatestStatus, Comparator.nullsLast(Comparator.naturalOrder()))
-                .thenComparing(this::getEffectiveDateTime)
-                .thenComparing(OffenderImprisonStatus::getImprisonStatusSeq)
-                .reversed();
-    }
-
-    private LocalDateTime getEffectiveDateTime(OffenderImprisonStatus ois) {
-        return typesTransformer.localDateTimeOf(ois.getEffectiveDate(), ois.getEffectiveTime());
     }
 
 }

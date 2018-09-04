@@ -22,6 +22,11 @@ import java.util.stream.Collectors;
 @Service
 public class SentenceCalculationsService {
 
+
+
+    private static final Comparator<SentenceCalculation> BY_CALCULATION_DATE = Comparator
+            .comparing(SentenceCalculation::getSentenceCalculationId)
+            .reversed();
     private final SentenceCalculationsTransformer sentenceCalculationsTransformer;
     private final OffenderSentenceCalculationsRepository sentenceCalculationsRepository;
     private final OffenderRepository offenderRepository;
@@ -38,28 +43,30 @@ public class SentenceCalculationsService {
     public Page<SentenceCalculation> getSentenceCalculations(Pageable pageable) {
         Page<uk.gov.justice.digital.nomis.jpa.entity.OffenderSentCalculation> rawSentenceCalcsPage = sentenceCalculationsRepository.findAll(pageable);
 
-        List<SentenceCalculation> sentenceCalculations = rawSentenceCalcsPage.getContent().stream()
+        List<SentenceCalculation> sentenceCalculations = rawSentenceCalcsPage.getContent()
+                .stream()
                 .map(sentenceCalculationsTransformer::sentenceCalculationOf)
-                .sorted(byCalculationDate())
+                .sorted(BY_CALCULATION_DATE)
                 .collect(Collectors.toList());
 
         return new PageImpl<>(sentenceCalculations, pageable, rawSentenceCalcsPage.getTotalElements());
     }
 
     public Optional<List<SentenceCalculation>> sentenceCalculationsForOffenderId(Long offenderId) {
-
         Optional<List<uk.gov.justice.digital.nomis.jpa.entity.OffenderSentCalculation>> maybeSentenceCalculations = Optional.ofNullable(offenderRepository.findOne(offenderId))
                 .map(offender ->
-                        offender.getOffenderBookings().stream()
+                        offender.getOffenderBookings()
+                                .stream()
                                 .map(OffenderBooking::getOffenderSentCalculations)
                                 .flatMap(Collection::stream)
                                 .collect(Collectors.toList()));
 
         return maybeSentenceCalculations
                 .map(sentCalculations ->
-                        sentCalculations.stream()
+                        sentCalculations
+                                .stream()
                                 .map(sentenceCalculationsTransformer::sentenceCalculationOf)
-                                .sorted(byCalculationDate())
+                                .sorted(BY_CALCULATION_DATE)
                                 .collect(Collectors.toList()));
     }
 
@@ -71,14 +78,11 @@ public class SentenceCalculationsService {
                         .stream()
                         .filter(ob -> ob.getOffenderBookId().equals(bookingId))
                         .findFirst()).
-                map(ob -> ob.getOffenderSentCalculations().stream()
+                map(ob -> ob.getOffenderSentCalculations()
+                        .stream()
                         .map(sentenceCalculationsTransformer::sentenceCalculationOf)
-                        .sorted(byCalculationDate())
+                        .sorted(BY_CALCULATION_DATE)
                         .collect(Collectors.toList()));
-    }
-
-    private Comparator<SentenceCalculation> byCalculationDate() {
-        return Comparator.comparing(SentenceCalculation::getSentenceCalculationId).reversed();
     }
 
 }

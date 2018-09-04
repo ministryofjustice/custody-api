@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.hateoas.PagedResources;
 import org.springframework.hateoas.Resource;
 import org.springframework.http.HttpStatus;
@@ -21,8 +22,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.justice.digital.nomis.api.OffenderAssessment;
+import uk.gov.justice.digital.nomis.jpa.filters.AssessmentsFilter;
 import uk.gov.justice.digital.nomis.service.AssessmentService;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -47,9 +50,16 @@ public class AssessmentsController {
             @ApiImplicitParam(name = "size", dataType = "int", paramType = "query",
                     value = "Number of records per page.")})
     public PagedResources<Resource<OffenderAssessment>> getAssessments(final @ApiParam Pageable pageable,
-                                                                       final PagedResourcesAssembler<OffenderAssessment> assembler) {
+                                                                       final PagedResourcesAssembler<OffenderAssessment> assembler,
+                                                                       @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) final @RequestParam("from") Optional<LocalDateTime> from,
+                                                                       @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) final @RequestParam("to") Optional<LocalDateTime> to) {
 
-        Page<OffenderAssessment> addresses = assessmentService.getAssessments(pageable);
+        AssessmentsFilter assessmentsFilter = AssessmentsFilter.builder()
+                .from(from)
+                .to(to)
+                .build();
+
+        Page<OffenderAssessment> addresses = assessmentService.getAssessments(pageable, assessmentsFilter);
         return assembler.toResource(addresses);
     }
 

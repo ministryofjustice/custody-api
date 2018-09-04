@@ -10,15 +10,16 @@ import java.time.LocalDate;
 public class Alert {
     private Long bookingId;
     private Integer alertSeq;
-    private Long rootOffenderId;
+    private Long offenderId;
     private String caseloadId;
     private String caseloadType;
     private LocalDate alertDate;
+    private LocalDate createdDate;
+    private LocalDate expiryDate;
     private String alertType;
     private KeyValue alertCode;
     private String authorizePersonText;
     private String alertStatus;
     private Boolean verified;
-    private LocalDate expiryDate;
     private String comments;
 }

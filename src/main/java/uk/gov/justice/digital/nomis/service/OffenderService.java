@@ -34,7 +34,8 @@ public class OffenderService {
 
         List<uk.gov.justice.digital.nomis.jpa.entity.Offender> rootOffenders = rootOffendersRawPage.getContent();
 
-        List<Offender> offenderList = rootOffenders.stream()
+        List<Offender> offenderList = rootOffenders
+                .stream()
                 .map(offenderTransformer::offenderOf)
                 .collect(Collectors.toList());
 

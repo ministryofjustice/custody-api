@@ -20,13 +20,12 @@ public class RehabDecisionService {
     private final RehabDecisionTransformer rehabDecisionTransformer;
     private final OffenderRepository offenderRepository;
     private final OffenderRehabProviderRepository offenderRehabProviderRepository;
-
-    private final Comparator<? super RehabDecision> rehabDecisionComparator =
+    private final Comparator<? super RehabDecision> BY_ACTIVE_REHAB_DECISION =
             Comparator.comparing(RehabDecision::getActive)
                     .thenComparing(RehabDecision::getOffenderRehabDecisionId)
                     .reversed();
 
-    private final Comparator<? super RehabProvider> rehabProviderComparator =
+    private final Comparator<? super RehabProvider> BY_ACTIVE_REHAB_PROVIDER =
             Comparator.comparing(RehabProvider::getActive)
                     .thenComparing(RehabProvider::getOffenderRehabProviderId)
                     .reversed();
@@ -46,7 +45,7 @@ public class RehabDecisionService {
                                 .stream()
                                 .flatMap(offenderBooking -> offenderBooking.getOffenderRehabDecisions().stream())
                                 .map(rehabDecisionTransformer::rehabDecisionOf)
-                                .sorted(rehabDecisionComparator)
+                                .sorted(BY_ACTIVE_REHAB_DECISION)
                                 .collect(Collectors.toList()));
 
         return maybeRehabDecisions.map(
@@ -63,7 +62,7 @@ public class RehabDecisionService {
                 rh -> offenderRehabProviderRepository.findByOffenderRehabDecisionId(rh.getOffenderRehabDecisionId())
                         .stream()
                         .map(rehabDecisionTransformer::rehabProviderOf)
-                        .sorted(rehabProviderComparator)
+                        .sorted(BY_ACTIVE_REHAB_PROVIDER)
                         .collect(Collectors.toList())
         ).orElse(Collections.emptyList());
 

@@ -62,8 +62,8 @@ public class SwaggerConfig {
         }
 
         return new ApiInfo(
-                "New Nomis API Documentation",
-                "REST service for accessing the Nomis Oracle database.",
+                "Custody API Documentation",
+                "A RESTful API service for accessing HMPPS Custody Information.",
                 buildProperties.getVersion(), "", contactInfo(), "", "",
                 Collections.emptyList());
     }

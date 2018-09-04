@@ -1,11 +1,16 @@
 package uk.gov.justice.digital.nomis.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import uk.gov.justice.digital.nomis.api.Alert;
 import uk.gov.justice.digital.nomis.jpa.entity.Offender;
 import uk.gov.justice.digital.nomis.jpa.entity.OffenderAlert;
 import uk.gov.justice.digital.nomis.jpa.entity.OffenderBooking;
+import uk.gov.justice.digital.nomis.jpa.filters.AlertsFilter;
+import uk.gov.justice.digital.nomis.jpa.repository.OffenderAlertsRepository;
 import uk.gov.justice.digital.nomis.jpa.repository.OffenderRepository;
 import uk.gov.justice.digital.nomis.service.transformer.AlertsTransformer;
 
@@ -17,7 +22,7 @@ import java.util.stream.Collectors;
 @Service
 public class AlertsService {
 
-    private static final Comparator<OffenderAlert> ALERTS_BY = Comparator
+    private static final Comparator<OffenderAlert> BY_ALERT_DATE = Comparator
             .comparing(OffenderAlert::getOffenderBookId)
             .thenComparing(OffenderAlert::getAlertDate, Comparator.reverseOrder()) // Earliest first
             .thenComparing(OffenderAlert::getAlertSeq, Comparator.reverseOrder()) // ASC
@@ -25,14 +30,28 @@ public class AlertsService {
 
     private final OffenderRepository offenderRepository;
     private final AlertsTransformer alertsTransformer;
+    private final OffenderAlertsRepository offenderAlertsRepository;
 
     @Autowired
-    public AlertsService(OffenderRepository offenderRepository, AlertsTransformer alertsTransformer) {
+    public AlertsService(OffenderRepository offenderRepository, AlertsTransformer alertsTransformer, OffenderAlertsRepository offenderAlertsRepository) {
         this.offenderRepository = offenderRepository;
+        this.offenderAlertsRepository = offenderAlertsRepository;
         this.alertsTransformer = alertsTransformer;
     }
 
-    public Optional<List<Alert>> offenderAlertsForOffenderId(Long offenderId, Optional<String> maybeAlertCode, Optional<String> maybeAlertStatus, Optional<String> maybeAlertType) {
+    public Page<Alert> getAlerts(Pageable pageable, AlertsFilter alertsFilter) {
+        Page<OffenderAlert> rawOffenderAlertsPage = offenderAlertsRepository.findAll(alertsFilter, pageable);
+
+        List<Alert> alerts = rawOffenderAlertsPage.getContent()
+                .stream()
+                .sorted(BY_ALERT_DATE)
+                .map(alertsTransformer::alertOf)
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(alerts, pageable, rawOffenderAlertsPage.getTotalElements());
+    }
+
+    public Optional<List<Alert>> getOffenderAlerts(Long offenderId, Optional<String> maybeAlertCode, Optional<String> maybeAlertStatus, Optional<String> maybeAlertType) {
 
         final Optional<Offender> maybeOffender = Optional.ofNullable(offenderRepository.findOne(offenderId));
 
@@ -41,7 +60,7 @@ public class AlertsService {
         return maybeOffenderBookings.map(bookings -> bookings
                 .stream()
                 .flatMap(booking -> booking.getOffenderAlerts().stream())
-                .sorted(ALERTS_BY)
+                .sorted(BY_ALERT_DATE)
                 .filter(alert -> shouldInclude(alert, maybeAlertCode, maybeAlertStatus, maybeAlertType))
                 .map(alertsTransformer::alertOf)
                 .collect(Collectors.toList()));
@@ -72,7 +91,7 @@ public class AlertsService {
                         .findFirst())
                 .map(ob -> ob.getOffenderAlerts()
                         .stream()
-                        .sorted(ALERTS_BY)
+                        .sorted(BY_ALERT_DATE)
                         .filter(alert -> shouldInclude(alert, maybeAlertCode, maybeAlertStatus, maybeAlertType))
                         .map(alertsTransformer::alertOf)
                         .collect(Collectors.toList()));

@@ -39,9 +39,9 @@ public class AddressesTransformer {
                     .get();
 
 
-    private static final Comparator<uk.gov.justice.digital.nomis.jpa.entity.AddressUsage> BY_ADDRESS_USAGE_MODIFIED =
-            Comparator.comparing(LAST_MODIFIED_ADDRESS_OF)
-                    .reversed();
+    private static final Comparator<uk.gov.justice.digital.nomis.jpa.entity.AddressUsage> BY_ADDRESS_USAGE_MODIFIED = Comparator
+            .comparing(LAST_MODIFIED_ADDRESS_OF)
+            .reversed();
 
     private static final Function<uk.gov.justice.digital.nomis.jpa.entity.AddressPhone, Timestamp> LAST_MODIFIED_PHONE_OF = (uk.gov.justice.digital.nomis.jpa.entity.AddressPhone address) ->
             Stream.of(
@@ -52,9 +52,9 @@ public class AddressesTransformer {
                     .get();
 
 
-    private static final Comparator<uk.gov.justice.digital.nomis.jpa.entity.AddressPhone> BY_ADDRESS_PHONE_MODIFIED =
-            Comparator.comparing(LAST_MODIFIED_PHONE_OF)
-                    .reversed();
+    private static final Comparator<uk.gov.justice.digital.nomis.jpa.entity.AddressPhone> BY_ADDRESS_PHONE_MODIFIED = Comparator
+            .comparing(LAST_MODIFIED_PHONE_OF)
+            .reversed();
 
     private final TypesTransformer typesTransformer;
     private final ReferenceCodesRepository referenceCodesRepository;

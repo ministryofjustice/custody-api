@@ -23,10 +23,9 @@ import java.util.stream.Collectors;
 @Service
 public class SentencesService {
 
-    private static final Comparator<OffenderSentence> BY_SENTENCE_PRIORITY =
-            Comparator
-                    .comparing(OffenderSentence::getSentenceStatus)
-                    .thenComparing(OffenderSentence::getSentenceSeq);
+    private static final Comparator<? super OffenderSentence> BY_SENTENCE_PRIORITY = Comparator
+            .comparing(OffenderSentence::getSentenceStatus)
+            .thenComparing(OffenderSentence::getSentenceSeq);
     private final OffenderSentencesRepository offenderSentencesRepository;
     private final OffenderRepository offenderRepository;
     private final SentenceTransformer sentenceTransformer;
@@ -45,8 +44,7 @@ public class SentencesService {
 
         List<Sentence> sentencesList = offenderSentences.getContent()
                 .stream()
-                .sorted(Comparator.comparing(OffenderSentence::getSentenceStatus)
-                        .thenComparing(OffenderSentence::getSentenceSeq))
+                .sorted(BY_SENTENCE_PRIORITY)
                 .map(sentenceTransformer::sentenceOf)
                 .collect(Collectors.toList());
 
@@ -55,7 +53,6 @@ public class SentencesService {
 
     @Transactional
     public Optional<List<Sentence>> sentencesForOffenderId(Long offenderId) {
-
         Optional<List<OffenderSentence>> maybeOffenderSentences = Optional.ofNullable(offenderRepository.findOne(offenderId))
                 .map(offender -> offender.getOffenderBookings().stream()
                         .map(OffenderBooking::getOffenderSentences).

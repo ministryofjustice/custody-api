@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.justice.digital.nomis.api.Charge;
+import uk.gov.justice.digital.nomis.jpa.entity.Offence;
 import uk.gov.justice.digital.nomis.jpa.entity.Offender;
 import uk.gov.justice.digital.nomis.jpa.entity.OffenderBooking;
 import uk.gov.justice.digital.nomis.jpa.entity.OffenderCharge;
@@ -24,7 +25,9 @@ import java.util.stream.Collectors;
 public class ChargesService {
 
     private static final Comparator<OffenderCharge> BY_OFFENCE_RANK = Comparator
-            .comparing((OffenderCharge oc) -> Optional.ofNullable(oc.getOffence()).map(o -> o.getSeverityRanking()).orElse(null), Comparator.nullsLast(Comparator.naturalOrder()))
+            .comparing((OffenderCharge oc) -> Optional.ofNullable(oc.getOffence())
+                    .map(Offence::getSeverityRanking)
+                    .orElse(null), Comparator.nullsLast(Comparator.naturalOrder()))
             .thenComparing(OffenderCharge::getOffenderChargeId);
 
     private final OffenderChargesRepository offenderChargesRepository;

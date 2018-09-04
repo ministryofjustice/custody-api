@@ -24,6 +24,13 @@ import java.util.stream.Collectors;
 @Service
 public class MovementsService {
 
+
+
+    private static final Comparator<OffenderExternalMovement> BY_MOVEMENT_DATE = Comparator
+            .comparing(OffenderExternalMovement::getMovementDate)
+            .thenComparing((OffenderExternalMovement::getMovementTime))
+            .thenComparingLong((OffenderExternalMovement oem) -> oem.getId().getMovementSeq())
+            .reversed();
     private final ExternalMovementsRepository externalMovementsRepository;
     private final OffenderRepository offenderRepository;
     private final MovementsTransformer movementsTransformer;
@@ -41,7 +48,7 @@ public class MovementsService {
 
         List<ExternalMovement> movementList = externalMovements.getContent()
                 .stream()
-                .sorted(byMovementDate())
+                .sorted(BY_MOVEMENT_DATE)
                 .map(movementsTransformer::movementOf)
                 .collect(Collectors.toList());
 
@@ -59,7 +66,7 @@ public class MovementsService {
 
         return maybeOffenderMovements.map(externalMovements -> externalMovements
                 .stream()
-                .sorted(byMovementDate())
+                .sorted(BY_MOVEMENT_DATE)
                 .map(movementsTransformer::movementOf)
                 .collect(Collectors.toList()));
     }
@@ -74,21 +81,10 @@ public class MovementsService {
                         .findFirst())
                 .map(ob -> ob.getOffenderExternalMovements()
                         .stream()
-                        .sorted(byMovementDate())
+                        .sorted(BY_MOVEMENT_DATE)
                         .map(movementsTransformer::movementOf)
                         .collect(Collectors.toList()));
 
-    }
-
-    private Comparator<OffenderExternalMovement> byMovementDate() {
-        return Comparator.comparing(OffenderExternalMovement::getMovementDate)
-                .thenComparing((OffenderExternalMovement::getMovementTime))
-                .thenComparingLong(this::getMovementSeq)
-                .reversed();
-    }
-
-    private long getMovementSeq(OffenderExternalMovement oem) {
-        return oem.getId().getMovementSeq();
     }
 
 }

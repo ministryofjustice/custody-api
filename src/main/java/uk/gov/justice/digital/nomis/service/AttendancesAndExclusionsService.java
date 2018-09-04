@@ -25,6 +25,10 @@ public class AttendancesAndExclusionsService {
             .comparing((OffenderExcludeActsSchds oe) -> Optional.ofNullable(oe.getModifyDatetime()).orElse(new Timestamp(0)))
             .thenComparing((OffenderExcludeActsSchds oe) -> Optional.ofNullable(oe.getCreateDatetime()).orElse(new Timestamp(0)))
             .reversed();
+    private static final Comparator<? super OffenderCourseAttendance> BY_COURSE_ATTENDENCE_PRIORITY = Comparator
+            .comparing((OffenderCourseAttendance oca) -> Optional.ofNullable(oca.getEventDate()).orElse(new Timestamp(0)))
+            .thenComparing((OffenderCourseAttendance oca) -> Optional.ofNullable(oca.getStartTime()).orElse(new Timestamp(0)))
+            .reversed();
     private final OffenderRepository offenderRepository;
     private final AttendanceAndExclusionTransformer attendanceAndExclusionTransformer;
     private final TypesTransformer typesTransformer;
@@ -45,15 +49,9 @@ public class AttendancesAndExclusionsService {
         return maybeOffenderBookings.map(bookings -> bookings
                 .stream()
                 .flatMap(booking -> booking.getOffenderCourseAttendances().stream())
-                .sorted(byCourseAttendancePriority())
+                .sorted(BY_COURSE_ATTENDENCE_PRIORITY)
                 .map(attendanceAndExclusionTransformer::courseAttendanceOf)
                 .collect(Collectors.toList()));
-    }
-
-    private Comparator<? super OffenderCourseAttendance> byCourseAttendancePriority() {
-        return Comparator
-                .comparing((OffenderCourseAttendance oca) -> typesTransformer.localDateTimeOf(oca.getEventDate(), oca.getStartTime()))
-                .reversed();
     }
 
     public Optional<List<CourseAttendance>> offenderCourseAttendancessForOffenderIdAndBookingId(Long offenderId, Long bookingId) {
@@ -66,7 +64,7 @@ public class AttendancesAndExclusionsService {
                         .findFirst())
                 .map(ob -> ob.getOffenderCourseAttendances()
                         .stream()
-                        .sorted(byCourseAttendancePriority())
+                        .sorted(BY_COURSE_ATTENDENCE_PRIORITY)
                         .map(attendanceAndExclusionTransformer::courseAttendanceOf)
                         .collect(Collectors.toList()));
     }

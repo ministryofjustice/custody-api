@@ -76,7 +76,7 @@ public class AttendancesAndExclusionsControllerTest {
     }
 
     @Test
-    public void noSuchOffenderForCOurseAttendancesGives404() {
+    public void noSuchOffenderForCourseAttendancesGives404() {
         given()
                 .when()
                 .auth().oauth2(validOauthToken)
