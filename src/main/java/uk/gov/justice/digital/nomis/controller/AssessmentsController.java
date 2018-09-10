@@ -51,16 +51,10 @@ public class AssessmentsController {
                     value = "Number of records per page.")})
     public PagedResources<Resource<OffenderAssessment>> getAssessments(final @ApiParam Pageable pageable,
                                                                        final PagedResourcesAssembler<OffenderAssessment> assembler,
-                                                                       @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) final @RequestParam("from") Optional<LocalDateTime> from,
-                                                                       @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) final @RequestParam("to") Optional<LocalDateTime> to) {
+                                                                       @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) final @RequestParam("from") Optional<LocalDateTime> maybeFrom,
+                                                                       @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) final @RequestParam("to") Optional<LocalDateTime> maybeTo) {
 
-        AssessmentsFilter assessmentsFilter = AssessmentsFilter.builder()
-                .from(from)
-                .to(to)
-                .build();
-
-        Page<OffenderAssessment> addresses = assessmentService.getAssessments(pageable, assessmentsFilter);
-        return assembler.toResource(addresses);
+        return assembler.toResource(assessmentService.getAssessments(pageable, maybeFrom, maybeTo));
     }
 
     @RequestMapping(path = "/offenders/offenderId/{offenderId}/assessments", method = RequestMethod.GET)

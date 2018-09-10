@@ -51,15 +51,10 @@ public class MovementsController {
                     value = "Number of records per page.")})
     public PagedResources<Resource<ExternalMovement>> getMovements(final @ApiParam Pageable pageable,
                                                                    final PagedResourcesAssembler<ExternalMovement> assembler,
-                                                                   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) final @RequestParam("from") Optional<LocalDateTime> from,
-                                                                   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) final @RequestParam("to") Optional<LocalDateTime> to) {
+                                                                   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) final @RequestParam("from") Optional<LocalDateTime> maybeFrom,
+                                                                   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) final @RequestParam("to") Optional<LocalDateTime> maybeTo) {
 
-        MovementsFilter movementsFilter = MovementsFilter.builder()
-                .from(from)
-                .to(to)
-                .build();
-
-        Page<ExternalMovement> externalMovements = movementsService.getMovements(pageable, movementsFilter);
+        Page<ExternalMovement> externalMovements = movementsService.getMovements(pageable, maybeFrom, maybeTo);
         return assembler.toResource(externalMovements);
     }
 

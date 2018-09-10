@@ -15,6 +15,7 @@ import uk.gov.justice.digital.nomis.jpa.repository.ExternalMovementsRepository;
 import uk.gov.justice.digital.nomis.jpa.repository.OffenderRepository;
 import uk.gov.justice.digital.nomis.service.transformer.MovementsTransformer;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
@@ -43,7 +44,12 @@ public class MovementsService {
     }
 
     @Transactional
-    public Page<ExternalMovement> getMovements(Pageable pageable, MovementsFilter movementsFilter) {
+    public Page<ExternalMovement> getMovements(Pageable pageable, Optional<LocalDateTime> maybeFrom, Optional<LocalDateTime> maybeTo) {
+        MovementsFilter movementsFilter = MovementsFilter.builder()
+                .from(maybeFrom)
+                .to(maybeTo)
+                .build();
+
         Page<OffenderExternalMovement> externalMovements = externalMovementsRepository.findAll(movementsFilter, pageable);
 
         List<ExternalMovement> movementList = externalMovements.getContent()
@@ -86,5 +92,4 @@ public class MovementsService {
                         .collect(Collectors.toList()));
 
     }
-
 }

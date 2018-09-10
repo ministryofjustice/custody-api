@@ -43,15 +43,10 @@ public class OffenderEventsController {
                     value = "Number of records per page.")})
     public PagedResources<Resource<OffenderEvent>> getEvents(final @ApiParam Pageable pageable,
                                                              final PagedResourcesAssembler<OffenderEvent> assembler,
-                                                             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) final @RequestParam("from") Optional<LocalDateTime> from,
-                                                             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) final @RequestParam("to") Optional<LocalDateTime> to) {
+                                                             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) final @RequestParam("from") Optional<LocalDateTime> maybeFrom,
+                                                             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) final @RequestParam("to") Optional<LocalDateTime> maybeTo) {
 
-        OffenderEventsFilter offenderEventsFilter = OffenderEventsFilter.builder()
-                .from(from)
-                .to(to)
-                .build();
-
-        Page<OffenderEvent> events = offenderEventsService.getEvents(pageable, offenderEventsFilter);
+        Page<OffenderEvent> events = offenderEventsService.getEvents(pageable, maybeFrom, maybeTo);
         return assembler.toResource(events);
     }
 }

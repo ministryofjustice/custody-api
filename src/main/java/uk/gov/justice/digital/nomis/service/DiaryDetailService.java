@@ -71,7 +71,12 @@ public class DiaryDetailService {
                                                 .domain(ESCORT)
                                                 .build()) : null));
 
-        return Stream.concat(Stream.concat(courtEventDiaryDetailStream, offenderReleaseDetailsDiaryDetailStream), offenderIndSchedulesDiaryDetailStream)
+        return Stream.of(
+                courtEventDiaryDetailStream,
+                offenderReleaseDetailsDiaryDetailStream,
+                offenderIndSchedulesDiaryDetailStream
+        )
+                .flatMap(s -> s)
                 .sorted(BY_COURT_EVENT_DATE);
 
     }

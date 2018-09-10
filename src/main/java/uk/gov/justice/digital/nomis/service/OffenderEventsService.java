@@ -11,6 +11,7 @@ import uk.gov.justice.digital.nomis.jpa.repository.OffenderEventsRepository;
 import uk.gov.justice.digital.nomis.jpa.repository.OffenderRepository;
 import uk.gov.justice.digital.nomis.service.transformer.OffenderEventsTransformer;
 
+import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -36,7 +37,12 @@ public class OffenderEventsService {
         this.offenderRepository = offenderRepository;
     }
 
-    public Page<OffenderEvent> getEvents(Pageable pageable, OffenderEventsFilter offenderEventsFilter) {
+    public Page<OffenderEvent> getEvents(Pageable pageable, Optional<LocalDateTime> maybeFrom, Optional<LocalDateTime> maybeTo) {
+        OffenderEventsFilter offenderEventsFilter = OffenderEventsFilter.builder()
+                .from(maybeFrom)
+                .to(maybeTo)
+                .build();
+
         Page<uk.gov.justice.digital.nomis.jpa.entity.OffenderEvent> rawOffenderEventsPage = offenderEventsRepository.findAll(offenderEventsFilter, pageable);
 
         List<OffenderEvent> events = rawOffenderEventsPage.getContent()
@@ -58,5 +64,4 @@ public class OffenderEventsService {
                         .collect(Collectors.toList()));
 
     }
-
 }

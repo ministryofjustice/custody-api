@@ -15,6 +15,7 @@ import uk.gov.justice.digital.nomis.jpa.repository.OffenderRepository;
 import uk.gov.justice.digital.nomis.service.transformer.AssessmentsTransformer;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
@@ -45,7 +46,12 @@ public class AssessmentService {
     }
 
     @Transactional
-    public Page<OffenderAssessment> getAssessments(Pageable pageable, AssessmentsFilter assessmentsFilter) {
+    public Page<OffenderAssessment> getAssessments(Pageable pageable, Optional<LocalDateTime> maybeFrom, Optional<LocalDateTime> maybeTo) {
+        AssessmentsFilter assessmentsFilter = AssessmentsFilter.builder()
+                .from(maybeFrom)
+                .to(maybeTo)
+                .build();
+
         Page<uk.gov.justice.digital.nomis.jpa.entity.OffenderAssessment> rawOffenderAssessmentsPage = offenderAssessmentRepository.findAll(assessmentsFilter, pageable);
 
         List<OffenderAssessment> assessments = rawOffenderAssessmentsPage.getContent()
@@ -88,5 +94,4 @@ public class AssessmentService {
                         .sorted(BY_ASSESSMENT_STATUS_SEQUENCE)
                         .collect(Collectors.toList()));
     }
-
 }

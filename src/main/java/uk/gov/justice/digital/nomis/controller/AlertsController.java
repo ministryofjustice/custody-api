@@ -7,7 +7,6 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -22,11 +21,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.justice.digital.nomis.api.Alert;
-import uk.gov.justice.digital.nomis.api.OffenderEvent;
-import uk.gov.justice.digital.nomis.jpa.filters.AlertsFilter;
-import uk.gov.justice.digital.nomis.jpa.filters.OffenderEventsFilter;
 import uk.gov.justice.digital.nomis.service.AlertsService;
-import uk.gov.justice.digital.nomis.service.OffenderEventsService;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -48,28 +43,22 @@ public class AlertsController {
     @RequestMapping(path = "/alerts", method = RequestMethod.GET)
     @ResponseBody
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "page", dataType = "int", paramType = "query",
-                    value = "Results page you want to retrieve (0..N)"),
-            @ApiImplicitParam(name = "size", dataType = "int", paramType = "query",
-                    value = "Number of records per page.")})
+            @ApiImplicitParam(name = "page", dataType = "int", paramType = "query", value = "Results page you want to retrieve (0..N)"),
+            @ApiImplicitParam(name = "size", dataType = "int", paramType = "query", value = "Number of records per page.")
+    })
     public PagedResources<Resource<Alert>> getAlerts(final @ApiParam Pageable pageable,
-                                                                       final PagedResourcesAssembler<Alert> assembler,
-                                                                       @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) final @RequestParam("from") Optional<LocalDateTime> from,
-                                                                       @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) final @RequestParam("to") Optional<LocalDateTime> to) {
+                                                     final PagedResourcesAssembler<Alert> assembler,
+                                                     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) final @RequestParam("from") Optional<LocalDateTime> maybeFrom,
+                                                     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) final @RequestParam("to") Optional<LocalDateTime> maybeTo) {
 
-        AlertsFilter alertsFilter = AlertsFilter.builder()
-                .from(from)
-                .to(to)
-                .build();
-
-        Page<Alert> addresses = alertsService.getAlerts(pageable, alertsFilter);
-        return assembler.toResource(addresses);
+        return assembler.toResource(alertsService.getAlerts(pageable, maybeFrom, maybeTo));
     }
 
     @RequestMapping(path = "/offenders/offenderId/{offenderId}/alerts", method = RequestMethod.GET)
     @ApiResponses({
             @ApiResponse(code = 404, message = "Offender or booking not found"),
-            @ApiResponse(code = 200, message = "OK")})
+            @ApiResponse(code = 200, message = "OK")
+    })
     public ResponseEntity<List<Alert>> getOffenderAlerts(@PathVariable("offenderId") Long offenderId,
                                                          @RequestParam("bookingId") Optional<Long> maybeBookingId,
                                                          @RequestParam("alertType") Optional<String> maybeAlertType,

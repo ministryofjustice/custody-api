@@ -14,6 +14,7 @@ import uk.gov.justice.digital.nomis.jpa.repository.OffenderAlertsRepository;
 import uk.gov.justice.digital.nomis.jpa.repository.OffenderRepository;
 import uk.gov.justice.digital.nomis.service.transformer.AlertsTransformer;
 
+import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -39,7 +40,12 @@ public class AlertsService {
         this.alertsTransformer = alertsTransformer;
     }
 
-    public Page<Alert> getAlerts(Pageable pageable, AlertsFilter alertsFilter) {
+    public Page<Alert> getAlerts(Pageable pageable, Optional<LocalDateTime> from, Optional<LocalDateTime> to) {
+        AlertsFilter alertsFilter = AlertsFilter.builder()
+                .from(from)
+                .to(to)
+                .build();
+
         Page<OffenderAlert> rawOffenderAlertsPage = offenderAlertsRepository.findAll(alertsFilter, pageable);
 
         List<Alert> alerts = rawOffenderAlertsPage.getContent()
@@ -96,5 +102,4 @@ public class AlertsService {
                         .map(alertsTransformer::alertOf)
                         .collect(Collectors.toList()));
     }
-
 }
