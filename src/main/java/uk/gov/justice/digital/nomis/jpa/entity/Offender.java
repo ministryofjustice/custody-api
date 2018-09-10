@@ -141,4 +141,11 @@ public class Offender {
     @JoinColumn(name = "OWNER_ID", insertable = false, updatable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     private List<OffenderAddress> offenderAddresses;
 
+    @OneToMany
+    @BatchSize(size = 1000)
+    @JoinColumn(name = "ROOT_OFFENDER_ID", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT), nullable = true)
+    private List<OffenderEvent> offenderEvents;
+
+
+
 }

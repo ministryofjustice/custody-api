@@ -30,6 +30,8 @@ public class Assessment {
     private String updateAllowedFlag;
     @Column(name = "EFFECTIVE_DATE")
     private Timestamp effectiveDate;
+    @Column(name = "CREATE_DATE")
+    private Timestamp createDate;
     @Column(name = "EXPIRY_DATE")
     private Timestamp expiryDate;
     @Column(name = "SCORE")
@@ -66,14 +68,12 @@ public class Assessment {
     private String measure;
     @Column(name = "CREATE_USER_ID")
     private String createUserId;
-    @Column(name = "CREATE_DATE")
-    private Timestamp createDate;
+    @Column(name = "CREATE_DATETIME")
+    private Timestamp createDatetime;
     @Column(name = "MODIFY_USER_ID")
     private String modifyUserId;
     @Column(name = "MODIFY_DATETIME")
     private Timestamp modifyDatetime;
-    @Column(name = "CREATE_DATETIME")
-    private Timestamp createDatetime;
     @Column(name = "CELL_SHARING_ALERT_FLAG")
     private String cellSharingAlertFlag;
     @Column(name = "AUDIT_TIMESTAMP")

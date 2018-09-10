@@ -22,8 +22,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.justice.digital.nomis.api.Alert;
+import uk.gov.justice.digital.nomis.api.OffenderEvent;
 import uk.gov.justice.digital.nomis.jpa.filters.AlertsFilter;
+import uk.gov.justice.digital.nomis.jpa.filters.OffenderEventsFilter;
 import uk.gov.justice.digital.nomis.service.AlertsService;
+import uk.gov.justice.digital.nomis.service.OffenderEventsService;
 
 import java.time.LocalDateTime;
 import java.util.List;

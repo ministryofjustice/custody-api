@@ -26,7 +26,6 @@ public class OffenderProgrammeProfilesService {
 
 
     public Optional<List<ProgrammeProfile>> offenderProgrammeProfilesForOffenderId(Long offenderId) {
-
         final Optional<Offender> maybeOffender = Optional.ofNullable(offenderRepository.findOne(offenderId));
 
         final Optional<List<OffenderBooking>> maybeOffenderBookings = maybeOffender.map(Offender::getOffenderBookings);
