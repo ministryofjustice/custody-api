@@ -8,6 +8,7 @@ import uk.gov.justice.digital.nomis.api.Schedule;
 import uk.gov.justice.digital.nomis.jpa.entity.CourseActivity;
 import uk.gov.justice.digital.nomis.jpa.entity.CourseSchedule;
 import uk.gov.justice.digital.nomis.jpa.entity.OffenderProgramProfile;
+import uk.gov.justice.digital.nomis.jpa.repository.OffenderProgramProfilesRepository;
 
 import java.time.format.TextStyle;
 import java.util.Collections;
@@ -20,10 +21,12 @@ import java.util.stream.Collectors;
 public class OffenderProgrammeProfileTransformer {
 
     private final TypesTransformer typesTransformer;
+    private final OffenderProgramProfilesRepository offenderProgramProfilesRepository;
 
     @Autowired
-    public OffenderProgrammeProfileTransformer(TypesTransformer typesTransformer) {
+    public OffenderProgrammeProfileTransformer(TypesTransformer typesTransformer, OffenderProgramProfilesRepository offenderProgramProfilesRepository) {
         this.typesTransformer = typesTransformer;
+        this.offenderProgramProfilesRepository = offenderProgramProfilesRepository;
     }
 
     public ProgrammeProfile programmeProfileOf(OffenderProgramProfile offenderProgramProfile) {
@@ -56,6 +59,8 @@ public class OffenderProgrammeProfileTransformer {
                         .courseActivityId(ca.getCrsActyId())
                         .description(ca.getDescription())
                         .active(typesTransformer.ynToBoolean(ca.getActiveFlag()))
+                        .outsideWork(typesTransformer.ynToBoolean(ca.getOutsideWorkFlag()))
+                        .scheduledStartDate(typesTransformer.localDateOf(ca.getScheduleStartDate()))
                         .scheduledEndDate(typesTransformer.localDateOf(ca.getScheduleEndDate())).build())
                 .orElse(null);
     }

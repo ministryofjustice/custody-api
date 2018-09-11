@@ -11,8 +11,10 @@ import java.util.List;
 public class Activity {
     private Long courseActivityId;
     private String description;
+    private LocalDate scheduledStartDate;
     private LocalDate scheduledEndDate;
     private Boolean active;
+    private Boolean outsideWork;
 
     private List<Schedule> schedules;
 
