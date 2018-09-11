@@ -3,7 +3,9 @@ package uk.gov.justice.digital.nomis.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import uk.gov.justice.digital.nomis.api.OffenderEvent;
 import uk.gov.justice.digital.nomis.jpa.filters.OffenderEventsFilter;
@@ -43,11 +45,11 @@ public class OffenderEventsService {
                 .to(maybeTo)
                 .build();
 
-        Page<uk.gov.justice.digital.nomis.jpa.entity.OffenderEvent> rawOffenderEventsPage = offenderEventsRepository.findAll(offenderEventsFilter, pageable);
+        PageRequest orderedPageable = new PageRequest(pageable.getPageNumber(), pageable.getPageSize(), new Sort(new Sort.Order(Sort.Direction.ASC, "eventTimestamp")));
+        Page<uk.gov.justice.digital.nomis.jpa.entity.OffenderEvent> rawOffenderEventsPage = offenderEventsRepository.findAll(offenderEventsFilter, orderedPageable);
 
         List<OffenderEvent> events = rawOffenderEventsPage.getContent()
                 .stream()
-                .sorted(BY_OFFENDER_EVENT_TIMESTAMP)
                 .map(offenderEventsTransformer::offenderEventOf)
                 .collect(Collectors.toList());
 
