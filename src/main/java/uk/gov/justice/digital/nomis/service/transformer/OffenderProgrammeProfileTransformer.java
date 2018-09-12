@@ -8,7 +8,6 @@ import uk.gov.justice.digital.nomis.api.Schedule;
 import uk.gov.justice.digital.nomis.jpa.entity.CourseActivity;
 import uk.gov.justice.digital.nomis.jpa.entity.CourseSchedule;
 import uk.gov.justice.digital.nomis.jpa.entity.OffenderProgramProfile;
-import uk.gov.justice.digital.nomis.jpa.repository.OffenderProgramProfilesRepository;
 
 import java.time.format.TextStyle;
 import java.util.Collections;
@@ -21,16 +20,13 @@ import java.util.stream.Collectors;
 public class OffenderProgrammeProfileTransformer {
 
     private final TypesTransformer typesTransformer;
-    private final OffenderProgramProfilesRepository offenderProgramProfilesRepository;
 
     @Autowired
-    public OffenderProgrammeProfileTransformer(TypesTransformer typesTransformer, OffenderProgramProfilesRepository offenderProgramProfilesRepository) {
+    public OffenderProgrammeProfileTransformer(TypesTransformer typesTransformer) {
         this.typesTransformer = typesTransformer;
-        this.offenderProgramProfilesRepository = offenderProgramProfilesRepository;
     }
 
     public ProgrammeProfile programmeProfileOf(OffenderProgramProfile offenderProgramProfile) {
-
         return ProgrammeProfile.builder()
                 .agencyLocationId(offenderProgramProfile.getAgyLocId())
                 .bookingId(offenderProgramProfile.getOffenderBookId())

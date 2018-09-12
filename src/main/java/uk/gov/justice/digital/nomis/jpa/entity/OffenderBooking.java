@@ -2,6 +2,7 @@ package uk.gov.justice.digital.nomis.jpa.entity;
 
 import lombok.Data;
 import org.hibernate.annotations.BatchSize;
+import org.hibernate.annotations.OrderBy;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -213,6 +214,7 @@ public class OffenderBooking {
     @OneToMany
     @BatchSize(size = 1000)
     @JoinColumn(name = "OFFENDER_BOOK_ID", referencedColumnName = "OFFENDER_BOOK_ID")
+    @OrderBy(clause = "RETURN_DATE DESC, RETURN_TIME DESC")
     private List<OffenderIndSchedule> offenderIndSchedules;
 
     @OneToMany

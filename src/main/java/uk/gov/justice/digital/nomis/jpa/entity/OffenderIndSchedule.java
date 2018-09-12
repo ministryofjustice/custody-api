@@ -16,8 +16,8 @@ public class OffenderIndSchedule {
     @Id
     @Column(name = "EVENT_ID")
     private Long eventId;
-    @Column(name = "OFFENDER_BOOK_ID")
-    private Long offenderBookId;
+    @Column(name = "PARENT_EVENT_ID")
+    private Integer parentEventId;
     @Column(name = "EVENT_DATE")
     private Timestamp eventDate;
     @Column(name = "START_TIME")
@@ -32,24 +32,60 @@ public class OffenderIndSchedule {
     private String eventSubType;
     @Column(name = "EVENT_STATUS")
     private String eventStatus;
+    @Column(name = "EVENT_OUTCOME")
+    private String eventOutcome;
+
+    @Column(name = "OFFENDER_BOOK_ID")
+    private Long offenderBookId;
     @Column(name = "COMMENT_TEXT")
     private String commentText;
     @Column(name = "HIDDEN_COMMENT_TEXT")
     private String hiddenCommentText;
+
     @Column(name = "APPLICATION_DATE")
     private Timestamp applicationDate;
-    @Column(name = "PARENT_EVENT_ID")
-    private Integer parentEventId;
+    @Column(name = "APPLICATION_TIME")
+    private Timestamp applicationTime;
+    @Column(name = "REPORT_IN_DATE")
+    private Timestamp reportInDate;
+    @Column(name = "SICK_NOTE_RECEIVED_DATE")
+    private Timestamp sickNoteReceivedDate;
+    @Column(name = "SICK_NOTE_EXPIRY_DATE")
+    private Timestamp sickNoteExpiryDate;
+    @Column(name = "RETURN_DATE")
+    private Timestamp returnDate;
+    @Column(name = "RETURN_TIME")
+    private Timestamp returnTime;
+
+    @Column(name = "DIRECTION_CODE")
+    private String directionCode;
+    @Column(name = "ESCORT_CODE")
+    private String escortCode;
+
     @Column(name = "AGY_LOC_ID")
     private String agyLocId;
+    @Column(name = "FROM_CITY")
+    private String fromCity;
+    @Column(name = "FROM_CITY_CODE")
+    private String fromCityCode;
+
     @Column(name = "TO_AGY_LOC_ID")
     private String toAgyLocId;
     @Column(name = "TO_INTERNAL_LOCATION_ID")
     private Integer toInternalLocationId;
-    @Column(name = "FROM_CITY")
-    private String fromCity;
+    @Column(name = "TO_ADDRESS_OWNER_CLASS")
+    private String toAddressOwnerClass;
+    @Column(name = "TO_ADDRESS_ID")
+    private Integer toAddressId;
+    @Column(name = "TO_CORPORATE_ID")
+    private Integer toCorporateId;
+    @Column(name = "TO_CITY_CODE")
+    private String toCityCode;
     @Column(name = "TO_CITY")
     private String toCity;
+    @Column(name = "TO_COUNTRY_CODE")
+    private String toCountryCode;
+
     @Column(name = "CRS_SCH_ID")
     private Integer crsSchId;
     @Column(name = "ORDER_ID")
@@ -68,8 +104,6 @@ public class OffenderIndSchedule {
     private Integer inChargeStaffId;
     @Column(name = "CREDITED_HOURS")
     private Integer creditedHours;
-    @Column(name = "REPORT_IN_DATE")
-    private Timestamp reportInDate;
     @Column(name = "PIECE_WORK")
     private BigDecimal pieceWork;
     @Column(name = "ENGAGEMENT_CODE")
@@ -88,32 +122,12 @@ public class OffenderIndSchedule {
     private String unpaidWorkBehaviour;
     @Column(name = "UNPAID_WORK_ACTION")
     private String unpaidWorkAction;
-    @Column(name = "SICK_NOTE_RECEIVED_DATE")
-    private Timestamp sickNoteReceivedDate;
-    @Column(name = "SICK_NOTE_EXPIRY_DATE")
-    private Timestamp sickNoteExpiryDate;
     @Column(name = "COURT_EVENT_RESULT")
     private String courtEventResult;
     @Column(name = "UNEXCUSED_ABSENCE_FLAG")
     private String unexcusedAbsenceFlag;
-    @Column(name = "CREATE_USER_ID")
-    private String createUserId;
-    @Column(name = "MODIFY_USER_ID")
-    private String modifyUserId;
-    @Column(name = "CREATE_DATETIME")
-    private Timestamp createDatetime;
-    @Column(name = "MODIFY_DATETIME")
-    private Timestamp modifyDatetime;
-    @Column(name = "ESCORT_CODE")
-    private String escortCode;
     @Column(name = "CONFIRM_FLAG")
     private String confirmFlag;
-    @Column(name = "DIRECTION_CODE")
-    private String directionCode;
-    @Column(name = "TO_CITY_CODE")
-    private String toCityCode;
-    @Column(name = "FROM_CITY_CODE")
-    private String fromCityCode;
     @Column(name = "OFF_PRGREF_ID")
     private Integer offPrgrefId;
     @Column(name = "IN_TIME")
@@ -128,28 +142,26 @@ public class OffenderIndSchedule {
     private Integer referenceId;
     @Column(name = "TRANSPORT_CODE")
     private String transportCode;
-    @Column(name = "APPLICATION_TIME")
-    private Timestamp applicationTime;
-    @Column(name = "TO_COUNTRY_CODE")
-    private String toCountryCode;
     @Column(name = "OJ_LOCATION_CODE")
     private String ojLocationCode;
     @Column(name = "CONTACT_PERSON_NAME")
     private String contactPersonName;
-    @Column(name = "TO_ADDRESS_OWNER_CLASS")
-    private String toAddressOwnerClass;
-    @Column(name = "TO_ADDRESS_ID")
-    private Integer toAddressId;
-    @Column(name = "RETURN_DATE")
-    private Timestamp returnDate;
-    @Column(name = "RETURN_TIME")
-    private Timestamp returnTime;
-    @Column(name = "TO_CORPORATE_ID")
-    private Integer toCorporateId;
     @Column(name = "TA_ID")
     private Integer taId;
-    @Column(name = "EVENT_OUTCOME")
-    private String eventOutcome;
+    @Column(name = "OFFENDER_PRG_OBLIGATION_ID")
+    private Integer offenderPrgObligationId;
+    @Column(name = "OFFENDER_MOVEMENT_APP_ID")
+    private Integer offenderMovementAppId;
+
+    @Column(name = "CREATE_USER_ID")
+    private String createUserId;
+    @Column(name = "CREATE_DATETIME")
+    private Timestamp createDatetime;
+    @Column(name = "MODIFY_USER_ID")
+    private String modifyUserId;
+    @Column(name = "MODIFY_DATETIME")
+    private Timestamp modifyDatetime;
+
     @Column(name = "AUDIT_TIMESTAMP")
     private Timestamp auditTimestamp;
     @Column(name = "AUDIT_USER_ID")
@@ -164,9 +176,4 @@ public class OffenderIndSchedule {
     private String auditClientWorkstationName;
     @Column(name = "AUDIT_ADDITIONAL_INFO")
     private String auditAdditionalInfo;
-    @Column(name = "OFFENDER_PRG_OBLIGATION_ID")
-    private Integer offenderPrgObligationId;
-    @Column(name = "OFFENDER_MOVEMENT_APP_ID")
-    private Integer offenderMovementAppId;
-
 }

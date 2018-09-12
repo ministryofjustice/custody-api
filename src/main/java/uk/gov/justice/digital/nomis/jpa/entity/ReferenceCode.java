@@ -28,8 +28,6 @@ public class ReferenceCode {
     private String activeFlag;
     @Column(name = "SYSTEM_DATA_FLAG")
     private String systemDataFlag;
-    @Column(name = "MODIFY_USER_ID")
-    private String modifyUserId;
     @Column(name = "EXPIRED_DATE")
     private Timestamp expiredDate;
     @Column(name = "NEW_CODE")
@@ -38,12 +36,16 @@ public class ReferenceCode {
     private String parentCode;
     @Column(name = "PARENT_DOMAIN")
     private String parentDomain;
-    @Column(name = "CREATE_DATETIME")
-    private Timestamp createDatetime;
+
     @Column(name = "CREATE_USER_ID")
     private String createUserId;
+    @Column(name = "CREATE_DATETIME")
+    private Timestamp createDatetime;
+    @Column(name = "MODIFY_USER_ID")
+    private String modifyUserId;
     @Column(name = "MODIFY_DATETIME")
     private Timestamp modifyDatetime;
+
     @Column(name = "AUDIT_TIMESTAMP")
     private Timestamp auditTimestamp;
     @Column(name = "AUDIT_USER_ID")
