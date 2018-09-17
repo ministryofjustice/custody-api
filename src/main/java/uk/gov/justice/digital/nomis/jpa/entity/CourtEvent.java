@@ -98,6 +98,6 @@ public class CourtEvent {
     private List<CourtEventCharge> courtEventCharges;
 
     @OneToOne
-    @JoinColumn(name = "AGY_LOC_ID")
+    @JoinColumn(name = "AGY_LOC_ID", insertable = false, updatable = false)
     private AgencyLocation agencyLocation;
 }
