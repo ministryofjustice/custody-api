@@ -30,7 +30,7 @@ public class OffenderProgrammeProfileTransformer {
         return ProgrammeProfile.builder()
                 .agencyLocationId(offenderProgramProfile.getAgyLocId())
                 .bookingId(offenderProgramProfile.getOffenderBookId())
-                .courseActivity(activityAndSchedulesOf(offenderProgramProfile.getCourseActivity()))
+                .courseActivity(activityOf(offenderProgramProfile.getCourseActivity()))
                 .offenderEndDate(typesTransformer.localDateOf(offenderProgramProfile.getOffenderEndDate()))
                 .offenderProgramStatus(offenderProgramProfile.getOffenderProgramStatus())
                 .offenderStartDate(typesTransformer.localDateOf(offenderProgramProfile.getOffenderStartDate()))
