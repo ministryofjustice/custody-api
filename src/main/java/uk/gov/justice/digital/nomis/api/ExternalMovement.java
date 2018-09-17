@@ -34,7 +34,7 @@ public class ExternalMovement {
     private Boolean transportation;
     private String internalScheduleType;
     private String internalScheduleReasonCode;
-    private AgencyLocation arrestAgencyLocation;
+    private String arrestAgencyLocationId;
     private KeyValue escortCode;
     private String escortText;
     private LocalDateTime reportingDateTime;

@@ -54,7 +54,7 @@ public class MovementsTransformer {
                 .transportation(typesTransformer.ynToBoolean(movementReason.getTransportationFlag()))
                 .internalScheduleType(em.getInternalScheduleType())
                 .internalScheduleReasonCode(em.getInternalScheduleReasonCode())
-                .arrestAgencyLocation(referenceDataTranformer.agencyLocationOf(em.getArrestAgencyLocation()))
+                .arrestAgencyLocationId(em.getArrestAgencyLocId())
                 .toProvStatCode(em.getToProvStatCode())
                 .escortCode(getEscortCodeOf(em))
                 .escortText(em.getEscortText())

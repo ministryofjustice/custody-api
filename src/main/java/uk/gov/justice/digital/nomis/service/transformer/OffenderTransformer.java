@@ -29,6 +29,7 @@ public class OffenderTransformer {
     private static final String SEX = "SEX";
 
     private final TypesTransformer typesTransformer;
+    private final ReferenceDataTranformer referenceDataTransformer;
     private final ReferenceCodesRepository referenceCodesRepository;
     private final MovementsTransformer movementsTransformer;
 
@@ -42,8 +43,9 @@ public class OffenderTransformer {
             .thenComparing(OffenderBooking::getBookingBeginDate, Comparator.reverseOrder());
 
     @Autowired
-    public OffenderTransformer(TypesTransformer typesTransformer, ReferenceCodesRepository referenceCodesRepository, MovementsTransformer movementsTransformer) {
+    public OffenderTransformer(TypesTransformer typesTransformer, ReferenceDataTranformer referenceDataTransformer, ReferenceCodesRepository referenceCodesRepository, MovementsTransformer movementsTransformer) {
         this.typesTransformer = typesTransformer;
+        this.referenceDataTransformer = referenceDataTransformer;
         this.referenceCodesRepository = referenceCodesRepository;
         this.movementsTransformer = movementsTransformer;
     }
@@ -95,11 +97,11 @@ public class OffenderTransformer {
                 .startDate(booking.getBookingBeginDate().toLocalDateTime().toLocalDate())
                 .endDate(Optional.ofNullable(booking.getBookingEndDate()).map(end -> end.toLocalDateTime().toLocalDate()))
                 .activeFlag(typesTransformer.ynToBoolean(booking.getActiveFlag()))
-                .agencyLocationId(booking.getAgyLocId())
+                .agencyLocation(referenceDataTransformer.agencyLocationOf(booking.getAgencyLocation()))
                 .bookingNo(booking.getBookingNo())
                 .bookingStatus(booking.getBookingStatus())
                 .inOutStatus(booking.getInOutStatus())
-                .livingUnitId(booking.getLivingUnitId())
+                .livingUnit(referenceDataTransformer.agencyInternalLocationOf(booking.getLivingUnit()))
                 .offenderId(booking.getOffenderId())
                 .bookingId(booking.getOffenderBookId())
                 .rootOffenderId(booking.getRootOffenderId())

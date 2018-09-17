@@ -9,6 +9,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import java.sql.Timestamp;
 import java.util.List;
@@ -236,6 +237,14 @@ public class OffenderBooking {
     @BatchSize(size = 1000)
     @JoinColumn(name = "OFFENDER_BOOK_ID", referencedColumnName = "OFFENDER_BOOK_ID")
     private List<OffenderAlert> offenderAlerts;
+
+    @OneToOne
+    @JoinColumn(name = "AGY_LOC_ID", insertable = false, updatable = false)
+    private AgencyLocation agencyLocation;
+
+    @OneToOne
+    @JoinColumn(name = "LIVING_UNIT_ID", insertable = false, updatable = false)
+    private AgencyInternalLocation livingUnit;
 
 
 }

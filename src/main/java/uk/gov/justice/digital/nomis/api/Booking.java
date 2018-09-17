@@ -14,8 +14,8 @@ public class Booking {
     private String bookingNo;
     private Long offenderId;
     private Long rootOffenderId;
-    private String agencyLocationId;
-    private Long livingUnitId;
+    private AgencyLocation agencyLocation;
+    private AgencyInternalLocation livingUnit;
     private Boolean activeFlag;
     private String bookingStatus;
     private String inOutStatus;

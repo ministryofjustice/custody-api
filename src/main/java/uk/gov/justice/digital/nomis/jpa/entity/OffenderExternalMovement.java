@@ -123,8 +123,4 @@ public class OffenderExternalMovement {
     @JoinColumn(name = "FROM_AGY_LOC_ID", insertable = false, updatable = false)
     private AgencyLocation fromAgencyLocation;
 
-    @OneToOne
-    @JoinColumn(name = "ARREST_AGENCY_LOC_ID", insertable = false, updatable = false)
-    private AgencyLocation arrestAgencyLocation;
-
 }
