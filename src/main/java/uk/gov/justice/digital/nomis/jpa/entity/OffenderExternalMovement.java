@@ -9,6 +9,7 @@ import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinColumns;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import java.io.Serializable;
 import java.sql.Timestamp;
@@ -62,14 +63,6 @@ public class OffenderExternalMovement {
     private String fromCity;
     @Column(name = "REPORTING_TIME")
     private Timestamp reportingTime;
-    @Column(name = "CREATE_DATETIME")
-    private Timestamp createDatetime;
-    @Column(name = "CREATE_USER_ID")
-    private String createUserId;
-    @Column(name = "MODIFY_DATETIME")
-    private Timestamp modifyDatetime;
-    @Column(name = "MODIFY_USER_ID")
-    private String modifyUserId;
     @Column(name = "EVENT_ID")
     private Integer eventId;
     @Column(name = "PARENT_EVENT_ID")
@@ -82,6 +75,24 @@ public class OffenderExternalMovement {
     private Timestamp applicationDate;
     @Column(name = "APPLICATION_TIME")
     private Timestamp applicationTime;
+    @Column(name = "FROM_AGY_LOC_ID")
+    private String fromAgyLocId;
+    @Column(name = "TO_AGY_LOC_ID")
+    private String toAgyLocId;
+    @Column(name = "FROM_ADDRESS_ID")
+    private Long fromAddressId;
+    @Column(name = "TO_ADDRESS_ID")
+    private Long toAddressId;
+
+    @Column(name = "CREATE_DATETIME")
+    private Timestamp createDatetime;
+    @Column(name = "CREATE_USER_ID")
+    private String createUserId;
+    @Column(name = "MODIFY_DATETIME")
+    private Timestamp modifyDatetime;
+    @Column(name = "MODIFY_USER_ID")
+    private String modifyUserId;
+
     @Column(name = "AUDIT_TIMESTAMP")
     private Timestamp auditTimestamp;
     @Column(name = "AUDIT_USER_ID")
@@ -96,14 +107,6 @@ public class OffenderExternalMovement {
     private String auditClientWorkstationName;
     @Column(name = "AUDIT_ADDITIONAL_INFO")
     private String auditAdditionalInfo;
-    @Column(name = "FROM_AGY_LOC_ID")
-    private String fromAgyLocId;
-    @Column(name = "TO_AGY_LOC_ID")
-    private String toAgyLocId;
-    @Column(name = "FROM_ADDRESS_ID")
-    private Long fromAddressId;
-    @Column(name = "TO_ADDRESS_ID")
-    private Long toAddressId;
 
     @ManyToOne
     @JoinColumns({
@@ -111,5 +114,17 @@ public class OffenderExternalMovement {
             @JoinColumn(name = "MOVEMENT_TYPE", referencedColumnName = "MOVEMENT_TYPE")
     })
     private MovementReason movementReason;
+
+    @OneToOne
+    @JoinColumn(name = "TO_AGY_LOC_ID", insertable = false, updatable = false)
+    private AgencyLocation toAgencyLocation;
+
+    @OneToOne
+    @JoinColumn(name = "FROM_AGY_LOC_ID", insertable = false, updatable = false)
+    private AgencyLocation fromAgencyLocation;
+
+    @OneToOne
+    @JoinColumn(name = "ARREST_AGENCY_LOC_ID", insertable = false, updatable = false)
+    private AgencyLocation arrestAgencyLocation;
 
 }

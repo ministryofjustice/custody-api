@@ -17,11 +17,13 @@ public class MovementsTransformer {
     private static final String ESCORT = "ESCORT";
 
     private final TypesTransformer typesTransformer;
+    private final ReferenceDataTranformer referenceDataTranformer;
     private final ReferenceCodesRepository referenceCodesRepository;
 
     @Autowired
-    public MovementsTransformer(TypesTransformer typesTransformer, ReferenceCodesRepository referenceCodesRepository) {
+    public MovementsTransformer(TypesTransformer typesTransformer, ReferenceDataTranformer referenceDataTranformer, ReferenceCodesRepository referenceCodesRepository) {
         this.typesTransformer = typesTransformer;
+        this.referenceDataTranformer = referenceDataTranformer;
         this.referenceCodesRepository = referenceCodesRepository;
     }
 
@@ -35,8 +37,8 @@ public class MovementsTransformer {
                 .comments(em.getCommentText())
                 .fromAddressId(em.getFromAddressId())
                 .toAddressId(em.getToAddressId())
-                .fromAgencyLocationId(em.getFromAgyLocId())
-                .toAgencyLocationId(em.getToAgyLocId())
+                .fromAgencyLocation(referenceDataTranformer.agencyLocationOf(em.getFromAgencyLocation()))
+                .toAgencyLocation(referenceDataTranformer.agencyLocationOf(em.getToAgencyLocation()))
                 .movementDirection(em.getDirectionCode())
                 .movementReasonCode(movementReason.getMovementReasonCode())
                 .movementReasonDescription(movementReason.getDescription())
@@ -52,7 +54,7 @@ public class MovementsTransformer {
                 .transportation(typesTransformer.ynToBoolean(movementReason.getTransportationFlag()))
                 .internalScheduleType(em.getInternalScheduleType())
                 .internalScheduleReasonCode(em.getInternalScheduleReasonCode())
-                .arrestAgencyLocationId(em.getArrestAgencyLocId())
+                .arrestAgencyLocation(referenceDataTranformer.agencyLocationOf(em.getArrestAgencyLocation()))
                 .toProvStatCode(em.getToProvStatCode())
                 .escortCode(getEscortCodeOf(em))
                 .escortText(em.getEscortText())
