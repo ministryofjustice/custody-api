@@ -90,7 +90,11 @@ dependencies {
     compile 'io.springfox:springfox-swagger-ui:2.9.2'
     compile 'com.zaxxer:HikariCP:2.7.6'
     compile 'commons-io:commons-io:2.6'
-
+    compile 'org.apache.commons:commons-lang3:3.8'
+    compile 'net.logstash.logback:logstash-logback-encoder:5.2'
+    compile 'com.microsoft.azure:applicationinsights-core:2.1.2'
+    compile 'com.microsoft.azure:applicationinsights-web:2.1.2'
+    compile 'com.microsoft.azure:applicationinsights-logging-logback:2.1.2'
 
     compileOnly 'org.projectlombok:lombok:1.16.18'
 
