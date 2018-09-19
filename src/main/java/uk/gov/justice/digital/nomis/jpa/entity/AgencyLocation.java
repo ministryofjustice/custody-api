@@ -81,6 +81,7 @@ public class AgencyLocation {
     private String cjitCode;
     @Column(name = "LONG_DESCRIPTION")
     private String longDescription;
+
     @Column(name = "CREATE_DATETIME")
     private Timestamp createDatetime;
     @Column(name = "CREATE_USER_ID")
@@ -89,6 +90,7 @@ public class AgencyLocation {
     private Timestamp modifyDatetime;
     @Column(name = "MODIFY_USER_ID")
     private String modifyUserId;
+
     @Column(name = "AUDIT_TIMESTAMP")
     private Timestamp auditTimestamp;
     @Column(name = "AUDIT_USER_ID")
