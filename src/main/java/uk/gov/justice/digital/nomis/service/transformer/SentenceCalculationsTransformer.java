@@ -5,8 +5,6 @@ import org.springframework.stereotype.Component;
 import uk.gov.justice.digital.nomis.api.SentenceCalculation;
 import uk.gov.justice.digital.nomis.jpa.entity.OffenderSentCalculation;
 
-import java.util.Optional;
-
 @Component
 public class SentenceCalculationsTransformer {
 
@@ -68,7 +66,7 @@ public class SentenceCalculationsTransformer {
                 .releaseDate(typesTransformer.localDateOf(osc.getDerivedReleaseDate()))
                 .confirmedReleaseDate(typesTransformer.localDateOf(osc.getConfirmedReleaseDate()))
                 .nonDtoReleaseDate(typesTransformer.localDateOf(osc.getNonDtoReleaseDate()))
-                .midTermDate(Optional.ofNullable(osc.getMidTermDate()).map(date -> date.toLocalDateTime().toLocalDate()).orElse(null))
+                .midTermDate(typesTransformer.localDateOf(osc.getMidTermDate()))
                 .build();
     }
 
