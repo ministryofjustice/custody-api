@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import lombok.val;
 
 import javax.persistence.Column;
@@ -22,6 +23,7 @@ import java.util.stream.Stream;
 
 @Data
 @Entity
+@ToString(exclude = "offenderBooking")
 @Table(name = "OFFENDER_SENT_CALCULATIONS")
 @Builder(toBuilder = true)
 @AllArgsConstructor
