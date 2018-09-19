@@ -13,7 +13,6 @@ import uk.gov.justice.digital.nomis.jpa.repository.OffenderReleaseDetailsReposit
 import uk.gov.justice.digital.nomis.jpa.repository.OffenderRepository;
 import uk.gov.justice.digital.nomis.service.transformer.ReleaseDetailsTransformer;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -49,13 +48,12 @@ public class ReleaseDetailsService {
                 .map(offender ->
                         offender.getOffenderBookings().stream()
                                 .map(OffenderBooking::getOffenderReleaseDetails)
-                                .flatMap(Collection::stream)
                                 .collect(Collectors.toList()));
 
         return maybeReleaseDetails.map(releaseDetails -> releaseDetails.stream().map(releaseDetailsTransformer::releaseDetailsOf).collect(Collectors.toList()));
     }
 
-    public Optional<List<ReleaseDetails>> releaseDetailsForOffenderIdAndBookingId(Long offenderId, Long bookingId) {
+    public Optional<ReleaseDetails> releaseDetailsForOffenderIdAndBookingId(Long offenderId, Long bookingId) {
         Optional<Offender> maybeOffender = Optional.ofNullable(offenderRepository.findOne(offenderId));
 
         return maybeOffender.flatMap(
@@ -63,10 +61,8 @@ public class ReleaseDetailsService {
                         .stream()
                         .filter(ob -> ob.getOffenderBookId().equals(bookingId))
                         .findFirst())
-                .map(ob -> ob.getOffenderReleaseDetails()
-                        .stream()
-                        .map(releaseDetailsTransformer::releaseDetailsOf)
-                        .collect(Collectors.toList()));
+                .flatMap(ob -> Optional.ofNullable(ob.getOffenderReleaseDetails())
+                        .map(releaseDetailsTransformer::releaseDetailsOf));
     }
 
 }

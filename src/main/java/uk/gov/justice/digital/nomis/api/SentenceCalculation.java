@@ -3,6 +3,7 @@ package uk.gov.justice.digital.nomis.api;
 import lombok.Builder;
 import lombok.Data;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
@@ -54,4 +55,8 @@ public class SentenceCalculation {
     private LocalDateTime rotlOverridedDate;
     private LocalDateTime tusedCalculatedDate;
     private LocalDateTime tusedOverridedDate;
+    private LocalDate releaseDate;
+    private LocalDate confirmedReleaseDate;
+    private LocalDate nonDtoReleaseDate;
+    private LocalDate midTermDate;
 }

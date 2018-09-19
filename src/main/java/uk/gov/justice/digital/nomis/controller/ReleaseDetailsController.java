@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.nomis.controller;
 
+import com.google.common.collect.ImmutableList;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -62,9 +63,13 @@ public class ReleaseDetailsController {
                                                                           @RequestParam("bookingId") Optional<Long> maybeBookingId) {
 
         return maybeBookingId
-                .map(bookingId -> releaseDetailsService.releaseDetailsForOffenderIdAndBookingId(offenderId, bookingId))
+                .map(bookingId -> maybeListOf(releaseDetailsService.releaseDetailsForOffenderIdAndBookingId(offenderId, bookingId)))
                 .orElse(releaseDetailsService.releaseDetailsForOffenderId(offenderId))
                 .map(releaseDetails -> new ResponseEntity<>(releaseDetails, HttpStatus.OK))
                 .orElse(new ResponseEntity<>(NOT_FOUND));
+    }
+
+    private Optional<List<ReleaseDetails>> maybeListOf(Optional<ReleaseDetails> releaseDetails) {
+        return releaseDetails.map(ImmutableList::of);
     }
 }

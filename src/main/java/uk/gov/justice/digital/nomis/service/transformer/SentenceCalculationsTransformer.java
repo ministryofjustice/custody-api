@@ -5,6 +5,8 @@ import org.springframework.stereotype.Component;
 import uk.gov.justice.digital.nomis.api.SentenceCalculation;
 import uk.gov.justice.digital.nomis.jpa.entity.OffenderSentCalculation;
 
+import java.util.Optional;
+
 @Component
 public class SentenceCalculationsTransformer {
 
@@ -21,7 +23,7 @@ public class SentenceCalculationsTransformer {
                 .apdOverridedDate(typesTransformer.localDateTimeOf(osc.getApdOverridedDate()))
                 .ardCalculatedDate(typesTransformer.localDateTimeOf(osc.getArdCalculatedDate()))
                 .ardOverridedDate(typesTransformer.localDateTimeOf(osc.getArdOverridedDate()))
-                .bookingId(osc.getOffenderBookId())
+                .bookingId(osc.getOffenderBooking().getOffenderBookId())
                 .calcReasonCode(osc.getCalcReasonCode())
                 .calculationDate(typesTransformer.localDateTimeOf(osc.getCalculationDate()))
                 .comments(osc.getCommentText())
@@ -63,6 +65,11 @@ public class SentenceCalculationsTransformer {
                 .tusedCalculatedDate(typesTransformer.localDateTimeOf(osc.getTusedCalculatedDate()))
                 .tusedOverridedDate(typesTransformer.localDateTimeOf(osc.getTusedOverridedDate()))
                 .workflowHistoryId(osc.getWorkflowHistoryId())
+                .releaseDate(typesTransformer.localDateOf(osc.getDerivedReleaseDate()))
+                .confirmedReleaseDate(typesTransformer.localDateOf(osc.getConfirmedReleaseDate()))
+                .nonDtoReleaseDate(typesTransformer.localDateOf(osc.getNonDtoReleaseDate()))
+                .midTermDate(Optional.ofNullable(osc.getMidTermDate()).map(date -> date.toLocalDateTime().toLocalDate()).orElse(null))
                 .build();
     }
+
 }

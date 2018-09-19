@@ -1,6 +1,9 @@
 package uk.gov.justice.digital.nomis.jpa.entity;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 import javax.persistence.Column;
@@ -19,6 +22,9 @@ import java.sql.Timestamp;
 @Entity
 @Table(name = "OFFENDER_SENTENCES")
 @IdClass(OffenderSentencePk.class)
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class OffenderSentence {
 
     @Id
@@ -166,4 +172,97 @@ public class OffenderSentence {
     @JoinColumn(name = "OFFENDER_BOOK_ID", insertable = false, updatable = false)
     private OffenderBooking offenderBooking;
 
+//    @OneToOne
+//    @JoinColumn(name = "OFFENDER_BOOK_ID")
+//    private OffenderReleaseDetails offenderReleaseDetails;
+//
+//    @Transient
+//    private Timestamp derivedReleaseDate;
+//    @Transient
+//    private Timestamp confirmedReleaseDate;
+//    @Transient
+//    private Timestamp nonDtoReleaseDate;
+//    @Transient
+//    private Timestamp midTermDate;
+//
+//    @PostLoad
+//    private void postLoadSignificantReleaseDates() {
+//        confirmedReleaseDate = calculateConfirmedReleaseDate().orElse(null);
+//        nonDtoReleaseDate = calculateNonDtoReleaseDate().orElse(null);
+//        midTermDate = calculateMidTermDate().orElse(null);
+//        derivedReleaseDate = calculateDerivedReleaseDate();
+//    }
+//
+//    public Timestamp calculateDerivedReleaseDate() {
+//
+//        final val maybeConfirmedReleaseDate = Optional.ofNullable(confirmedReleaseDate);
+//
+//        if (maybeConfirmedReleaseDate.isPresent()) {
+//            return maybeConfirmedReleaseDate.get();
+//        }
+//
+//        final val maybeActualParoleDate = Optional.ofNullable(latestSentenceCalculation()).map(OffenderSentCalculation::getApdOverridedDate);
+//
+//        if (maybeActualParoleDate.isPresent()) {
+//            return maybeActualParoleDate.get();
+//        }
+//
+//        final val maybeHdcActualDate = Optional.ofNullable(latestSentenceCalculation()).map(OffenderSentCalculation::getHdcadOverridedDate);
+//
+//        if (maybeHdcActualDate.isPresent()) {
+//            return maybeHdcActualDate.get();
+//        }
+//
+//        final val maybeNonDtoReleaseDate = Optional.ofNullable(nonDtoReleaseDate);
+//        final val maybeMidTermDate = Optional.ofNullable(midTermDate);
+//
+//        return greaterOf(maybeNonDtoReleaseDate, maybeMidTermDate);
+//    }
+//
+//    public Timestamp greaterOf(Optional<Timestamp> maybeNonDtoReleaseDate, Optional<Timestamp> maybeMidTermDate) {
+//
+//        return Stream.of(maybeNonDtoReleaseDate, maybeMidTermDate)
+//                .filter(Optional::isPresent)
+//                .map(Optional::get)
+//                .max(Timestamp::compareTo).orElse(null);
+//    }
+//
+//    public Optional<Timestamp> calculateConfirmedReleaseDate() {
+//        return Optional.ofNullable(offenderReleaseDetails).flatMap(
+//                ord -> firstNonNullDateOf(ord.getReleaseDate(), ord.getAutoReleaseDate()));
+//    }
+//
+//    public Optional<Timestamp> firstNonNullDateOf(Timestamp a, Timestamp b) {
+//        return Optional.ofNullable(Optional.ofNullable(a).orElse(b));
+//    }
+//
+//    public OffenderSentCalculation latestSentenceCalculation() {
+//        return offenderSentCalculations
+//                .stream()
+//                .max(Comparator.comparing(OffenderSentCalculation::getOffenderSentCalculationId)).orElse(null);
+//    }
+//
+//    public Optional<Timestamp> calculateNonDtoReleaseDate() {
+//        final val maybeDates = Optional.ofNullable(latestSentenceCalculation()).map(
+//                sc -> ImmutableList.<Optional<Timestamp>>builder()
+//                        .add(firstNonNullDateOf(sc.getArdOverridedDate(), sc.getArdCalculatedDate()))
+//                        .add(firstNonNullDateOf(sc.getCrdOverridedDate(), sc.getCrdCalculatedDate()))
+//                        .add(firstNonNullDateOf(sc.getNpdOverridedDate(), sc.getNpdCalculatedDate()))
+//                        .add(firstNonNullDateOf(sc.getPrrdOverridedDate(), sc.getPrrdCalculatedDate()))
+//                        .build());
+//
+//        return maybeDates.flatMap(dates -> dates
+//                .stream()
+//                .flatMap(o -> o.map(Stream::of).orElseGet(Stream::empty))
+//                .min(Timestamp::compareTo));
+//
+//    }
+//
+//    public Optional<Timestamp> calculateMidTermDate() {
+//        return Optional.ofNullable(latestSentenceCalculation())
+//                .flatMap(sc -> firstNonNullDateOf(sc.getMtdOverridedDate(), sc.getMtdCalculatedDate()));
+//    }
+
+//    @OneToMany(mappedBy = "offenderSentence")
+//    private List<OffenderSentCalculation> offenderSentCalculations;
 }

@@ -1,22 +1,38 @@
 package uk.gov.justice.digital.nomis.jpa.entity;
 
+import com.google.common.collect.ImmutableList;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.val;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.PostLoad;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import java.sql.Timestamp;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 @Data
 @Entity
 @Table(name = "OFFENDER_SENT_CALCULATIONS")
+@Builder(toBuilder = true)
+@AllArgsConstructor
+@NoArgsConstructor
 public class OffenderSentCalculation {
     @Id
     @Column(name = "OFFENDER_SENT_CALCULATION_ID")
     private Long offenderSentCalculationId;
-    @Column(name = "OFFENDER_BOOK_ID")
-    private Long offenderBookId;
+    @JoinColumn(name = "OFFENDER_BOOK_ID", referencedColumnName = "OFFENDER_BOOK_ID")
+    @ManyToOne
+    private OffenderBooking offenderBooking;
     @Column(name = "CALCULATION_DATE")
     private Timestamp calculationDate;
     @Column(name = "STAFF_ID")
@@ -131,5 +147,86 @@ public class OffenderSentCalculation {
     private Timestamp tusedCalculatedDate;
     @Column(name = "TUSED_OVERRIDED_DATE")
     private Timestamp tusedOverridedDate;
+
+
+    @Transient
+    private Timestamp derivedReleaseDate;
+    @Transient
+    private Timestamp confirmedReleaseDate;
+    @Transient
+    private Timestamp nonDtoReleaseDate;
+    @Transient
+    private Timestamp midTermDate;
+
+    @PostLoad
+    private void postLoadSignificantReleaseDates() {
+        confirmedReleaseDate = calculateConfirmedReleaseDate().orElse(null);
+        nonDtoReleaseDate = calculateNonDtoReleaseDate().orElse(null);
+        midTermDate = calculateMidTermDate().orElse(null);
+        derivedReleaseDate = calculateDerivedReleaseDate();
+    }
+
+    public Timestamp calculateDerivedReleaseDate() {
+
+        final val maybeConfirmedReleaseDate = Optional.ofNullable(confirmedReleaseDate);
+
+        if (maybeConfirmedReleaseDate.isPresent()) {
+            return maybeConfirmedReleaseDate.get();
+        }
+
+        final val maybeActualParoleDate = Optional.ofNullable(apdOverridedDate);
+
+        if (maybeActualParoleDate.isPresent()) {
+            return maybeActualParoleDate.get();
+        }
+
+        final val maybeHdcActualDate = Optional.ofNullable(hdcadOverridedDate);
+
+        if (maybeHdcActualDate.isPresent()) {
+            return maybeHdcActualDate.get();
+        }
+
+        final val maybeNonDtoReleaseDate = Optional.ofNullable(nonDtoReleaseDate);
+        final val maybeMidTermDate = Optional.ofNullable(midTermDate);
+
+        return greaterOf(maybeNonDtoReleaseDate, maybeMidTermDate);
+    }
+
+    public Timestamp greaterOf(Optional<Timestamp> maybeNonDtoReleaseDate, Optional<Timestamp> maybeMidTermDate) {
+
+        return Stream.of(maybeNonDtoReleaseDate, maybeMidTermDate)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .max(Timestamp::compareTo).orElse(null);
+    }
+
+    public Optional<Timestamp> calculateConfirmedReleaseDate() {
+        return Optional.ofNullable(offenderBooking.getOffenderReleaseDetails())
+                .flatMap(ord -> firstNonNullDateOf(ord.getReleaseDate(), ord.getAutoReleaseDate()));
+    }
+
+    public Optional<Timestamp> firstNonNullDateOf(Timestamp a, Timestamp b) {
+        return Optional.ofNullable(Optional.ofNullable(a).orElse(b));
+    }
+
+    public Optional<Timestamp> calculateNonDtoReleaseDate() {
+        final List<Optional<Timestamp>> dates = ImmutableList.<Optional<Timestamp>>builder()
+                        .add(firstNonNullDateOf(ardOverridedDate, ardCalculatedDate))
+                        .add(firstNonNullDateOf(crdOverridedDate, crdCalculatedDate))
+                        .add(firstNonNullDateOf(npdOverridedDate, npdCalculatedDate))
+                        .add(firstNonNullDateOf(prrdOverridedDate, prrdCalculatedDate))
+                        .build();
+
+        return dates
+                .stream()
+                .flatMap(o -> o.map(Stream::of).orElseGet(Stream::empty))
+                .min(Timestamp::compareTo);
+
+    }
+
+    public Optional<Timestamp> calculateMidTermDate() {
+        return firstNonNullDateOf(mtdOverridedDate, mtdCalculatedDate);
+    }
+
 
 }

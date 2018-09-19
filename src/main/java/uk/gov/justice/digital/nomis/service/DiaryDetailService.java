@@ -54,10 +54,11 @@ public class DiaryDetailService {
                 .filter(courtEvent -> SCH.equals(courtEvent.getEventStatus()))
                 .map(diaryDetailTransformer::diaryDetailOf);
 
-        final Stream<DiaryDetail> offenderReleaseDetailsDiaryDetailStream = offenderBooking.getOffenderReleaseDetails()
-                .stream()
+        final Stream<DiaryDetail> offenderReleaseDetailsDiaryDetailStream =
+                Optional.ofNullable(offenderBooking.getOffenderReleaseDetails())
                 .filter(offenderReleaseDetails -> SCH.equals(offenderReleaseDetails.getEventStatus()))
-                .map(diaryDetailTransformer::diaryDetailOf);
+                .map(diaryDetailTransformer::diaryDetailOf)
+                .map(Stream::of).orElse(Stream.empty());
 
         final Stream<DiaryDetail> offenderIndSchedulesDiaryDetailStream = offenderBooking.getOffenderIndSchedules()
                 .stream()
