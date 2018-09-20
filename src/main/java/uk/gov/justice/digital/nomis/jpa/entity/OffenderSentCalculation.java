@@ -152,13 +152,13 @@ public class OffenderSentCalculation {
 
 
     @Transient
-    private Timestamp derivedReleaseDate;
+    private LabelledTimestamp derivedReleaseDate;
     @Transient
-    private Timestamp confirmedReleaseDate;
+    private LabelledTimestamp confirmedReleaseDate;
     @Transient
-    private Timestamp nonDtoReleaseDate;
+    private LabelledTimestamp nonDtoReleaseDate;
     @Transient
-    private Timestamp midTermDate;
+    private LabelledTimestamp midTermDate;
 
     @PostLoad
     private void postLoadSignificantReleaseDates() {
@@ -168,7 +168,7 @@ public class OffenderSentCalculation {
         derivedReleaseDate = calculateDerivedReleaseDate();
     }
 
-    public Timestamp calculateDerivedReleaseDate() {
+    public LabelledTimestamp calculateDerivedReleaseDate() {
 
         final val maybeConfirmedReleaseDate = Optional.ofNullable(confirmedReleaseDate);
 
@@ -179,56 +179,83 @@ public class OffenderSentCalculation {
         final val maybeActualParoleDate = Optional.ofNullable(apdOverridedDate);
 
         if (maybeActualParoleDate.isPresent()) {
-            return maybeActualParoleDate.get();
+            return new LabelledTimestamp("APD", maybeActualParoleDate.get());
         }
 
         final val maybeHdcActualDate = Optional.ofNullable(hdcadOverridedDate);
 
         if (maybeHdcActualDate.isPresent()) {
-            return maybeHdcActualDate.get();
+            return new LabelledTimestamp("HDCAD", maybeHdcActualDate.get());
         }
 
         final val maybeNonDtoReleaseDate = Optional.ofNullable(nonDtoReleaseDate);
         final val maybeMidTermDate = Optional.ofNullable(midTermDate);
 
-        return greaterOf(maybeNonDtoReleaseDate, maybeMidTermDate);
+        return greaterOf(maybeNonDtoReleaseDate, maybeMidTermDate).orElse(null);
     }
 
-    public Timestamp greaterOf(Optional<Timestamp> maybeNonDtoReleaseDate, Optional<Timestamp> maybeMidTermDate) {
+    public Optional<LabelledTimestamp> greaterOf(Optional<LabelledTimestamp> maybeDate1, Optional<LabelledTimestamp> maybeDate2) {
 
-        return Stream.of(maybeNonDtoReleaseDate, maybeMidTermDate)
+        return Stream.of(maybeDate1, maybeDate2)
                 .filter(Optional::isPresent)
                 .map(Optional::get)
-                .max(Timestamp::compareTo).orElse(null);
+                .max(LabelledTimestamp::compareTo);
     }
 
-    public Optional<Timestamp> calculateConfirmedReleaseDate() {
+    public Optional<LabelledTimestamp> calculateConfirmedReleaseDate() {
         return Optional.ofNullable(offenderBooking.getOffenderReleaseDetails())
-                .flatMap(ord -> firstNonNullDateOf(ord.getReleaseDate(), ord.getAutoReleaseDate()));
+                .flatMap(ord -> firstNonNullDateOf(ord.getReleaseDate(), ord.getAutoReleaseDate()))
+                .flatMap(t -> Optional.of(new LabelledTimestamp("ORD", t)));
     }
 
     public Optional<Timestamp> firstNonNullDateOf(Timestamp a, Timestamp b) {
         return Optional.ofNullable(Optional.ofNullable(a).orElse(b));
     }
 
-    public Optional<Timestamp> calculateNonDtoReleaseDate() {
-        final List<Optional<Timestamp>> dates = ImmutableList.<Optional<Timestamp>>builder()
-                        .add(firstNonNullDateOf(ardOverridedDate, ardCalculatedDate))
-                        .add(firstNonNullDateOf(crdOverridedDate, crdCalculatedDate))
-                        .add(firstNonNullDateOf(npdOverridedDate, npdCalculatedDate))
-                        .add(firstNonNullDateOf(prrdOverridedDate, prrdCalculatedDate))
-                        .build();
+    public Optional<LabelledTimestamp> calculateNonDtoReleaseDate() {
+        final List<Optional<LabelledTimestamp>> dates = ImmutableList.<Optional<LabelledTimestamp>>builder()
+                .add(labelledTimestampOf("ARD", firstNonNullDateOf(ardOverridedDate, ardCalculatedDate)))
+                .add(labelledTimestampOf("CRD", firstNonNullDateOf(crdOverridedDate, crdCalculatedDate)))
+                .add(labelledTimestampOf("NPD" , firstNonNullDateOf(npdOverridedDate, npdCalculatedDate)))
+                .add(labelledTimestampOf("PRRD", firstNonNullDateOf(prrdOverridedDate, prrdCalculatedDate)))
+                .build();
 
         return dates
                 .stream()
                 .flatMap(o -> o.map(Stream::of).orElseGet(Stream::empty))
-                .min(Timestamp::compareTo);
+                .min(LabelledTimestamp::compareTo);
 
     }
 
-    public Optional<Timestamp> calculateMidTermDate() {
-        return firstNonNullDateOf(mtdOverridedDate, mtdCalculatedDate);
+    private Optional<LabelledTimestamp> labelledTimestampOf(String label, Optional<Timestamp> timestamp) {
+        return timestamp.map(t -> new LabelledTimestamp(label, t));
+    }
+
+    public Optional<LabelledTimestamp> calculateMidTermDate() {
+        return labelledTimestampOf("MTD", firstNonNullDateOf(mtdOverridedDate, mtdCalculatedDate));
     }
 
 
+    public class LabelledTimestamp implements Comparable<LabelledTimestamp>{
+        private final String label;
+        private final Timestamp timestamp;
+
+        public LabelledTimestamp(String label, Timestamp timestamp) {
+            this.label = label;
+            this.timestamp = timestamp;
+        }
+
+        public String getLabel() {
+            return label;
+        }
+
+        public Timestamp getTimestamp() {
+            return timestamp;
+        }
+
+        @Override
+        public int compareTo(LabelledTimestamp o) {
+            return timestamp.compareTo(o.timestamp);
+        }
+    }
 }

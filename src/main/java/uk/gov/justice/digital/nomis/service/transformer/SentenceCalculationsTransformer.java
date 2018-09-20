@@ -5,6 +5,8 @@ import org.springframework.stereotype.Component;
 import uk.gov.justice.digital.nomis.api.SentenceCalculation;
 import uk.gov.justice.digital.nomis.jpa.entity.OffenderSentCalculation;
 
+import java.util.Optional;
+
 @Component
 public class SentenceCalculationsTransformer {
 
@@ -64,6 +66,7 @@ public class SentenceCalculationsTransformer {
                 .tusedOverridedDate(typesTransformer.localDateTimeOf(osc.getTusedOverridedDate()))
                 .workflowHistoryId(osc.getWorkflowHistoryId())
                 .releaseDate(typesTransformer.localDateOf(osc.getDerivedReleaseDate()))
+                .releaseType(Optional.ofNullable(osc.getDerivedReleaseDate()).map(OffenderSentCalculation.LabelledTimestamp::getLabel).orElse(null))
                 .confirmedReleaseDate(typesTransformer.localDateOf(osc.getConfirmedReleaseDate()))
                 .nonDtoReleaseDate(typesTransformer.localDateOf(osc.getNonDtoReleaseDate()))
                 .midTermDate(typesTransformer.localDateOf(osc.getMidTermDate()))

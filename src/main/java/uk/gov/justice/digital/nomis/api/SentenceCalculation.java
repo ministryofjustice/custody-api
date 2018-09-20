@@ -56,6 +56,7 @@ public class SentenceCalculation {
     private LocalDateTime tusedCalculatedDate;
     private LocalDateTime tusedOverridedDate;
     private LocalDate releaseDate;
+    private String releaseType;
     private LocalDate confirmedReleaseDate;
     private LocalDate nonDtoReleaseDate;
     private LocalDate midTermDate;
