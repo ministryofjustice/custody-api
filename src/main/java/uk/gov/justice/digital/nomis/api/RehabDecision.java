@@ -12,7 +12,7 @@ import java.util.List;
 public class RehabDecision {
     private Long offenderRehabDecisionId;
     private Long bookingId;
-    private String decisionCode;
+    private KeyValue decision;
     private LocalDate decisionDate;
     private String comments;
     private Long staffId;

@@ -4,6 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.justice.digital.nomis.api.RehabDecision;
 import uk.gov.justice.digital.nomis.api.RehabProvider;
+import uk.gov.justice.digital.nomis.jpa.entity.OffenderRehabDecision;
+import uk.gov.justice.digital.nomis.jpa.entity.OffenderRehabProvider;
 import uk.gov.justice.digital.nomis.jpa.repository.OffenderRehabProviderRepository;
 import uk.gov.justice.digital.nomis.jpa.repository.OffenderRepository;
 import uk.gov.justice.digital.nomis.service.transformer.RehabDecisionTransformer;
@@ -20,14 +22,14 @@ public class RehabDecisionService {
     private final RehabDecisionTransformer rehabDecisionTransformer;
     private final OffenderRepository offenderRepository;
     private final OffenderRehabProviderRepository offenderRehabProviderRepository;
-    private final Comparator<? super RehabDecision> BY_ACTIVE_REHAB_DECISION =
-            Comparator.comparing(RehabDecision::getActive)
-                    .thenComparing(RehabDecision::getOffenderRehabDecisionId)
+    private final Comparator<? super OffenderRehabDecision> BY_ACTIVE_REHAB_DECISION =
+            Comparator.comparing(OffenderRehabDecision::getActiveFlag)
+                    .thenComparing(OffenderRehabDecision::getOffenderRehabDecisionId)
                     .reversed();
 
-    private final Comparator<? super RehabProvider> BY_ACTIVE_REHAB_PROVIDER =
-            Comparator.comparing(RehabProvider::getActive)
-                    .thenComparing(RehabProvider::getOffenderRehabProviderId)
+    private final Comparator<? super OffenderRehabProvider> BY_ACTIVE_REHAB_PROVIDER =
+            Comparator.comparing(OffenderRehabProvider::getActiveFlag)
+                    .thenComparing(OffenderRehabProvider::getOffenderRehabProviderId)
                     .reversed();
 
     @Autowired
@@ -44,8 +46,8 @@ public class RehabDecisionService {
                         offender.getOffenderBookings()
                                 .stream()
                                 .flatMap(offenderBooking -> offenderBooking.getOffenderRehabDecisions().stream())
-                                .map(rehabDecisionTransformer::rehabDecisionOf)
                                 .sorted(BY_ACTIVE_REHAB_DECISION)
+                                .map(rehabDecisionTransformer::rehabDecisionOf)
                                 .collect(Collectors.toList()));
 
         return maybeRehabDecisions.map(
@@ -61,8 +63,8 @@ public class RehabDecisionService {
         return Optional.ofNullable(rehabDecision).map(
                 rh -> offenderRehabProviderRepository.findByOffenderRehabDecisionId(rh.getOffenderRehabDecisionId())
                         .stream()
-                        .map(rehabDecisionTransformer::rehabProviderOf)
                         .sorted(BY_ACTIVE_REHAB_PROVIDER)
+                        .map(rehabDecisionTransformer::rehabProviderOf)
                         .collect(Collectors.toList())
         ).orElse(Collections.emptyList());
 
