@@ -39,7 +39,11 @@ public class OffenderEventsController {
             @ApiImplicitParam(name = "page", dataType = "int", paramType = "query",
                     value = "Results page you want to retrieve (0..N)"),
             @ApiImplicitParam(name = "size", dataType = "int", paramType = "query",
-                    value = "Number of records per page.")})
+                    value = "Number of records per page."),
+            @ApiImplicitParam(name = "from", dataType = "date", paramType = "query",
+                    value = "ISO 8601 Date Time, eg 2017-07-24T09:18:15"),
+            @ApiImplicitParam(name = "to", dataType = "date", paramType = "query",
+                    value = "ISO 8601 Date Time, eg 2017-07-24T09:18:15")})
     public PagedResources<Resource<OffenderEvent>> getEvents(final @ApiIgnore Pageable pageable,
                                                              final PagedResourcesAssembler<OffenderEvent> assembler,
                                                              @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) final @RequestParam("from") Optional<LocalDateTime> maybeFrom,
