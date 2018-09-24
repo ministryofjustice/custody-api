@@ -1,7 +1,7 @@
 package uk.gov.justice.digital.nomis.service.transformer;
 
 import org.springframework.stereotype.Component;
-import uk.gov.justice.digital.nomis.jpa.entity.OffenderSentCalculation;
+import uk.gov.justice.digital.nomis.jpa.entity.LabelledTimestamp;
 
 import java.sql.Date;
 import java.sql.Timestamp;
@@ -19,7 +19,7 @@ public class TypesTransformer {
                 .orElse(null);
     }
 
-    public LocalDate localDateOf(OffenderSentCalculation.LabelledTimestamp timestamp) {
+    public LocalDate localDateOf(LabelledTimestamp timestamp) {
         return Optional.ofNullable(timestamp)
                 .map(t -> t.getTimestamp().toLocalDateTime().toLocalDate())
                 .orElse(null);

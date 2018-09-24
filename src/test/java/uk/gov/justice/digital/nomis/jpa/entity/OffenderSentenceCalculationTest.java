@@ -14,14 +14,14 @@ public class OffenderSentenceCalculationTest {
     public void greaterOfBehavesAppropriately() {
         final OffenderSentCalculation offenderSentenceCalculation = OffenderSentCalculation.builder().build();
 
-        final Timestamp now = Timestamp.valueOf(LocalDateTime.now());
-        final Timestamp later = Timestamp.valueOf(LocalDateTime.now().plusDays(1L));
+        final LabelledTimestamp now = LabelledTimestamp.builder().label("X").timestamp(Timestamp.valueOf(LocalDateTime.now())).build();
+        final LabelledTimestamp later = LabelledTimestamp.builder().label("X").timestamp(Timestamp.valueOf(LocalDateTime.now().plusDays(1L))).build();
 
-        assertThat(offenderSentenceCalculation.greaterOf(Optional.empty(), Optional.empty())).isNull();
-        assertThat(offenderSentenceCalculation.greaterOf(Optional.of(now), Optional.empty())).isEqualTo(now);
-        assertThat(offenderSentenceCalculation.greaterOf(Optional.empty(), Optional.of(now))).isEqualTo(now);
-        assertThat(offenderSentenceCalculation.greaterOf(Optional.of(now), Optional.of(later))).isEqualTo(later);
-        assertThat(offenderSentenceCalculation.greaterOf(Optional.of(later), Optional.of(now))).isEqualTo(later);
+        assertThat(offenderSentenceCalculation.greaterOf(Optional.empty(), Optional.empty())).isEqualTo(Optional.empty());
+        assertThat(offenderSentenceCalculation.greaterOf(Optional.of(now), Optional.empty())).isEqualTo(Optional.of(now));
+        assertThat(offenderSentenceCalculation.greaterOf(Optional.empty(), Optional.of(now))).isEqualTo(Optional.of(now));
+        assertThat(offenderSentenceCalculation.greaterOf(Optional.of(now), Optional.of(later))).isEqualTo(Optional.of(later));
+        assertThat(offenderSentenceCalculation.greaterOf(Optional.of(later), Optional.of(now))).isEqualTo(Optional.of(later));
     }
 
     @Test
@@ -48,7 +48,7 @@ public class OffenderSentenceCalculationTest {
                 .mtdCalculatedDate(now)
                 .build();
 
-        assertThat(offenderSentenceCalculation.calculateMidTermDate()).isEqualTo(Optional.of(now));
+        assertThat(offenderSentenceCalculation.calculateMidTermDate()).isEqualTo(Optional.of(LabelledTimestamp.builder().label("MTD").timestamp(now).build()));
 
         offenderSentenceCalculation = OffenderSentCalculation
                 .builder()
@@ -56,7 +56,7 @@ public class OffenderSentenceCalculationTest {
                 .mtdOverridedDate(later)
                 .build();
 
-        assertThat(offenderSentenceCalculation.calculateMidTermDate()).isEqualTo(Optional.of(later));
+        assertThat(offenderSentenceCalculation.calculateMidTermDate()).isEqualTo(Optional.of(LabelledTimestamp.builder().label("MTD").timestamp(later).build()));
     }
 
     @Test
@@ -69,6 +69,7 @@ public class OffenderSentenceCalculationTest {
                 .offenderReleaseDetails(OffenderReleaseDetails
                         .builder()
                         .autoReleaseDate(now)
+                        .movementReason(MovementReason.builder().movementReasonCode("XYZ").build())
                         .build())
                 .build();
 
@@ -76,15 +77,16 @@ public class OffenderSentenceCalculationTest {
                 .offenderBooking(offenderBooking)
                 .build();
 
-        assertThat(offenderSentence.calculateConfirmedReleaseDate()).isEqualTo(Optional.of(now));
+        assertThat(offenderSentence.calculateConfirmedReleaseDate()).isEqualTo(Optional.of(LabelledTimestamp.builder().label("REL-XYZ").timestamp(now).build()));
 
         offenderBooking.setOffenderReleaseDetails(OffenderReleaseDetails
                 .builder()
                 .autoReleaseDate(now)
                 .releaseDate(later)
+                .movementReason(MovementReason.builder().movementReasonCode("XYZ").build())
                 .build());
 
-        assertThat(offenderSentence.calculateConfirmedReleaseDate()).isEqualTo(Optional.of(later));
+        assertThat(offenderSentence.calculateConfirmedReleaseDate()).isEqualTo(Optional.of(LabelledTimestamp.builder().label("REL-XYZ").timestamp(later).build()));
     }
 
 

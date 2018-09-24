@@ -1,6 +1,9 @@
 package uk.gov.justice.digital.nomis.jpa.entity;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -13,6 +16,9 @@ import java.sql.Timestamp;
 @Entity
 @Table(name = "MOVEMENT_REASONS")
 @IdClass(MovementReasonPK.class)
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class MovementReason {
     @Id
     @Column(name = "MOVEMENT_TYPE")

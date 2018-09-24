@@ -204,8 +204,12 @@ public class OffenderSentCalculation {
 
     public Optional<LabelledTimestamp> calculateConfirmedReleaseDate() {
         return Optional.ofNullable(offenderBooking.getOffenderReleaseDetails())
-                .flatMap(ord -> firstNonNullDateOf(ord.getReleaseDate(), ord.getAutoReleaseDate()))
-                .flatMap(t -> Optional.of(new LabelledTimestamp("ORD", t)));
+                .map(ord -> firstNonNullDateOf(ord.getReleaseDate(), ord.getAutoReleaseDate())
+                        .map(t -> LabelledTimestamp.builder()
+                                .label("REL-" + ord.getMovementReason().getMovementReasonCode()).
+                                        timestamp(t)
+                                .build())
+                        .orElse(null));
     }
 
     public Optional<Timestamp> firstNonNullDateOf(Timestamp a, Timestamp b) {
@@ -216,7 +220,7 @@ public class OffenderSentCalculation {
         final List<Optional<LabelledTimestamp>> dates = ImmutableList.<Optional<LabelledTimestamp>>builder()
                 .add(labelledTimestampOf("ARD", firstNonNullDateOf(ardOverridedDate, ardCalculatedDate)))
                 .add(labelledTimestampOf("CRD", firstNonNullDateOf(crdOverridedDate, crdCalculatedDate)))
-                .add(labelledTimestampOf("NPD" , firstNonNullDateOf(npdOverridedDate, npdCalculatedDate)))
+                .add(labelledTimestampOf("NPD", firstNonNullDateOf(npdOverridedDate, npdCalculatedDate)))
                 .add(labelledTimestampOf("PRRD", firstNonNullDateOf(prrdOverridedDate, prrdCalculatedDate)))
                 .build();
 
@@ -236,26 +240,4 @@ public class OffenderSentCalculation {
     }
 
 
-    public class LabelledTimestamp implements Comparable<LabelledTimestamp>{
-        private final String label;
-        private final Timestamp timestamp;
-
-        public LabelledTimestamp(String label, Timestamp timestamp) {
-            this.label = label;
-            this.timestamp = timestamp;
-        }
-
-        public String getLabel() {
-            return label;
-        }
-
-        public Timestamp getTimestamp() {
-            return timestamp;
-        }
-
-        @Override
-        public int compareTo(LabelledTimestamp o) {
-            return timestamp.compareTo(o.timestamp);
-        }
-    }
 }
