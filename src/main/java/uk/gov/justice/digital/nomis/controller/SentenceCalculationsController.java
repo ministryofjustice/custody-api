@@ -3,7 +3,6 @@ package uk.gov.justice.digital.nomis.controller;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import springfox.documentation.annotations.ApiIgnore;
 import uk.gov.justice.digital.nomis.api.SentenceCalculation;
 import uk.gov.justice.digital.nomis.service.SentenceCalculationsService;
 
@@ -47,7 +47,7 @@ public class SentenceCalculationsController {
             @ApiImplicitParam(name = "size", dataType = "int", paramType = "query",
                     value = "Number of records per page.")})
     public PagedResources<Resource<SentenceCalculation>> getSentenceCalculations(
-            final @ApiParam Pageable pageable,
+            final @ApiIgnore Pageable pageable,
             final PagedResourcesAssembler<SentenceCalculation> assembler) {
 
         Page<SentenceCalculation> sentenceCalculations = sentenceCalculationsService.getSentenceCalculations(pageable);
