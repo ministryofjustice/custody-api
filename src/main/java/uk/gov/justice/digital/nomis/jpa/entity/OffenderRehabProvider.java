@@ -26,6 +26,6 @@ public class OffenderRehabProvider {
     private String commentText;
 
     @OneToOne
-    @JoinColumn(name = "provider_code", referencedColumnName = "provider_code")
+    @JoinColumn(name = "provider_code", referencedColumnName = "provider_code", insertable = false, updatable = false)
     private RehabilitationProvider rehabilitationProvider;
 }
