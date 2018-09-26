@@ -70,6 +70,16 @@ public class OffenderControllerTest {
     }
 
     @Test
+    public void getOffenderByOffenderIdReturns404WhenOffenderNotFound() {
+        given()
+                .when()
+                .auth().oauth2(validOauthToken)
+                .get("/offenders/offenderId/-666666")
+                .then()
+                .statusCode(404);
+    }
+
+    @Test
     public void offendersAreAuthorized() {
         given()
                 .when()
@@ -100,6 +110,16 @@ public class OffenderControllerTest {
                 .as(Offender.class);
 
         assertThat(offender).extracting("offenderId").containsOnly(-1001L);
+    }
+
+    @Test
+    public void getOffenderByNomsIdReturns404WhenOffenderNotFound() {
+        given()
+                .when()
+                .auth().oauth2(validOauthToken)
+                .get("/offenders/nomsId/Z666666ZZ")
+                .then()
+                .statusCode(404);
     }
 
     @Test

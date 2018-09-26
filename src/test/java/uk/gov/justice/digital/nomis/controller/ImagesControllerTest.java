@@ -58,6 +58,16 @@ public class ImagesControllerTest {
     }
 
     @Test
+    public void getImagesByOffenderIdReturns404WhenOffenderNotFound() {
+        given()
+            .when()
+            .auth().oauth2(validOauthToken)
+            .get("/offenders/offenderId/-666666/images")
+            .then()
+            .statusCode(404);
+    }
+
+    @Test
     public void returnsUnauthorisedWhenOAuth2CredentialsAreMissing() {
         given()
                 .when()
@@ -82,6 +92,16 @@ public class ImagesControllerTest {
     }
 
     @Test
+    public void getImagesByNomsIdReturns404WhenOffenderNotFound() {
+        given()
+            .when()
+            .auth().oauth2(validOauthToken)
+            .get("/offenders/nomsId/Z666666ZZ/images")
+            .then()
+            .statusCode(404);
+    }
+
+    @Test
     public void getImagesByNomsIdReturnsUnauthorisedWhenOAuth2CredentialsAreMissing() {
         given()
             .when()
@@ -89,4 +109,25 @@ public class ImagesControllerTest {
             .then()
             .statusCode(401);
     }
+
+    @Test
+    public void canGetThumbnailByImageId() {
+        given()
+            .when()
+            .auth().oauth2(validOauthToken)
+            .get("/images/-1/thumbnail")
+            .then()
+            .statusCode(200);
+    }
+
+    @Test
+    public void getThumbnailByImageIdReturns404WhenImageNotFound() {
+        given()
+            .when()
+            .auth().oauth2(validOauthToken)
+            .get("/images/-66/thumbnail")
+            .then()
+            .statusCode(404);
+    }
+
 }

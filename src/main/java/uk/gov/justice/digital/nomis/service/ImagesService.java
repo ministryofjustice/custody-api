@@ -33,7 +33,7 @@ public class ImagesService {
 
     public Optional<byte[]> getImageForImageId(Long imageId) {
         Optional<uk.gov.justice.digital.nomis.jpa.entity.OffenderImage> maybeOffender =
-            Optional.of(offenderImagesRepository.findOne(imageId));
+            Optional.ofNullable(offenderImagesRepository.findOne(imageId));
 
         return maybeOffender.map(offenderImageTransformer::thumbnailOf);
     }
