@@ -8,6 +8,7 @@ import uk.gov.justice.digital.nomis.jpa.repository.OffenderImagesRepository;
 import uk.gov.justice.digital.nomis.service.transformer.OffenderImageTransformer;
 
 import java.util.List;
+import java.util.Optional;
 
 import static java.util.stream.Collectors.toList;
 
@@ -26,7 +27,14 @@ public class ImagesService {
 
     public List<OffenderImage> getImagesForBookingId(Long bookingId) {
         return offenderImagesRepository.findByOffenderBookingId(bookingId).stream()
-            .map(offenderImage -> offenderImageTransformer.offenderOf(offenderImage))
+            .map(offenderImage -> offenderImageTransformer.offenderImageMetaDataOf(offenderImage))
             .collect(toList());
+    }
+
+    public Optional<byte[]> getImageForImageId(Long imageId) {
+        Optional<uk.gov.justice.digital.nomis.jpa.entity.OffenderImage> maybeOffender =
+            Optional.of(offenderImagesRepository.findOne(imageId));
+
+        return maybeOffender.map(offenderImageTransformer::thumbnailOf);
     }
 }

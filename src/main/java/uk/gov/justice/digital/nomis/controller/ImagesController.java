@@ -18,8 +18,6 @@ import uk.gov.justice.digital.nomis.service.OffenderService;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static java.util.stream.Collectors.collectingAndThen;
-import static java.util.stream.Collectors.toList;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 @RestController
@@ -54,6 +52,17 @@ public class ImagesController {
 
         return offenderService.getOffenderByNomsId(nomsId).
             map(offender -> new ResponseEntity<>(imagesForOffender(offender), HttpStatus.OK))
+            .orElse(new ResponseEntity<>(NOT_FOUND));
+    }
+
+    @RequestMapping(path = "/images/{imageId}/thumbnail", method = RequestMethod.GET, produces = "image/jpeg")
+    @ApiResponses({
+        @ApiResponse(code = 404, message = "Image not found"),
+        @ApiResponse(code = 200, message = "OK")})
+    public ResponseEntity<byte[]> getImageData(@PathVariable("imageId") final Long imageId) {
+
+        return imagesService.getImageForImageId(imageId)
+            .map(bytes -> new ResponseEntity<>(bytes, HttpStatus.OK))
             .orElse(new ResponseEntity<>(NOT_FOUND));
     }
 
