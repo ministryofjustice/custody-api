@@ -20,12 +20,11 @@ public class OffenderImageTransformer {
         return uk.gov.justice.digital.nomis.api.OffenderImage.builder()
             .activeFlag(typesTransformer.ynToBoolean(offenderImage.getActiveFlag()))
             .bookingId(offenderImage.getOffenderBookingId())
-            .captureTime(typesTransformer.localDateTimeOf(offenderImage.getCaptureTime()))
+            .captureDateTime(typesTransformer.localDateTimeOf(offenderImage.getCaptureDateTime()))
             .createDatetime(typesTransformer.localDateTimeOf(offenderImage.getCreateDatetime()))
             .imageObjectId(offenderImage.getImageObjectId())
             .imageObjectSeq(offenderImage.getImageObjectSeq())
             .imageObjectType(imageObjectTypeOf(offenderImage.getImageObjectType()))
-            .imageSourceCode(offenderImage.getImageSourceCode())
             .imageViewType(imageViewTypeOf(offenderImage.getImageViewType()))
             .modifyDatetime(typesTransformer.localDateTimeOf(offenderImage.getModifyDatetime()))
             .offenderImageId(offenderImage.getOffenderImageId())
@@ -37,7 +36,7 @@ public class OffenderImageTransformer {
         switch(imageObjectType) {
             case "OIC" : return "INCIDENT";
             case "OFF_IDM" : return "IDENTIFYING_MARK";
-            case "OFF_BKG" : return "FACE";
+            case "OFF_BKG" : return "BOOKING";
         }
         return imageObjectType;
     }

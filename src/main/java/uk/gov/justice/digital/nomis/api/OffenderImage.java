@@ -11,12 +11,12 @@ import java.time.LocalDateTime;
 public class OffenderImage {
     private Long offenderImageId;
     private Long bookingId;
-    private LocalDateTime captureTime;
+    private LocalDateTime captureDateTime;
 
     @ApiModelProperty(value = "NECK, KNEE, TORSO, FACE, DAMAGE, INJURY, HEAD, HAND, INCIDENT, ELBOW, FOOT, THIGH, ARM, ANKLE, FINGER, SHOULDER, EAR, TOE, FIGHT, FRONT, LEG, NOSE")
     private String orientationType;
 
-    @ApiModelProperty(value="FACE, INCIDENT or IDENTIFYING_MARKS")
+    @ApiModelProperty(value="BOOKING, INCIDENT or IDENTIFYING_MARKS")
     private String imageObjectType;
 
     @ApiModelProperty(value="INCIDENT, FACE, TATTOO, MARK, SCAR, OTHER")
@@ -27,6 +27,4 @@ public class OffenderImage {
     private Boolean activeFlag;
     private LocalDateTime createDatetime;
     private LocalDateTime modifyDatetime;
-    private String imageSourceCode;
-
 }

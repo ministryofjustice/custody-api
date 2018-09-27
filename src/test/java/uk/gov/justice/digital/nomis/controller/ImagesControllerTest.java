@@ -111,21 +111,41 @@ public class ImagesControllerTest {
     }
 
     @Test
-    public void canGetThumbnailByImageId() {
+    public void canGetThumbnailByOffenderIdAndImageId() {
         given()
             .when()
             .auth().oauth2(validOauthToken)
-            .get("/images/-1/thumbnail")
+            .get("/offenders/offenderId/-1001/images/-1/thumbnail")
             .then()
             .statusCode(200);
     }
 
     @Test
-    public void getThumbnailByImageIdReturns404WhenImageNotFound() {
+    public void canGetThumbnailByNomsIdAndImageId() {
         given()
             .when()
             .auth().oauth2(validOauthToken)
-            .get("/images/-66/thumbnail")
+            .get("/offenders/nomsId/A1234AA/images/-1/thumbnail")
+            .then()
+            .statusCode(200);
+    }
+
+    @Test
+    public void getThumbnailByOffenderIdAndImageIdReturns404WhenOffenderNotFound() {
+        given()
+            .when()
+            .auth().oauth2(validOauthToken)
+            .get("/offenders/offenderId/-666666/images/-1/thumbnail")
+            .then()
+            .statusCode(404);
+    }
+
+    @Test
+    public void getThumbnailByOffenderIdAndImageIdReturns404WhenImageNotFound() {
+        given()
+            .when()
+            .auth().oauth2(validOauthToken)
+            .get("/offenders/offenderId/-1001/images/-66/thumbnail")
             .then()
             .statusCode(404);
     }

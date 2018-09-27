@@ -20,7 +20,7 @@ public class OffenderImage {
     private Long offenderBookingId;
 
     @Column(name = "CAPTURE_DATETIME")
-    private Timestamp captureTime;
+    private Timestamp captureDateTime;
 
     @Column(name = "ORIENTATION_TYPE")
     private String orientationType;

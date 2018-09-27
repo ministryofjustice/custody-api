@@ -16,8 +16,8 @@ import static java.util.stream.Collectors.toList;
 @Slf4j
 public class ImagesService {
 
-    private OffenderImagesRepository offenderImagesRepository;
-    private OffenderImageTransformer offenderImageTransformer;
+    private final OffenderImagesRepository offenderImagesRepository;
+    private final OffenderImageTransformer offenderImageTransformer;
 
     @Autowired
     public ImagesService(OffenderImagesRepository offenderImagesRepository, OffenderImageTransformer offenderImageTransformer) {
@@ -25,9 +25,9 @@ public class ImagesService {
         this.offenderImageTransformer = offenderImageTransformer;
     }
 
-    public List<OffenderImage> getImagesForBookingId(Long bookingId) {
+    public List<OffenderImage> getImageMetaDataForBookingId(Long bookingId) {
         return offenderImagesRepository.findByOffenderBookingId(bookingId).stream()
-            .map(offenderImage -> offenderImageTransformer.offenderImageMetaDataOf(offenderImage))
+            .map(offenderImageTransformer::offenderImageMetaDataOf)
             .collect(toList());
     }
 
