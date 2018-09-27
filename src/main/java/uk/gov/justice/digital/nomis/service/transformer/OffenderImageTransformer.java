@@ -24,14 +24,37 @@ public class OffenderImageTransformer {
             .createDatetime(typesTransformer.localDateTimeOf(offenderImage.getCreateDatetime()))
             .imageObjectId(offenderImage.getImageObjectId())
             .imageObjectSeq(offenderImage.getImageObjectSeq())
-            .imageObjectType(offenderImage.getImageObjectType())
+            .imageObjectType(imageObjectTypeOf(offenderImage.getImageObjectType()))
             .imageSourceCode(offenderImage.getImageSourceCode())
-            .imageViewType(offenderImage.getImageViewType())
+            .imageViewType(imageViewTypeOf(offenderImage.getImageViewType()))
             .modifyDatetime(typesTransformer.localDateTimeOf(offenderImage.getModifyDatetime()))
             .offenderImageId(offenderImage.getOffenderImageId())
             .orientationType(offenderImage.getOrientationType())
             .build();
     }
+
+    private String imageObjectTypeOf(String imageObjectType) {
+        switch(imageObjectType) {
+            case "OIC" : return "INCIDENT";
+            case "OFF_IDM" : return "IDENTIFYING_MARK";
+            case "OFF_BKG" : return "FACE";
+        }
+        return imageObjectType;
+    }
+
+    private String imageViewTypeOf(String imageViewType) {
+        switch(imageViewType) {
+            case "OIC" : return "INCIDENT";
+            case "FACE" : return "FACE";
+            case "TAT" : return "TATTOO";
+            case "MARK" : return "MARK";
+            case "SCAR" : return "SCAR";
+            case "OTH" : return "OTHER";
+        }
+
+        return imageViewType;
+    }
+
 
     public byte[] thumbnailOf(OffenderImage offenderImage) {
         return offenderImage.getThumbnailImage();
