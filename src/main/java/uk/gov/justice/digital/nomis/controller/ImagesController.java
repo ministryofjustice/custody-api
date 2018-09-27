@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 @RestController
-@Api( description = "Offender images", tags = {"photographs", "images"})
+@Api( description = "Offender image resources", tags = "Offender Images")
 public class ImagesController {
 
     private final OffenderService offenderService;
