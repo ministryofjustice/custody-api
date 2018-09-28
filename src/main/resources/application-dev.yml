@@ -48,9 +48,14 @@ spring:
           classpath:some_court_event_charges.sql,
           classpath:some_offender_sentence_charges.sql,
           classpath:some_offender_rehab_decisions.sql,
-          classpath:some_offender_rehab_providers.sql'
+          classpath:some_offender_rehab_providers.sql,
+          classpath:some_offender_images.sql'
 
   jpa:
     hibernate:
       ddl-auto: create
+
+  h2:
+    console:
+      enabled: true
 
