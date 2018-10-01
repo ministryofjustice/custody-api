@@ -1,6 +1,8 @@
 package uk.gov.justice.digital.nomis.controller;
 
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +35,9 @@ public class ProgrammeProfilesController {
     }
 
     @RequestMapping(path = "/offenders/offenderId/{offenderId}/programmeProfiles", method = RequestMethod.GET)
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "from", dataType = "date", paramType = "query", value = "ISO 8601 Date Time, eg 2017-07-24T09:18:15"),
+            @ApiImplicitParam(name = "to", dataType = "date", paramType = "query", value = "ISO 8601 Date Time, eg 2017-07-24T09:18:15")})
     @ApiResponses({
             @ApiResponse(code = 404, message = "Offender not found"),
             @ApiResponse(code = 200, message = "OK")})

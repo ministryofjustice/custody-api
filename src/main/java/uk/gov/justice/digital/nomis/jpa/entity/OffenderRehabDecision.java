@@ -31,3 +31,4 @@ public class OffenderRehabDecision {
     private String activeFlag;
 
 }
+

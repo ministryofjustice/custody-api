@@ -1,6 +1,9 @@
 package uk.gov.justice.digital.nomis.jpa.entity;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -14,6 +17,9 @@ import java.sql.Timestamp;
 @Data
 @Entity
 @Table(name = "OFFENDER_RELEASE_DETAILS")
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class OffenderReleaseDetails {
     @Id
     @Column(name = "OFFENDER_BOOK_ID")

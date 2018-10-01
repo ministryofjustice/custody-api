@@ -10,4 +10,6 @@ public class RehabProvider {
     private String providerCode;
     private Boolean active;
     private String comments;
+    private RehabilitationDecisionProvider provider;
 }
+

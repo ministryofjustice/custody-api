@@ -5,6 +5,8 @@ import lombok.Data;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 @Data
@@ -23,4 +25,7 @@ public class OffenderRehabProvider {
     @Column(name = "COMMENT_TEXT")
     private String commentText;
 
+    @OneToOne
+    @JoinColumn(name = "provider_code", referencedColumnName = "provider_code", insertable = false, updatable = false)
+    private RehabilitationProvider rehabilitationProvider;
 }

@@ -3,7 +3,6 @@ package uk.gov.justice.digital.nomis.controller;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import springfox.documentation.annotations.ApiIgnore;
 import uk.gov.justice.digital.nomis.api.Alert;
 import uk.gov.justice.digital.nomis.service.AlertsService;
 
@@ -44,9 +44,13 @@ public class AlertsController {
     @ResponseBody
     @ApiImplicitParams({
             @ApiImplicitParam(name = "page", dataType = "int", paramType = "query", value = "Results page you want to retrieve (0..N)"),
-            @ApiImplicitParam(name = "size", dataType = "int", paramType = "query", value = "Number of records per page.")
+            @ApiImplicitParam(name = "size", dataType = "int", paramType = "query", value = "Number of records per page."),
+            @ApiImplicitParam(name = "from", dataType = "date", paramType = "query",
+                    value = "ISO 8601 Date Time, eg 2017-07-24T09:18:15"),
+            @ApiImplicitParam(name = "to", dataType = "date", paramType = "query",
+                    value = "ISO 8601 Date Time, eg 2017-07-24T09:18:15")
     })
-    public PagedResources<Resource<Alert>> getAlerts(final @ApiParam Pageable pageable,
+    public PagedResources<Resource<Alert>> getAlerts(final @ApiIgnore Pageable pageable,
                                                      final PagedResourcesAssembler<Alert> assembler,
                                                      @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) final @RequestParam("from") Optional<LocalDateTime> maybeFrom,
                                                      @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) final @RequestParam("to") Optional<LocalDateTime> maybeTo) {

@@ -1,6 +1,9 @@
 package uk.gov.justice.digital.nomis.jpa.entity;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 import javax.persistence.Column;
@@ -19,6 +22,9 @@ import java.sql.Timestamp;
 @Entity
 @Table(name = "OFFENDER_SENTENCES")
 @IdClass(OffenderSentencePk.class)
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class OffenderSentence {
 
     @Id
@@ -165,5 +171,4 @@ public class OffenderSentence {
     @ManyToOne
     @JoinColumn(name = "OFFENDER_BOOK_ID", insertable = false, updatable = false)
     private OffenderBooking offenderBooking;
-
 }

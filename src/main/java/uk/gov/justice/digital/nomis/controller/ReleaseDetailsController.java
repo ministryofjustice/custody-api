@@ -1,9 +1,9 @@
 package uk.gov.justice.digital.nomis.controller;
 
+import com.google.common.collect.ImmutableList;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import springfox.documentation.annotations.ApiIgnore;
 import uk.gov.justice.digital.nomis.api.ReleaseDetails;
 import uk.gov.justice.digital.nomis.service.ReleaseDetailsService;
 
@@ -47,7 +48,7 @@ public class ReleaseDetailsController {
             @ApiImplicitParam(name = "size", dataType = "int", paramType = "query",
                     value = "Number of records per page.")})
     public PagedResources<Resource<ReleaseDetails>> getReleaseDetails(
-            final @ApiParam Pageable pageable,
+            final @ApiIgnore Pageable pageable,
             final PagedResourcesAssembler<ReleaseDetails> assembler) {
 
         Page<ReleaseDetails> releaseDetails = releaseDetailsService.getReleaseDetails(pageable);
@@ -62,9 +63,13 @@ public class ReleaseDetailsController {
                                                                           @RequestParam("bookingId") Optional<Long> maybeBookingId) {
 
         return maybeBookingId
-                .map(bookingId -> releaseDetailsService.releaseDetailsForOffenderIdAndBookingId(offenderId, bookingId))
+                .map(bookingId -> maybeListOf(releaseDetailsService.releaseDetailsForOffenderIdAndBookingId(offenderId, bookingId)))
                 .orElse(releaseDetailsService.releaseDetailsForOffenderId(offenderId))
                 .map(releaseDetails -> new ResponseEntity<>(releaseDetails, HttpStatus.OK))
                 .orElse(new ResponseEntity<>(NOT_FOUND));
+    }
+
+    private Optional<List<ReleaseDetails>> maybeListOf(Optional<ReleaseDetails> releaseDetails) {
+        return releaseDetails.map(ImmutableList::of);
     }
 }
