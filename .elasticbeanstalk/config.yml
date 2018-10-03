@@ -1,6 +1,6 @@
 branch-defaults:
   master:
-    environment: newnomisapi-dev
+    environment: custody-api-dev
 deploy:
   artifact: Dockerrun.aws.json
 global:
