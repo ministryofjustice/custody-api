@@ -17,13 +17,13 @@ public class MovementsTransformer {
     private static final String ESCORT = "ESCORT";
 
     private final TypesTransformer typesTransformer;
-    private final ReferenceDataTranformer referenceDataTranformer;
+    private final ReferenceDataTransformer referenceDataTransformer;
     private final ReferenceCodesRepository referenceCodesRepository;
 
     @Autowired
-    public MovementsTransformer(TypesTransformer typesTransformer, ReferenceDataTranformer referenceDataTranformer, ReferenceCodesRepository referenceCodesRepository) {
+    public MovementsTransformer(TypesTransformer typesTransformer, ReferenceDataTransformer referenceDataTransformer, ReferenceCodesRepository referenceCodesRepository) {
         this.typesTransformer = typesTransformer;
-        this.referenceDataTranformer = referenceDataTranformer;
+        this.referenceDataTransformer = referenceDataTransformer;
         this.referenceCodesRepository = referenceCodesRepository;
     }
 
@@ -37,8 +37,8 @@ public class MovementsTransformer {
                 .comments(em.getCommentText())
                 .fromAddressId(em.getFromAddressId())
                 .toAddressId(em.getToAddressId())
-                .fromAgencyLocation(referenceDataTranformer.agencyLocationOf(em.getFromAgencyLocation()))
-                .toAgencyLocation(referenceDataTranformer.agencyLocationOf(em.getToAgencyLocation()))
+                .fromAgencyLocation(referenceDataTransformer.agencyLocationOf(em.getFromAgencyLocation()))
+                .toAgencyLocation(referenceDataTransformer.agencyLocationOf(em.getToAgencyLocation()))
                 .movementDirection(em.getDirectionCode())
                 .movementReasonCode(movementReason.getMovementReasonCode())
                 .movementReasonDescription(movementReason.getDescription())

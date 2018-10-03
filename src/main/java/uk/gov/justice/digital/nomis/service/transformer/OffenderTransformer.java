@@ -29,7 +29,7 @@ public class OffenderTransformer {
     private static final String SEX = "SEX";
 
     private final TypesTransformer typesTransformer;
-    private final ReferenceDataTranformer referenceDataTransformer;
+    private final ReferenceDataTransformer referenceDataTransformer;
     private final ReferenceCodesRepository referenceCodesRepository;
     private final MovementsTransformer movementsTransformer;
 
@@ -43,7 +43,7 @@ public class OffenderTransformer {
             .thenComparing(OffenderBooking::getBookingBeginDate, Comparator.reverseOrder());
 
     @Autowired
-    public OffenderTransformer(TypesTransformer typesTransformer, ReferenceDataTranformer referenceDataTransformer, ReferenceCodesRepository referenceCodesRepository, MovementsTransformer movementsTransformer) {
+    public OffenderTransformer(TypesTransformer typesTransformer, ReferenceDataTransformer referenceDataTransformer, ReferenceCodesRepository referenceCodesRepository, MovementsTransformer movementsTransformer) {
         this.typesTransformer = typesTransformer;
         this.referenceDataTransformer = referenceDataTransformer;
         this.referenceCodesRepository = referenceCodesRepository;

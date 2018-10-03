@@ -9,7 +9,7 @@ import uk.gov.justice.digital.nomis.api.AgencyInternalLocation;
 import uk.gov.justice.digital.nomis.api.AgencyLocation;
 import uk.gov.justice.digital.nomis.jpa.repository.AgencyInternalLocationsRepository;
 import uk.gov.justice.digital.nomis.jpa.repository.AgencyLocationsRepository;
-import uk.gov.justice.digital.nomis.service.transformer.ReferenceDataTranformer;
+import uk.gov.justice.digital.nomis.service.transformer.ReferenceDataTransformer;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -19,12 +19,12 @@ public class ReferenceDataService {
 
     private final AgencyLocationsRepository agencyLocationsRepository;
     private final AgencyInternalLocationsRepository agencyInternalLocationsRepository;
-    private final ReferenceDataTranformer referenceDataTranformer;
+    private final ReferenceDataTransformer referenceDataTransformer;
 
-    public ReferenceDataService(AgencyLocationsRepository agencyLocationsRepository, AgencyInternalLocationsRepository agencyInternalLocationsRepository, ReferenceDataTranformer referenceDataTranformer) {
+    public ReferenceDataService(AgencyLocationsRepository agencyLocationsRepository, AgencyInternalLocationsRepository agencyInternalLocationsRepository, ReferenceDataTransformer referenceDataTransformer) {
         this.agencyLocationsRepository = agencyLocationsRepository;
         this.agencyInternalLocationsRepository = agencyInternalLocationsRepository;
-        this.referenceDataTranformer = referenceDataTranformer;
+        this.referenceDataTransformer = referenceDataTransformer;
     }
 
     @Transactional
@@ -32,7 +32,7 @@ public class ReferenceDataService {
         Page<uk.gov.justice.digital.nomis.jpa.entity.AgencyLocation> agencyLocations = agencyLocationsRepository.findAll(pageable);
 
         List<AgencyLocation> agencyLocationList = agencyLocations.getContent().stream().map(
-                referenceDataTranformer::agencyLocationOf).collect(Collectors.toList());
+                referenceDataTransformer::agencyLocationOf).collect(Collectors.toList());
 
         return new PageImpl<>(agencyLocationList, pageable, agencyLocations.getTotalElements());
     }
@@ -42,7 +42,7 @@ public class ReferenceDataService {
         Page<uk.gov.justice.digital.nomis.jpa.entity.AgencyInternalLocation> agencyInternalLocations = agencyInternalLocationsRepository.findAll(pageable);
 
         List<AgencyInternalLocation> agencyInternalLocationList = agencyInternalLocations.getContent().stream().map(
-                referenceDataTranformer::agencyInternalLocationOf).collect(Collectors.toList());
+                referenceDataTransformer::agencyInternalLocationOf).collect(Collectors.toList());
 
         return new PageImpl<>(agencyInternalLocationList, pageable, agencyInternalLocations.getTotalElements());
     }

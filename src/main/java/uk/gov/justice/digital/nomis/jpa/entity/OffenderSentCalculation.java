@@ -206,8 +206,10 @@ public class OffenderSentCalculation {
         return Optional.ofNullable(offenderBooking.getOffenderReleaseDetails())
                 .map(ord -> firstNonNullDateOf(ord.getReleaseDate(), ord.getAutoReleaseDate())
                         .map(t -> LabelledTimestamp.builder()
-                                .label("REL-" + ord.getMovementReason().getMovementReasonCode()).
-                                        timestamp(t)
+                                .label(Optional.ofNullable(ord.getMovementReason())
+                                        .map(mr -> "REL-" + mr.getMovementReasonCode())
+                                        .orElse("REL"))
+                                .timestamp(t)
                                 .build())
                         .orElse(null));
     }

@@ -19,7 +19,6 @@ public class ReleaseDetailsTransformer {
     }
 
     public ReleaseDetails releaseDetailsOf(OffenderReleaseDetails ord) {
-
         Optional<MovementReason> maybeMovementReason = Optional.ofNullable(ord.getMovementReason());
 
         return ReleaseDetails.builder()

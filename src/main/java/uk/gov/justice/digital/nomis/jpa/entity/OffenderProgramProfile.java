@@ -19,6 +19,8 @@ public class OffenderProgramProfile {
     @Id
     @Column(name = "OFF_PRGREF_ID")
     private Long offPrgrefId;
+    @Column(name = "CRS_ACTY_ID")
+    private Long crsActyId;
     @Column(name = "OFFENDER_BOOK_ID")
     private Long offenderBookId;
     @Column(name = "PROGRAM_ID")
@@ -59,30 +61,8 @@ public class OffenderProgramProfile {
     private String rejectReasonCode;
     @Column(name = "AGY_LOC_ID")
     private String agyLocId;
-    @Column(name = "CREATE_DATETIME")
-    private Timestamp createDatetime;
-    @Column(name = "CREATE_USER_ID")
-    private String createUserId;
-    @Column(name = "MODIFY_DATETIME")
-    private Timestamp modifyDatetime;
-    @Column(name = "MODIFY_USER_ID")
-    private String modifyUserId;
     @Column(name = "REVIEWED_BY")
     private String reviewedBy;
-    @Column(name = "AUDIT_TIMESTAMP")
-    private Timestamp auditTimestamp;
-    @Column(name = "AUDIT_USER_ID")
-    private String auditUserId;
-    @Column(name = "AUDIT_MODULE_NAME")
-    private String auditModuleName;
-    @Column(name = "AUDIT_CLIENT_USER_ID")
-    private String auditClientUserId;
-    @Column(name = "AUDIT_CLIENT_IP_ADDRESS")
-    private String auditClientIpAddress;
-    @Column(name = "AUDIT_CLIENT_WORKSTATION_NAME")
-    private String auditClientWorkstationName;
-    @Column(name = "AUDIT_ADDITIONAL_INFO")
-    private String auditAdditionalInfo;
     @Column(name = "OFFENDER_SENT_CONDITION_ID")
     private Integer offenderSentConditionId;
     @Column(name = "SENTENCE_SEQ")
@@ -108,9 +88,37 @@ public class OffenderProgramProfile {
     @Column(name = "EARLY_END_REASON")
     private String earlyEndReason;
 
+    @Column(name = "CREATE_DATETIME")
+    private Timestamp createDatetime;
+    @Column(name = "CREATE_USER_ID")
+    private String createUserId;
+    @Column(name = "MODIFY_DATETIME")
+    private Timestamp modifyDatetime;
+    @Column(name = "MODIFY_USER_ID")
+    private String modifyUserId;
+
+    @Column(name = "AUDIT_TIMESTAMP")
+    private Timestamp auditTimestamp;
+    @Column(name = "AUDIT_USER_ID")
+    private String auditUserId;
+    @Column(name = "AUDIT_MODULE_NAME")
+    private String auditModuleName;
+    @Column(name = "AUDIT_CLIENT_USER_ID")
+    private String auditClientUserId;
+    @Column(name = "AUDIT_CLIENT_IP_ADDRESS")
+    private String auditClientIpAddress;
+    @Column(name = "AUDIT_CLIENT_WORKSTATION_NAME")
+    private String auditClientWorkstationName;
+    @Column(name = "AUDIT_ADDITIONAL_INFO")
+    private String auditAdditionalInfo;
+
     @OneToOne
     @BatchSize(size = 1000)
-    @JoinColumn(name = "CRS_ACTY_ID")
+    @JoinColumn(name = "CRS_ACTY_ID", insertable = false, updatable = false)
     private CourseActivity courseActivity;
+
+    @OneToOne
+    @JoinColumn(name = "AGY_LOC_ID", insertable = false, updatable = false)
+    private AgencyLocation agencyLocation;
 
 }

@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.gov.justice.digital.nomis.api.ReleaseDetails;
 import uk.gov.justice.digital.nomis.jpa.entity.Offender;
 import uk.gov.justice.digital.nomis.jpa.entity.OffenderBooking;
+import uk.gov.justice.digital.nomis.jpa.entity.OffenderReleaseDetails;
 import uk.gov.justice.digital.nomis.jpa.repository.OffenderReleaseDetailsRepository;
 import uk.gov.justice.digital.nomis.jpa.repository.OffenderRepository;
 import uk.gov.justice.digital.nomis.service.transformer.ReleaseDetailsTransformer;
@@ -33,31 +34,34 @@ public class ReleaseDetailsService {
 
     @Transactional
     public Page<ReleaseDetails> getReleaseDetails(Pageable pageable) {
-        Page<uk.gov.justice.digital.nomis.jpa.entity.OffenderReleaseDetails> rawReleaseDetailsPage = releaseDetailsRepository.findAll(pageable);
+        Page<OffenderReleaseDetails> rawReleaseDetailsPage = releaseDetailsRepository.findAll(pageable);
 
-        List<ReleaseDetails> releaseDetails = rawReleaseDetailsPage.getContent().stream().map(
-                releaseDetailsTransformer::releaseDetailsOf
-        ).collect(Collectors.toList());
+        List<ReleaseDetails> releaseDetails = rawReleaseDetailsPage.getContent()
+                .stream()
+                .map(releaseDetailsTransformer::releaseDetailsOf)
+                .collect(Collectors.toList());
 
         return new PageImpl<>(releaseDetails, pageable, rawReleaseDetailsPage.getTotalElements());
     }
 
     public Optional<List<ReleaseDetails>> releaseDetailsForOffenderId(Long offenderId) {
-
-        Optional<List<uk.gov.justice.digital.nomis.jpa.entity.OffenderReleaseDetails>> maybeReleaseDetails = Optional.ofNullable(offenderRepository.findOne(offenderId))
-                .map(offender ->
-                        offender.getOffenderBookings().stream()
+        Optional<List<OffenderReleaseDetails>> maybeReleaseDetails = Optional.ofNullable(offenderRepository.findOne(offenderId))
+                .map(offender -> offender.getOffenderBookings()
+                                .stream()
                                 .map(OffenderBooking::getOffenderReleaseDetails)
+                                .filter(x -> x != null)
                                 .collect(Collectors.toList()));
 
-        return maybeReleaseDetails.map(releaseDetails -> releaseDetails.stream().map(releaseDetailsTransformer::releaseDetailsOf).collect(Collectors.toList()));
+        return maybeReleaseDetails.map(releaseDetails -> releaseDetails
+                        .stream()
+                        .map(releaseDetailsTransformer::releaseDetailsOf)
+                        .collect(Collectors.toList()));
     }
 
     public Optional<ReleaseDetails> releaseDetailsForOffenderIdAndBookingId(Long offenderId, Long bookingId) {
         Optional<Offender> maybeOffender = Optional.ofNullable(offenderRepository.findOne(offenderId));
 
-        return maybeOffender.flatMap(
-                offender -> offender.getOffenderBookings()
+        return maybeOffender.flatMap(offender -> offender.getOffenderBookings()
                         .stream()
                         .filter(ob -> ob.getOffenderBookId().equals(bookingId))
                         .findFirst())

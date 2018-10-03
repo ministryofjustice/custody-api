@@ -47,14 +47,14 @@ public class OffenderProgrammeProfilesControllerTest {
         ProgrammeProfile[] programmeProfiles = given()
                 .when()
                 .auth().oauth2(validOauthToken)
-                .get("/offenders/offenderId/-1001/programmeProfiles")
+                .get("/offenders/offenderId/-1001/programmeProfiles?from=2010-01-01T00:00&to=2018-12-28T00:00")
                 .then()
                 .statusCode(200)
                 .extract()
                 .body()
                 .as(ProgrammeProfile[].class);
 
-        assertThat(programmeProfiles.length).isEqualTo(4);
+        assertThat(programmeProfiles.length).isEqualTo(3);
     }
 
 
@@ -64,14 +64,14 @@ public class OffenderProgrammeProfilesControllerTest {
                 .when()
                 .auth().oauth2(validOauthToken)
                 .param("bookingId", -1)
-                .get("/offenders/offenderId/-1001/programmeProfiles")
+                .get("/offenders/offenderId/-1001/programmeProfiles?from=2010-01-01T00:00&to=2018-12-28T00:00")
                 .then()
                 .statusCode(200)
                 .extract()
                 .body()
                 .as(ProgrammeProfile[].class);
 
-        assertThat(programmeProfiles.length).isEqualTo(4);
+        assertThat(programmeProfiles.length).isEqualTo(3);
     }
 
     @Test

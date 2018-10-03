@@ -22,21 +22,21 @@ public class CourtEventsTransformer {
     private final TypesTransformer typesTransformer;
     private final ChargesTransformer chargesTransformer;
     private final SentenceTransformer sentenceTransformer;
-    private final ReferenceDataTranformer referenceDataTranformer;
+    private final ReferenceDataTransformer referenceDataTransformer;
     private final OffenceResultsCodeRepository offenceResultsCodeRepository;
 
     @Autowired
-    public CourtEventsTransformer(TypesTransformer typesTransformer, ChargesTransformer chargesTransformer, SentenceTransformer sentenceTransformer, ReferenceDataTranformer referenceDataTranformer, OffenceResultsCodeRepository offenceResultsCodeRepository) {
+    public CourtEventsTransformer(TypesTransformer typesTransformer, ChargesTransformer chargesTransformer, SentenceTransformer sentenceTransformer, ReferenceDataTransformer referenceDataTransformer, OffenceResultsCodeRepository offenceResultsCodeRepository) {
         this.typesTransformer = typesTransformer;
         this.chargesTransformer = chargesTransformer;
         this.sentenceTransformer = sentenceTransformer;
-        this.referenceDataTranformer = referenceDataTranformer;
+        this.referenceDataTransformer = referenceDataTransformer;
         this.offenceResultsCodeRepository = offenceResultsCodeRepository;
     }
 
     public CourtEvent courtEventOf(uk.gov.justice.digital.nomis.jpa.entity.CourtEvent courtEvent) {
         return CourtEvent.builder()
-                .agencyLocation(referenceDataTranformer.agencyLocationOf(courtEvent.getAgencyLocation()))
+                .agencyLocation(referenceDataTransformer.agencyLocationOf(courtEvent.getAgencyLocation()))
                 .bookingId(courtEvent.getOffenderBookId())
                 .caseId(courtEvent.getCaseId())
                 .comments(courtEvent.getCommentText())

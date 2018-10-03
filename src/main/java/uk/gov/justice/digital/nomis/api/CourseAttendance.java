@@ -21,7 +21,7 @@ public class CourseAttendance {
     private String eventStatus;
     private String comments;
     private String hiddenComments;
-    private Long toInternalLocationId;
+    private AgencyInternalLocation toInternalLocation;
     private String outcomeReasonCode;
     private BigDecimal pieceWork;
     private String engagementCode;
@@ -46,8 +46,8 @@ public class CourseAttendance {
     private Long crsApptId;
     private Long offenderCourseApptRuleId;
     private String eventType;
-    private String agencyLocationId;
-    private String toAgencyLocationId;
+    private AgencyLocation agencyLocation;
+    private AgencyLocation toAgencyLocation;
     private Boolean unexcusedAbsence;
     private Integer sessionNo;
     private Long offenderPrgObligationId;
