@@ -94,32 +94,10 @@ public class OffenderCourseAttendance {
 
     @Column(name = "EVENT_TYPE")
     private String eventType;
-    @Column(name = "CREATE_DATETIME")
-    private Timestamp createDatetime;
-    @Column(name = "CREATE_USER_ID")
-    private String createUserId;
-    @Column(name = "MODIFY_DATETIME")
-    private Timestamp modifyDatetime;
-    @Column(name = "MODIFY_USER_ID")
-    private String modifyUserId;
     @Column(name = "AGY_LOC_ID")
     private String agyLocId;
     @Column(name = "EVENT_CLASS")
     private String eventClass;
-    @Column(name = "AUDIT_TIMESTAMP")
-    private Timestamp auditTimestamp;
-    @Column(name = "AUDIT_USER_ID")
-    private String auditUserId;
-    @Column(name = "AUDIT_MODULE_NAME")
-    private String auditModuleName;
-    @Column(name = "AUDIT_CLIENT_USER_ID")
-    private String auditClientUserId;
-    @Column(name = "AUDIT_CLIENT_IP_ADDRESS")
-    private String auditClientIpAddress;
-    @Column(name = "AUDIT_CLIENT_WORKSTATION_NAME")
-    private String auditClientWorkstationName;
-    @Column(name = "AUDIT_ADDITIONAL_INFO")
-    private String auditAdditionalInfo;
     @Column(name = "UNEXCUSED_ABSENCE_FLAG")
     private String unexcusedAbsenceFlag;
     @Column(name = "TO_AGY_LOC_ID")
@@ -141,6 +119,30 @@ public class OffenderCourseAttendance {
     @Column(name = "AUTHORISED_ABSENCE_FLAG")
     private String authorisedAbsenceFlag;
 
+    @Column(name = "CREATE_DATETIME")
+    private Timestamp createDatetime;
+    @Column(name = "CREATE_USER_ID")
+    private String createUserId;
+    @Column(name = "MODIFY_DATETIME")
+    private Timestamp modifyDatetime;
+    @Column(name = "MODIFY_USER_ID")
+    private String modifyUserId;
+
+    @Column(name = "AUDIT_TIMESTAMP")
+    private Timestamp auditTimestamp;
+    @Column(name = "AUDIT_USER_ID")
+    private String auditUserId;
+    @Column(name = "AUDIT_MODULE_NAME")
+    private String auditModuleName;
+    @Column(name = "AUDIT_CLIENT_USER_ID")
+    private String auditClientUserId;
+    @Column(name = "AUDIT_CLIENT_IP_ADDRESS")
+    private String auditClientIpAddress;
+    @Column(name = "AUDIT_CLIENT_WORKSTATION_NAME")
+    private String auditClientWorkstationName;
+    @Column(name = "AUDIT_ADDITIONAL_INFO")
+    private String auditAdditionalInfo;
+
     @OneToOne
     @JoinColumns({
             @JoinColumn(name = "CRS_ACTY_ID", referencedColumnName = "CRS_ACTY_ID", insertable = false, updatable = false),
@@ -148,5 +150,19 @@ public class OffenderCourseAttendance {
             @JoinColumn(name = "CRS_SCH_ID", referencedColumnName = "CRS_SCH_ID", insertable = false, updatable = false)
     })
     private CourseSchedule courseSchedule;
+
+    @OneToOne
+    @JoinColumn(name = "AGY_LOC_ID", insertable = false, updatable = false)
+    private AgencyLocation agencyLocation;
+
+
+    @OneToOne
+    @JoinColumn(name = "TO_INTERNAL_LOCATION_ID", insertable = false, updatable = false)
+    private AgencyInternalLocation toInternalLocation;
+
+
+    @OneToOne
+    @JoinColumn(name = "TO_AGY_LOC_ID", insertable = false, updatable = false)
+    private AgencyLocation toAgencyLocation;
 
 }

@@ -7,11 +7,11 @@ import uk.gov.justice.digital.nomis.jpa.entity.AgencyLocation;
 import java.util.Optional;
 
 @Component
-public class ReferenceDataTranformer {
+public class ReferenceDataTransformer {
 
     private final TypesTransformer typesTransformer;
 
-    public ReferenceDataTranformer(TypesTransformer typesTransformer) {
+    public ReferenceDataTransformer(TypesTransformer typesTransformer) {
         this.typesTransformer = typesTransformer;
     }
 

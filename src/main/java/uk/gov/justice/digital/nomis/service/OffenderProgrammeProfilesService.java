@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.nomis.service;
 
+import com.google.common.collect.ImmutableList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.justice.digital.nomis.api.ProgrammeProfile;
@@ -10,6 +11,7 @@ import uk.gov.justice.digital.nomis.jpa.repository.OffenderProgramProfilesReposi
 import uk.gov.justice.digital.nomis.jpa.repository.OffenderRepository;
 import uk.gov.justice.digital.nomis.service.transformer.OffenderProgrammeProfileTransformer;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -34,21 +36,29 @@ public class OffenderProgrammeProfilesService {
 
         final Optional<List<OffenderBooking>> maybeOffenderBookings = maybeOffender.map(Offender::getOffenderBookings);
 
-        return maybeOffenderBookings.map(bookings -> bookings
+        LocalDateTime from = maybeFrom.orElse(maybeTo.orElse(LocalDate.now().atStartOfDay()));
+        LocalDateTime to = maybeTo.orElse(from.toLocalDate().plusDays(1).atStartOfDay().minusNanos(1));
+
+        Optional<List<ProgrammeProfile>> out = maybeOffenderBookings.map(bookings -> bookings
                 .stream()
                 .flatMap(ob -> offenderProgramProfilesRepository
                         .findAll(OffenderProgramProfilesFilter.builder()
                                 .bookingId(ob.getOffenderBookId())
-                                .from(maybeFrom)
-                                .to(maybeTo)
+                                .from(from)
+                                .to(to)
                                 .build())
-                        .stream())
-                .map(offenderProgrammeProfileTransformer::programmeProfileOf)
-                .collect(Collectors.toList()));
+                        .stream()
+                        .map(opp -> offenderProgrammeProfileTransformer.programmeProfileOf(opp, from, to)))
+                .collect(Collectors.toSet()))
+                .map(ImmutableList::copyOf);
+        return out;
     }
 
     public Optional<List<ProgrammeProfile>> offenderProgrammeProfilesForOffenderIdAndBookingId(Long offenderId, Long bookingId, Optional<LocalDateTime> maybeFrom, Optional<LocalDateTime> maybeTo) {
         Optional<Offender> maybeOffender = Optional.ofNullable(offenderRepository.findOne(offenderId));
+
+        LocalDateTime from = maybeFrom.orElse(maybeTo.orElse(LocalDate.now().atStartOfDay()));
+        LocalDateTime to = maybeTo.orElse(from.toLocalDate().plusDays(1).atStartOfDay().minusNanos(1));
 
         return maybeOffender.flatMap(
                 offender -> offender.getOffenderBookings()
@@ -58,11 +68,12 @@ public class OffenderProgrammeProfilesService {
                 .map(ob -> offenderProgramProfilesRepository
                         .findAll(OffenderProgramProfilesFilter.builder()
                                 .bookingId(ob.getOffenderBookId())
-                                .from(maybeFrom)
-                                .to(maybeTo)
+                                .from(from)
+                                .to(to)
                                 .build())
                         .stream()
-                .map(offenderProgrammeProfileTransformer::programmeProfileOf)
-                        .collect(Collectors.toList()));
+                        .map(opp -> offenderProgrammeProfileTransformer.programmeProfileOf(opp, from, to))
+                        .collect(Collectors.toSet()))
+                .map(ImmutableList::copyOf);
     }
 }

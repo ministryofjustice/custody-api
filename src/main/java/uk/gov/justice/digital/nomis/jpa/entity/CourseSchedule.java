@@ -30,6 +30,15 @@ public class CourseSchedule implements Serializable {
     private Integer sessionNo;
     @Column(name = "DETAILS")
     private String details;
+    @Column(name = "SCHEDULE_STATUS")
+    private String scheduleStatus;
+    @Column(name = "CATCH_UP_CRS_SCH_ID")
+    private Long catchUpCrsSchId;
+    @Column(name = "VIDEO_REFERENCE_ID")
+    private String videoReferenceId;
+    @Column(name = "SLOT_CATEGORY_CODE")
+    private String slotCategoryCode;
+
     @Column(name = "CREATE_DATETIME")
     private Timestamp createDatetime;
     @Column(name = "CREATE_USER_ID")
@@ -38,6 +47,7 @@ public class CourseSchedule implements Serializable {
     private Timestamp modifyDatetime;
     @Column(name = "MODIFY_USER_ID")
     private String modifyUserId;
+
     @Column(name = "AUDIT_TIMESTAMP")
     private Timestamp auditTimestamp;
     @Column(name = "AUDIT_USER_ID")
@@ -52,13 +62,5 @@ public class CourseSchedule implements Serializable {
     private String auditClientWorkstationName;
     @Column(name = "AUDIT_ADDITIONAL_INFO")
     private String auditAdditionalInfo;
-    @Column(name = "SCHEDULE_STATUS")
-    private String scheduleStatus;
-    @Column(name = "CATCH_UP_CRS_SCH_ID")
-    private Long catchUpCrsSchId;
-    @Column(name = "VIDEO_REFERENCE_ID")
-    private String videoReferenceId;
-    @Column(name = "SLOT_CATEGORY_CODE")
-    private String slotCategoryCode;
 
 }

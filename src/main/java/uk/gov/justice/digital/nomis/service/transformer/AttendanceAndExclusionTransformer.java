@@ -14,11 +14,13 @@ public class AttendanceAndExclusionTransformer {
 
     private final TypesTransformer typesTransformer;
     private final OffenderProgrammeProfileTransformer offenderProgrammeProfileTransformer;
+    private final ReferenceDataTransformer referenceDataTransformer;
 
     @Autowired
-    public AttendanceAndExclusionTransformer(TypesTransformer typesTransformer, OffenderProgrammeProfileTransformer offenderProgrammeProfileTransformer) {
+    public AttendanceAndExclusionTransformer(TypesTransformer typesTransformer, OffenderProgrammeProfileTransformer offenderProgrammeProfileTransformer, ReferenceDataTransformer referenceDataTransformer) {
         this.typesTransformer = typesTransformer;
         this.offenderProgrammeProfileTransformer = offenderProgrammeProfileTransformer;
+        this.referenceDataTransformer = referenceDataTransformer;
     }
 
     public CourseAttendance courseAttendanceOf(OffenderCourseAttendance offenderCourseAttendance) {
@@ -26,14 +28,14 @@ public class AttendanceAndExclusionTransformer {
                 .map(ca -> CourseAttendance.builder()
                         .actionCode(ca.getActionCode())
                         .agreedTravelHour(ca.getAgreedTravelHour())
-                        .agencyLocationId(ca.getAgyLocId())
+                        .agencyLocation(referenceDataTransformer.agencyLocationOf(ca.getAgencyLocation()))
                         .authorisedAbsence(typesTransformer.ynToBoolean(ca.getAuthorisedAbsenceFlag()))
                         .behaviourCode(ca.getBehaviourCode())
                         .bonusPay(ca.getBonusPay())
                         .bookingId(ca.getOffenderBookId())
                         .comments(ca.getCommentText())
                         .courseActivity(offenderProgrammeProfileTransformer.activityOf(ca.getCourseActivity()))
-                        .courseSchedule(offenderProgrammeProfileTransformer.courseScheduleOf(ca.getCourseSchedule()))
+                        .courseSchedule(offenderProgrammeProfileTransformer.scheduleOf(ca.getCourseSchedule()))
                         .creditedHours(ca.getCreditedHours())
                         .crsApptId(ca.getCrsApptId())
                         .details(ca.getDetails())
@@ -65,11 +67,12 @@ public class AttendanceAndExclusionTransformer {
                         .supervisorStaffId(ca.getSupervisorStaffId())
                         .toAddressId(ca.getToAddressId())
                         .toAddressOwnerClass(ca.getToAddressOwnerClass())
-                        .toAgencyLocationId(ca.getToAgyLocId())
-                        .toInternalLocationId(ca.getToInternalLocationId())
+                        .toAgencyLocation(referenceDataTransformer.agencyLocationOf(ca.getToAgencyLocation()))
+                        .toInternalLocation(referenceDataTransformer.agencyInternalLocationOf(ca.getToInternalLocation()))
                         .understandingCode(ca.getUnderstandingCode())
                         .unexcusedAbsence(typesTransformer.ynToBoolean(ca.getUnexcusedAbsenceFlag()))
-                        .build()).orElse(null);
+                        .build())
+                .orElse(null);
     }
 
     public Exclusion exclusionOf(OffenderExcludeActsSchds offenderExcludeActsSchds) {
@@ -81,7 +84,8 @@ public class AttendanceAndExclusionTransformer {
                         .offenderExcludeActSchdId(exclude.getOffenderExcludeActSchdId())
                         .offenderProgramProfileId(exclude.getOffPrgrefId())
                         .slotCategoryCode(exclude.getSlotCategoryCode())
-                        .build()).orElse(null);
+                        .build())
+                .orElse(null);
 
     }
 }
