@@ -58,6 +58,9 @@ public class SentenceCalculation {
     private LocalDate releaseDate;
     private String releaseType;
     private LocalDate confirmedReleaseDate;
+    private String confirmedReleaseType;
     private LocalDate nonDtoReleaseDate;
+    private String nonDtoReleaseType;
     private LocalDate midTermDate;
+    private String midTermType;
 }

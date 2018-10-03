@@ -69,8 +69,11 @@ public class SentenceCalculationsTransformer {
                 .releaseDate(typesTransformer.localDateOf(osc.getDerivedReleaseDate()))
                 .releaseType(Optional.ofNullable(osc.getDerivedReleaseDate()).map(LabelledTimestamp::getLabel).orElse(null))
                 .confirmedReleaseDate(typesTransformer.localDateOf(osc.getConfirmedReleaseDate()))
+                .confirmedReleaseType(Optional.ofNullable(osc.getConfirmedReleaseDate()).map(LabelledTimestamp::getLabel).orElse(null))
                 .nonDtoReleaseDate(typesTransformer.localDateOf(osc.getNonDtoReleaseDate()))
+                .nonDtoReleaseType(Optional.ofNullable(osc.getNonDtoReleaseDate()).map(LabelledTimestamp::getLabel).orElse(null))
                 .midTermDate(typesTransformer.localDateOf(osc.getMidTermDate()))
+                .midTermType(Optional.ofNullable(osc.getMidTermDate()).map(LabelledTimestamp::getLabel).orElse(null))
                 .build();
     }
 
