@@ -22,10 +22,10 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.E
 @SpringBootApplication
 @Slf4j
 @EnableResourceServer
-public class NewNomisAPI {
+public class CustodyApiApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(NewNomisAPI.class, args);
+        SpringApplication.run(CustodyApiApplication.class, args);
     }
 
     @Bean(name = "globalObjectMapper")

@@ -8,7 +8,7 @@ cat <<- _EOF_ > Dockerrun.aws.json
 {
   "AWSEBDockerrunVersion": "1",
   "Image": {
-    "Name": "mojdigitalstudio/newnomisapi:${BUILD_VERSION}",
+    "Name": "mojdigitalstudio/custody-api:${BUILD_VERSION}",
     "Update": "true"
   },
   "Ports": [
