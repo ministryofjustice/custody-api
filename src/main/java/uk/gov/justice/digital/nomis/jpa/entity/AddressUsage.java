@@ -22,6 +22,7 @@ public class AddressUsage {
     private String addressUsage;
     @Column(name = "ACTIVE_FLAG")
     private String activeFlag;
+    
     @Column(name = "CREATE_DATETIME")
     private Timestamp createDatetime;
     @Column(name = "CREATE_USER_ID")
