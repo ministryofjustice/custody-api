@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 import uk.gov.justice.digital.nomis.api.OffenderEvent;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Optional;
 
 @Component
@@ -38,7 +39,7 @@ public class OffenderEventsTransformer {
 
                 return String.format("%s-%s", json.get("case_note").get("type").get("code").asText(), json.get("case_note").get("sub_type").get("code").asText());
             } catch (IOException e) {
-                System.err.println(e.getStackTrace());
+                System.err.println(Arrays.toString(e.getStackTrace()));
             }
         }
 
