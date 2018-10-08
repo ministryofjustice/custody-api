@@ -29,18 +29,10 @@ public class AgencyInternalLocation {
     private Integer capacity;
     @Column(name = "PARENT_INTERNAL_LOCATION_ID")
     private Long parentInternalLocationId;
-    @Column(name = "CREATE_USER_ID")
-    private String createUserId;
     @Column(name = "ACTIVE_FLAG")
     private String activeFlag;
     @Column(name = "LIST_SEQ")
     private Integer listSeq;
-    @Column(name = "CREATE_DATETIME")
-    private Timestamp createDatetime;
-    @Column(name = "MODIFY_DATETIME")
-    private Timestamp modifyDatetime;
-    @Column(name = "MODIFY_USER_ID")
-    private String modifyUserId;
     @Column(name = "CNA_NO")
     private Long cnaNo;
     @Column(name = "CERTIFIED_FLAG")
@@ -65,6 +57,16 @@ public class AgencyInternalLocation {
     private Integer noOfOccupant;
     @Column(name = "TRACKING_FLAG")
     private String trackingFlag;
+
+    @Column(name = "CREATE_USER_ID")
+    private String createUserId;
+    @Column(name = "CREATE_DATETIME")
+    private Timestamp createDatetime;
+    @Column(name = "MODIFY_DATETIME")
+    private Timestamp modifyDatetime;
+    @Column(name = "MODIFY_USER_ID")
+    private String modifyUserId;
+
     @Column(name = "AUDIT_TIMESTAMP")
     private Timestamp auditTimestamp;
     @Column(name = "AUDIT_USER_ID")
