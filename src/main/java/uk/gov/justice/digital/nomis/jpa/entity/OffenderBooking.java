@@ -148,6 +148,11 @@ public class OffenderBooking {
     @OneToMany
     @BatchSize(size = 1000)
     @JoinColumn(name = "OFFENDER_BOOK_ID")
+    private List<OffenderMilitaryRecord> offenderMilitaryRecords;
+
+    @OneToMany
+    @BatchSize(size = 1000)
+    @JoinColumn(name = "OFFENDER_BOOK_ID")
     private List<OffenderCharge> offenderCharges;
 
     @OneToMany
