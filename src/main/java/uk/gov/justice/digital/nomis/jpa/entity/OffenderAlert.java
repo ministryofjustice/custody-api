@@ -42,16 +42,18 @@ public class OffenderAlert {
     private String commentText;
     @Column(name = "CASELOAD_ID")
     private String caseloadId;
-    @Column(name = "MODIFY_USER_ID")
-    private String modifyUserId;
-    @Column(name = "MODIFY_DATETIME")
-    private Timestamp modifyDatetime;
     @Column(name = "CASELOAD_TYPE")
     private String caseloadType;
+
     @Column(name = "CREATE_DATETIME")
     private Timestamp createDatetime;
     @Column(name = "CREATE_USER_ID")
     private String createUserId;
+    @Column(name = "MODIFY_USER_ID")
+    private String modifyUserId;
+    @Column(name = "MODIFY_DATETIME")
+    private Timestamp modifyDatetime;
+
     @Column(name = "AUDIT_TIMESTAMP")
     private Timestamp auditTimestamp;
     @Column(name = "AUDIT_USER_ID")
