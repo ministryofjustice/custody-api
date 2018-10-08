@@ -12,17 +12,17 @@ public class MilitaryRecord {
     private Long bookingId;
     private Long militarySeq;
 
-    private String warZoneCode;
+    private KeyValue warZoneCode;
     private LocalDate startDate;
     private LocalDate endDate;
-    private String militaryDischargeCode;
-    private String militaryBranchCode;
     private String description;
     private String unitNumber;
+    private String serviceNumber;
     private String enlistmentLocation;
     private String dischargeLocation;
-    private String selectiveServicesFlag;
-    private String militaryRankCode;
-    private String serviceNumber;
-    private String disciplinaryActionCode;
+    private Boolean selectiveServices;
+    private KeyValue militaryDischargeCode;
+    private KeyValue militaryBranchCode;
+    private KeyValue militaryRankCode;
+    private KeyValue disciplinaryActionCode;
 }
