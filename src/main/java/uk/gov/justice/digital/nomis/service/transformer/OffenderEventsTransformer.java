@@ -18,6 +18,7 @@ public class OffenderEventsTransformer {
     public OffenderEventsTransformer(TypesTransformer typesTransformer) {
         this.typesTransformer = typesTransformer;
     }
+
     public OffenderEvent offenderEventOf(uk.gov.justice.digital.nomis.jpa.entity.OffenderEvent offenderEvent) {
         return Optional.ofNullable(offenderEvent)
                 .map(event -> OffenderEvent.builder()
