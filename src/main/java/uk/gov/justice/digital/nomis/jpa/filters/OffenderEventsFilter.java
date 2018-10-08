@@ -9,38 +9,66 @@ import uk.gov.justice.digital.nomis.jpa.entity.OffenderEvent;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Builder
 @EqualsAndHashCode
 public class OffenderEventsFilter implements Specification<OffenderEvent> {
 
-    @Builder.Default
-    private Optional<List<String>> contactTypes = Optional.empty();
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     @Builder.Default
-    private Optional<LocalDateTime> from = Optional.empty();
+    private LocalDateTime from = null;
+
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     @Builder.Default
-    private Optional<LocalDateTime> to = Optional.empty();
+    private LocalDateTime to = null;
+
+    @Builder.Default
+    private Optional<Set<String>> types = Optional.empty();
+
     private Long offenderId;
 
     @Override
     public Predicate toPredicate(Root<OffenderEvent> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
+        Timestamp tsFrom = Timestamp.valueOf(from);
+        Timestamp tsTo = Timestamp.valueOf(to);
+
+        if (tsFrom.after(tsTo)) {
+            Timestamp tsTemp = tsFrom;
+            tsFrom = tsTo;
+            tsTo = tsTemp;
+        }
+
+        Root alertsTable = root;
+        Path eventTimestamp = alertsTable.get("eventTimestamp");
+        Path eventType = root.get("eventType");
+
         ImmutableList.Builder<Predicate> predicateBuilder = ImmutableList.builder();
 
-        from.ifPresent(localDateTime -> predicateBuilder.add(cb.greaterThanOrEqualTo(root.get("eventTimestamp"), Timestamp.valueOf(localDateTime))));
+        predicateBuilder
+                .add(cb.greaterThanOrEqualTo(eventTimestamp, tsFrom))
+                .add(cb.lessThanOrEqualTo(eventTimestamp, tsTo));
 
-        to.ifPresent(localDateTime -> predicateBuilder.add(cb.lessThanOrEqualTo(root.get("eventTimestamp"), Timestamp.valueOf(localDateTime))));
+        types.ifPresent(filter -> {
+            filter.add("CASE_NOTE");
+            predicateBuilder.add(valueInList(cb, eventType, filter));
+        });
 
         ImmutableList<Predicate> predicates = predicateBuilder.build();
 
         return cb.and(predicates.toArray(new Predicate[predicates.size()]));
+    }
+
+    private Predicate valueInList(CriteriaBuilder cb, Path eventType, Set<String> list) {
+        CriteriaBuilder.In inTypes = cb.in(eventType);
+        list.stream().map(String::toUpperCase).forEach(inTypes::value);
+        return inTypes;
     }
 
 }

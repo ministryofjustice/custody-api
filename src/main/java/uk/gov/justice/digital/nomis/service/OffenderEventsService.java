@@ -1,11 +1,6 @@
 package uk.gov.justice.digital.nomis.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import uk.gov.justice.digital.nomis.api.OffenderEvent;
 import uk.gov.justice.digital.nomis.jpa.filters.OffenderEventsFilter;
@@ -13,10 +8,13 @@ import uk.gov.justice.digital.nomis.jpa.repository.OffenderEventsRepository;
 import uk.gov.justice.digital.nomis.jpa.repository.OffenderRepository;
 import uk.gov.justice.digital.nomis.service.transformer.OffenderEventsTransformer;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -39,31 +37,45 @@ public class OffenderEventsService {
         this.offenderRepository = offenderRepository;
     }
 
-    public Page<OffenderEvent> getEvents(Pageable pageable, Optional<LocalDateTime> maybeFrom, Optional<LocalDateTime> maybeTo) {
-        OffenderEventsFilter offenderEventsFilter = OffenderEventsFilter.builder()
-                .from(maybeFrom)
-                .to(maybeTo)
-                .build();
+    public Optional<List<OffenderEvent>> getEvents(Optional<LocalDateTime> maybeFrom,
+                                         Optional<LocalDateTime> maybeTo,
+                                         Optional<Set<String>> maybeTypeFilter) {
+        LocalDateTime from = maybeFrom.orElse(maybeTo.orElse(LocalDate.now().atStartOfDay()));
+        LocalDateTime to = maybeTo.orElse(from.toLocalDate().plusDays(1).atStartOfDay().minusNanos(1));
 
-        PageRequest orderedPageable = new PageRequest(pageable.getPageNumber(), pageable.getPageSize(), new Sort(new Sort.Order(Sort.Direction.ASC, "eventTimestamp")));
-        Page<uk.gov.justice.digital.nomis.jpa.entity.OffenderEvent> rawOffenderEventsPage = offenderEventsRepository.findAll(offenderEventsFilter, orderedPageable);
+        Set<String> typeFilter = maybeTypeFilter.map(types -> types.stream().map(String::toUpperCase).collect(Collectors.toSet())).orElse(Collections.EMPTY_SET);
 
-        List<OffenderEvent> events = rawOffenderEventsPage.getContent()
-                .stream()
-                .map(offenderEventsTransformer::offenderEventOf)
-                .collect(Collectors.toList());
-
-        return new PageImpl<>(events, pageable, rawOffenderEventsPage.getTotalElements());
+        return getFilteredOffenderEvents(typeFilter, OffenderEventsFilter.builder()
+                .from(from)
+                .to(to)
+                .types(maybeTypeFilter)
+                .build());
     }
 
-    public Optional<List<OffenderEvent>> eventsForOffenderId(Long offenderId) {
+    public Optional<List<OffenderEvent>> getEventsForOffenderId(Long offenderId,
+                                                      Optional<LocalDateTime> maybeFrom,
+                                                      Optional<LocalDateTime> maybeTo,
+                                                      Optional<Set<String>> maybeTypeFilter) {
+        LocalDateTime from = maybeFrom.orElse(maybeTo.orElse(LocalDate.now().atStartOfDay()));
+        LocalDateTime to = maybeTo.orElse(from.toLocalDate().plusDays(1).atStartOfDay().minusNanos(1));
 
-        return Optional.ofNullable(offenderRepository.findOne(offenderId))
-                .map(offender -> offender.getOffenderEvents()
+        Set<String> typeFilter = maybeTypeFilter.map(types -> types.stream().map(String::toUpperCase).collect(Collectors.toSet())).orElse(Collections.EMPTY_SET);
+
+        return getFilteredOffenderEvents(typeFilter, OffenderEventsFilter.builder()
+                .from(from)
+                .to(to)
+                .types(maybeTypeFilter)
+                .offenderId(offenderId)
+                .build());
+    }
+
+    private Optional<List<OffenderEvent>> getFilteredOffenderEvents(Set<String> typeFilter, OffenderEventsFilter filter) {
+        return Optional.ofNullable(offenderEventsRepository.findAll(filter))
+                .map(ev -> ev
                         .stream()
                         .sorted(BY_OFFENDER_EVENT_TIMESTAMP)
                         .map(offenderEventsTransformer::offenderEventOf)
+                        .filter(oe -> typeFilter.isEmpty() || typeFilter.contains(oe.getEventType()))
                         .collect(Collectors.toList()));
-
     }
 }
