@@ -40,8 +40,8 @@ public class OffenderEventsService {
     public Optional<List<OffenderEvent>> getEvents(Optional<LocalDateTime> maybeFrom,
                                          Optional<LocalDateTime> maybeTo,
                                          Optional<Set<String>> maybeTypeFilter) {
-        LocalDateTime from = maybeFrom.orElse(maybeTo.orElse(LocalDate.now().atStartOfDay()));
-        LocalDateTime to = maybeTo.orElse(from.toLocalDate().plusDays(1).atStartOfDay().minusNanos(1));
+        LocalDateTime from = maybeFrom.orElse(maybeTo.map(to -> to.minusDays(1)).orElse(LocalDate.now().atStartOfDay()));
+        LocalDateTime to = maybeTo.orElse(from.plusDays(1));
 
         Set<String> typeFilter = maybeTypeFilter.map(types -> types.stream().map(String::toUpperCase).collect(Collectors.toSet())).orElse(Collections.EMPTY_SET);
 
@@ -56,8 +56,8 @@ public class OffenderEventsService {
                                                       Optional<LocalDateTime> maybeFrom,
                                                       Optional<LocalDateTime> maybeTo,
                                                       Optional<Set<String>> maybeTypeFilter) {
-        LocalDateTime from = maybeFrom.orElse(maybeTo.orElse(LocalDate.now().atStartOfDay()));
-        LocalDateTime to = maybeTo.orElse(from.toLocalDate().plusDays(1).atStartOfDay().minusNanos(1));
+        LocalDateTime from = maybeFrom.orElse(maybeTo.map(to -> to.minusDays(1)).orElse(LocalDate.now().atStartOfDay()));
+        LocalDateTime to = maybeTo.orElse(from.plusDays(1));
 
         Set<String> typeFilter = maybeTypeFilter.map(types -> types.stream().map(String::toUpperCase).collect(Collectors.toSet())).orElse(Collections.EMPTY_SET);
 
