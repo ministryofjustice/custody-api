@@ -8,6 +8,8 @@ import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.Optional;
 
 @Component
@@ -52,6 +54,17 @@ public class TypesTransformer {
                             .map(t -> t.toLocalDateTime().toLocalTime().atDate(dateTime.toLocalDate()))
                             .orElse(dateTime))
                 .orElse(null);
+    }
+    public static LocalDateTime localDateTimeOf(String localDate) {
+        if (localDate.isEmpty()) {
+            return null;
+        }
+
+        try {
+            return LocalDateTime.parse(localDate, DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss"));
+        } catch (DateTimeParseException ex) {
+            return null;
+        }
     }
 
     public Boolean ynToBoolean(String yn) {
