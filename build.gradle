@@ -73,16 +73,19 @@ configurations {
 // In this section you declare the dependencies for your production and test code
 dependencies {
     compile files('lib/ojdbc8-12.2.0.1.jar')
+    compile files('lib/aqapi.jar')
 
     compile 'com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.8.0'
     compile 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.8.0'
     compile 'org.springframework.boot:spring-boot-starter-web'
     compile 'org.springframework.boot:spring-boot-starter-jetty'
     compile 'org.springframework.boot:spring-boot-starter-data-jpa'
+    compile 'org.springframework.boot:spring-boot-starter-data-mongodb'
     compile 'org.springframework.boot:spring-boot-starter-actuator'
     compile 'org.springframework.boot:spring-boot-starter-security'
     compile 'org.springframework.security.oauth:spring-security-oauth2'
     compile 'org.springframework.security:spring-security-jwt'
+    compile 'org.springframework.boot:spring-boot-starter-activemq'
 
     compile 'org.hibernate:hibernate-java8:5.1.12.Final'
     compile 'org.springframework.hateoas:spring-hateoas:0.24.0.RELEASE'
