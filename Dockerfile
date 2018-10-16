@@ -2,8 +2,11 @@ FROM openjdk:8-jdk-alpine
 RUN apk add --update \
         curl \
     && rm -rf /var/cache/apk/*
-MAINTAINER Mike Jackson <michael.jackson@digital.justice.gov.uk>
+MAINTAINER HMPPS Digital Studio <info@digital.justice.gov.uk>
 
-COPY build/libs/new-nomis-api*.jar /root/new-nomis-api.jar
+WORKDIR /app
 
-ENTRYPOINT ["/usr/bin/java", "-jar", "/root/new-nomis-api.jar"]
+COPY build/libs/custody-api*.jar /app/app.jar
+COPY run.sh /app
+
+ENTRYPOINT ["/bin/sh", "/app/run.sh"]
