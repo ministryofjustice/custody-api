@@ -4,7 +4,7 @@ New Tech Nomis: Offender API.
 The service provides REST access to the Nomis Oracle DB offender information.
 
 ## Continuous Integration
-https://circleci.com/gh/noms-digital-studio/new-nomis-api
+https://circleci.com/gh/noms-digital-studio/custody-api
 
 ## Gradle commands
 
@@ -25,12 +25,12 @@ This profile starts the application additional configuration this mode uses an i
 populated with a sample data set
 
 ```
-SPRING_PROFILES_ACTIVE=dev java -jar build/libs/new-nomis-api.jar
+SPRING_PROFILES_ACTIVE=dev java -jar build/libs/custody-api.jar
 ```
 
 ### Start the application with Nomis Oracle db
 ```
-SPRING_PROFILES_ACTIVE=oracle SPRING_DATASOURCE_URL=jdbc:oracle:thin:@<VM Oracle IP address>:1521:<sid> java -jar build/libs/new-nomis-api.jar
+SPRING_PROFILES_ACTIVE=oracle SPRING_DATASOURCE_URL=jdbc:oracle:thin:@<VM Oracle IP address>:1521:<sid> java -jar build/libs/custody-api.jar
 ```
 
 ### Additional configuration
