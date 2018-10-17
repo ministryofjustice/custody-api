@@ -20,7 +20,7 @@ import java.sql.SQLFeatureNotSupportedException;
 import java.util.logging.Logger;
 
 @Configuration
-@Profile("oracle")
+@Profile({"oracle", "integrated"})
 public class OracleAQConfig {
 
 //    @Bean
