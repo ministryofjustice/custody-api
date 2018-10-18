@@ -72,7 +72,7 @@ public class XtagEvent {
     @Column(name = "SENDER_PROTOCOL")
     private Long senderProtocol;
 
-    @Column(name = "USER_DATA")
+    //@Column(name = "USER_DATA")
     private STRUCT userData;                // SYS.AQ$_JMS_MESSAGE
     //@Column(name = "USER_PROP")
     //private STRUCT userProp;                // SYS.ANYDATA
