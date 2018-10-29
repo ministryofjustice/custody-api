@@ -95,7 +95,7 @@ public class OffenderTransformer {
         return Booking.builder()
                 .bookingSequence(booking.getBookingSeq())
                 .startDate(booking.getBookingBeginDate().toLocalDateTime().toLocalDate())
-                .endDate(Optional.ofNullable(booking.getBookingEndDate()).map(end -> end.toLocalDateTime().toLocalDate()))
+                .endDate(Optional.ofNullable(booking.getBookingEndDate()).map(end -> end.toLocalDateTime().toLocalDate()).orElse(null))
                 .activeFlag(typesTransformer.ynToBoolean(booking.getActiveFlag()))
                 .agencyLocation(referenceDataTransformer.agencyLocationOf(booking.getAgencyLocation()))
                 .bookingNo(booking.getBookingNo())

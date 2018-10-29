@@ -15,4 +15,4 @@ include 'api'
 include 'services:webservice'
 */
 
-rootProject.name = 'new-nomis-api'
+rootProject.name = 'custody-api'

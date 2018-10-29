@@ -1,20 +1,30 @@
 package uk.gov.justice.digital.nomis.service.transformer;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.justice.digital.nomis.api.CaseNote;
+import uk.gov.justice.digital.nomis.api.CaseNoteAmendment;
 import uk.gov.justice.digital.nomis.api.KeyValue;
 import uk.gov.justice.digital.nomis.jpa.entity.OffenderCaseNote;
 import uk.gov.justice.digital.nomis.jpa.entity.ReferenceCodePK;
 import uk.gov.justice.digital.nomis.jpa.repository.ReferenceCodesRepository;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Component
 public class OffenderCaseNotesTransformer {
     private static final String NOTE_SOURCE = "NOTE_SOURCE";
     private static final String TASK_TYPE = "TASK_TYPE";
     private static final String TASK_SUBTYPE = "TASK_SUBTYPE";
+
+    private static final String AMEND_REGEX = "\\.\\.\\.\\[(\\w+) updated the case notes* on ([0-9-/ :]*)\\]";
+    private final static Pattern AMEND_CASE_NOTE_REGEX = Pattern.compile(AMEND_REGEX);
 
     private final TypesTransformer typesTransformer;
     private final ReferenceCodesRepository referenceCodesRepository;
@@ -28,6 +38,8 @@ public class OffenderCaseNotesTransformer {
     }
 
     public CaseNote caseNoteOf(OffenderCaseNote ocn) {
+        List<CaseNoteAmendment> amendments = amendmentsOf(ocn.getCaseNoteText(), ocn.getStaffId(), typesTransformer.localDateTimeOf(ocn.getCreationDate(), ocn.getCreationTime()));
+
         return CaseNote.builder()
                 .caseNoteId(ocn.getCaseNoteId())
                 .contactDateTime(typesTransformer.localDateTimeOf(ocn.getContactDate(), ocn.getContactTime()))
@@ -39,14 +51,10 @@ public class OffenderCaseNotesTransformer {
                 .source(sourceOf(ocn.getNoteSourceCode()))
                 .staffId(ocn.getStaffId())
                 .subType(subTypeOf(ocn.getCaseNoteSubType()))
-                .text(textOf(ocn.getCaseNoteText()))
+                .text(ocn.getCaseNoteText())
                 .type(typeOf(ocn.getCaseNoteType()))
+                .amendments(amendments)
                 .build();
-    }
-
-    private String textOf(String caseNoteText) {
-        //todo: need to understand how to parse the text content to create an amendments log
-        return caseNoteText;
     }
 
     private KeyValue subTypeOf(String caseNoteSubType) {
@@ -77,5 +85,43 @@ public class OffenderCaseNotesTransformer {
                         .build()) : null)
                 .map(rc -> KeyValue.builder().code(rc.getCode()).description(rc.getDescription()).build())
                 .orElse(null);
+    }
+
+    private List<CaseNoteAmendment> amendmentsOf(String caseNoteText, Long staffId, LocalDateTime creationDateTime) {
+        String[] breakUp = caseNoteText.split(AMEND_REGEX);
+        String workingText = caseNoteText;
+
+        List<CaseNoteAmendment> amendments = new ArrayList<>();
+
+        for (int amendmentCount = 0; amendmentCount < breakUp.length; amendmentCount ++) {
+            final String amendmentText = breakUp[amendmentCount];
+
+            if (amendmentCount == 0) {
+                amendments.add(CaseNoteAmendment.builder()
+                        .text(amendmentText.trim())
+                        .authorName(staffId.toString())
+                        .creationDateTime(creationDateTime)
+                        .build());
+
+                workingText = StringUtils.replace(workingText, amendmentText, StringUtils.EMPTY, 1);
+            } else {
+                final int firstOcc = StringUtils.indexOf(workingText, amendmentText);
+
+                String amendmentDetails = StringUtils.substring(workingText, 0, firstOcc);
+                Matcher m = AMEND_CASE_NOTE_REGEX.matcher(amendmentDetails);
+
+                if (m.find()) {
+                    amendments.add(CaseNoteAmendment.builder()
+                            .text(amendmentText.trim())
+                            .authorName(m.group(1))
+                            .creationDateTime(typesTransformer.localDateTimeOf(m.group(2)))
+                            .build());
+                }
+
+                workingText = StringUtils.substring(workingText, firstOcc);
+            }
+        }
+
+        return amendments;
     }
 }

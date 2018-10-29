@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @Builder(toBuilder = true)
@@ -23,4 +24,6 @@ public class CaseNote {
     private Long staffId;
     private KeyValue source;
 
+    private List<CaseNoteAmendment> amendments;
 }
+
