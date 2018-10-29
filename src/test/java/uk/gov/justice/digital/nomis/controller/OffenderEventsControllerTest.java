@@ -57,7 +57,7 @@ public class OffenderEventsControllerTest {
         LocalDateTime from = LocalDateTime.of(2018,10,29,0,0);
         LocalDateTime to = from.plusDays(1L);
 
-        OffenderEventsFilter filter = OffenderEventsFilter.builder().from(from.minusYears(1L)).to(to).build();
+        OffenderEventsFilter filter = OffenderEventsFilter.builder().from(from).to(to).build();
         Mockito.when(xtagEventsService.findAll(Matchers.eq(filter))).thenReturn(someXtagEvents(from));
 
         final OffenderEvent[] offenderEvents = given()
