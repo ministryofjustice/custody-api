@@ -37,8 +37,8 @@ public class AttendancesAndExclusionsController {
 
     @RequestMapping(path = "/offenders/offenderId/{offenderId}/courseAttendances", method = RequestMethod.GET)
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "from", dataType = "date", paramType = "query", value = "ISO 8601 Date Time, eg 2017-07-24T09:18:15"),
-            @ApiImplicitParam(name = "to", dataType = "date", paramType = "query", value = "ISO 8601 Date Time, eg 2017-07-24T09:18:15")})
+            @ApiImplicitParam(name = "from", dataType = "date", paramType = "query", value = "ISO 8601 Date Time without zone or offset (local date time), eg 2017-07-24T09:18:15"),
+            @ApiImplicitParam(name = "to", dataType = "date", paramType = "query", value = "ISO 8601 Date Time without zone or offset (local date time), eg 2017-07-24T09:18:15")})
     @ApiResponses({
             @ApiResponse(code = 404, message = "Offender not found"),
             @ApiResponse(code = 200, message = "OK")})
@@ -56,8 +56,8 @@ public class AttendancesAndExclusionsController {
 
     @RequestMapping(path = "/offenders/offenderId/{offenderId}/courseExclusions", method = RequestMethod.GET)
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "from", dataType = "date", paramType = "query", value = "ISO 8601 Date Time, eg 2017-07-24T09:18:15"),
-            @ApiImplicitParam(name = "to", dataType = "date", paramType = "query", value = "ISO 8601 Date Time, eg 2017-07-24T09:18:15")})
+            @ApiImplicitParam(name = "from", dataType = "date", paramType = "query", value = "ISO 8601 Date Time without zone or offset (local date time), eg 2017-07-24T09:18:15"),
+            @ApiImplicitParam(name = "to", dataType = "date", paramType = "query", value = "ISO 8601 Date Time without zone or offset (local date time), eg 2017-07-24T09:18:15")})
     @ApiResponses({
             @ApiResponse(code = 404, message = "Offender not found"),
             @ApiResponse(code = 200, message = "OK")})

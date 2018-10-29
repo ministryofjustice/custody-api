@@ -41,19 +41,27 @@ public class OffenderEventsService {
     public Optional<List<OffenderEvent>> getEvents(Optional<LocalDateTime> maybeFrom,
                                                    Optional<LocalDateTime> maybeTo,
                                                    Optional<Set<String>> maybeTypeFilter) {
-        LocalDateTime from = maybeFrom.orElse(maybeTo.map(to -> to.minusDays(1)).orElse(LocalDate.now().atStartOfDay()));
-        LocalDateTime to = maybeTo.orElse(from.plusDays(1));
+        LocalDateTime from = fromOrDefault(maybeFrom, maybeTo);
+        LocalDateTime to = toOrDefault(maybeTo, from);
 
         final OffenderEventsFilter oeFilter = OffenderEventsFilter.builder().from(from).to(to).types(maybeTypeFilter).build();
         return getFilteredOffenderEvents(oeFilter);
+    }
+
+    private LocalDateTime toOrDefault(Optional<LocalDateTime> maybeTo, LocalDateTime from) {
+        return maybeTo.orElse(from.plusDays(1));
+    }
+
+    private LocalDateTime fromOrDefault(Optional<LocalDateTime> maybeFrom, Optional<LocalDateTime> maybeTo) {
+        return maybeFrom.orElse(maybeTo.map(to -> to.minusDays(1)).orElse(LocalDate.now().atStartOfDay()));
     }
 
     public Optional<List<OffenderEvent>> getEventsForOffenderId(Long offenderId,
                                                                 Optional<LocalDateTime> maybeFrom,
                                                                 Optional<LocalDateTime> maybeTo,
                                                                 Optional<Set<String>> maybeTypeFilter) {
-        LocalDateTime from = maybeFrom.orElse(maybeTo.map(to -> to.minusDays(1)).orElse(LocalDate.now().atStartOfDay()));
-        LocalDateTime to = maybeTo.orElse(from.plusDays(1));
+        LocalDateTime from = fromOrDefault(maybeFrom, maybeTo);
+        LocalDateTime to = toOrDefault(maybeTo, from);
 
         final OffenderEventsFilter offenderEventsFilter = OffenderEventsFilter.builder().from(from).to(to).types(maybeTypeFilter).offenderId(Optional.of(offenderId)).build();
         return getFilteredOffenderEvents(offenderEventsFilter);
