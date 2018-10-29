@@ -1,7 +1,6 @@
 spring:
   datasource:
-    data: 'classpath:CREATE_API_OWNER_SCHEMA.sql,
-          classpath:R__1_2__ADDRESSES.sql,
+    data: 'classpath:R__1_2__ADDRESSES.sql,
           classpath:R__1_4__ASSESSMENTS.sql,
           classpath:R__1_6__CONTACT_PERSON_TYPES.sql,
           classpath:R__1_9__HO_CODES.sql,
@@ -49,13 +48,19 @@ spring:
           classpath:some_offender_sentence_charges.sql,
           classpath:some_offender_rehab_decisions.sql,
           classpath:some_offender_rehab_providers.sql,
-          classpath:some_offender_images.sql'
+          classpath:some_offender_images.sql,
+          classpath:some_offender_events.sql'
 
   jpa:
     hibernate:
       ddl-auto: create
 
+
   h2:
     console:
       enabled: true
+
+hibernate:
+  hbm2ddl:
+
 

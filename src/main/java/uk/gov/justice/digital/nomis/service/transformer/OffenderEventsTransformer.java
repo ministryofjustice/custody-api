@@ -8,11 +8,12 @@ import oracle.sql.Datum;
 import oracle.sql.RAW;
 import oracle.sql.STRUCT;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import uk.gov.justice.digital.nomis.api.OffenderEvent;
-import uk.gov.justice.digital.nomis.jpa.entity.XtagEvent;
-import uk.gov.justice.digital.nomis.mongodb.entity.Xtag;
-import uk.gov.justice.digital.nomis.mongodb.entity.XtagContent;
+import uk.gov.justice.digital.nomis.jpa.entity.XtagEventNonJpa;
+import uk.gov.justice.digital.nomis.xtag.Xtag;
+import uk.gov.justice.digital.nomis.xtag.XtagContent;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -33,7 +34,7 @@ public class OffenderEventsTransformer {
     private final ObjectMapper objectMapper;
 
     @Autowired
-    public OffenderEventsTransformer(TypesTransformer typesTransformer, ObjectMapper objectMapper) {
+    public OffenderEventsTransformer(TypesTransformer typesTransformer, @Qualifier("globalObjectMapper") ObjectMapper objectMapper) {
         this.typesTransformer = typesTransformer;
         this.objectMapper = objectMapper;
     }
@@ -50,41 +51,45 @@ public class OffenderEventsTransformer {
                         .build()).orElse(null);
     }
 
-    public OffenderEvent offenderEventOf(XtagEvent xtagEvent) {
+    public OffenderEvent offenderEventOf(XtagEventNonJpa xtagEvent) {
         try {
             final STRUCT s = xtagEvent.getUserData();
 
-            final Optional<Datum> maybeStruct = Arrays.asList(s.getOracleAttributes()).stream().filter(a -> a instanceof STRUCT).findFirst();
-            final Optional<Datum> maybeRaw = Arrays.asList(s.getOracleAttributes()).stream().filter(a -> a instanceof RAW).findFirst();
-
-            final Optional<String> maybeType = maybeStruct.flatMap(d -> {
-                try {
-                    final STRUCT d1 = (STRUCT) d;
-                    return Optional.ofNullable(d1.getAttributes()[1].toString());
-                } catch (SQLException e) {
-                    log.error(e.getMessage());
-                    return Optional.empty();
-                }
-            });
-
-            final Optional<Map<String, String>> maybeMap = maybeRaw.flatMap(d -> {
-                try {
-                    return Optional.ofNullable(deserialize(d.getBytes()));
-                } catch (IOException | ClassNotFoundException e) {
-                    log.error(e.getMessage());
-                    return Optional.empty();
-                }
-            });
-
-            return offenderEventOf(Xtag.builder()
-                    .eventType(maybeType.orElse("dunno"))
-                    .nomisTimestamp(xtagEvent.getEnqTime().toLocalDateTime())
-                    .content(maybeMap.map(this::xtagContentOf).orElse(null))
-                    .build());
+            return getOffenderEvent(s, xtagEvent.getEnqTime());
         } catch (SQLException e) {
             log.error(e.getMessage());
             return null;
         }
+    }
+
+    private OffenderEvent getOffenderEvent(STRUCT s, Timestamp enqTime) throws SQLException {
+        final Optional<Datum> maybeStruct = Arrays.asList(s.getOracleAttributes()).stream().filter(a -> a instanceof STRUCT).findFirst();
+        final Optional<Datum> maybeRaw = Arrays.asList(s.getOracleAttributes()).stream().filter(a -> a instanceof RAW).findFirst();
+
+        final Optional<String> maybeType = maybeStruct.flatMap(d -> {
+            try {
+                final STRUCT d1 = (STRUCT) d;
+                return Optional.ofNullable(d1.getAttributes()[1].toString());
+            } catch (SQLException e) {
+                log.error(e.getMessage());
+                return Optional.empty();
+            }
+        });
+
+        final Optional<Map<String, String>> maybeMap = maybeRaw.flatMap(d -> {
+            try {
+                return Optional.ofNullable(deserialize(d.getBytes()));
+            } catch (IOException | ClassNotFoundException e) {
+                log.error(e.getMessage());
+                return Optional.empty();
+            }
+        });
+
+        return offenderEventOf(Xtag.builder()
+                .eventType(maybeType.orElse("?"))
+                .nomisTimestamp(enqTime.toLocalDateTime())
+                .content(maybeMap.map(this::xtagContentOf).orElse(null))
+                .build());
     }
 
     private XtagContent xtagContentOf(Map<String, String> map) {
@@ -97,17 +102,7 @@ public class OffenderEventsTransformer {
         }
     }
 
-    private Optional<STRUCT> readStruct(byte[] bytes) {
-        try {
-            final Object o = new ObjectInputStream(new ByteArrayInputStream(bytes)).readObject();
-            return Optional.ofNullable((STRUCT) o);
-        } catch (IOException | ClassNotFoundException e) {
-            log.error(e.getMessage());
-            return Optional.empty();
-        }
-    }
-
-    private Map<String,String> deserialize(byte[] bytes) throws IOException, ClassNotFoundException {
+    private Map<String, String> deserialize(byte[] bytes) throws IOException, ClassNotFoundException {
         final Object o = new ObjectInputStream(new ByteArrayInputStream(bytes)).readObject();
         return (Map<String, String>) o;
     }
@@ -138,8 +133,8 @@ public class OffenderEventsTransformer {
                 return externalMovementRecordEventOf(xtag);
             case "OFF_UPD_OASYS":
                 return !Strings.isNullOrEmpty(xtag.getContent().getP_offender_book_id()) ?
-                    offenderBookingChangedEventOf(xtag) :
-                    offenderDetailsChangedEventOf(xtag);
+                        offenderBookingChangedEventOf(xtag) :
+                        offenderDetailsChangedEventOf(xtag);
             case "ADDR_USG_INS":
                 return addressUsageInsertedEventOf(xtag);
             case "ADDR_USG_UPD":
@@ -176,10 +171,10 @@ public class OffenderEventsTransformer {
                 return !Strings.isNullOrEmpty(xtag.getContent().getP_imprison_status_seq()) ?
                         imprisonmentStatusChangedEventOf(xtag) :
                         !Strings.isNullOrEmpty(xtag.getContent().getP_assessment_seq()) ?
-                            assessmentChangedEventOf(xtag) :
-                            !Strings.isNullOrEmpty(xtag.getContent().getP_alert_date()) ?
-                                alertUpdatedEventOf(xtag) :
-                                alertInsertedEventOf(xtag);
+                                assessmentChangedEventOf(xtag) :
+                                !Strings.isNullOrEmpty(xtag.getContent().getP_alert_date()) ?
+                                        alertUpdatedEventOf(xtag) :
+                                        alertInsertedEventOf(xtag);
             case "OFF_IMP_STAT_OASYS":
                 return imprisonmentStatusChangedEventOf(xtag);
             case "OFF_PROF_DETAIL_INS":
@@ -237,6 +232,7 @@ public class OffenderEventsTransformer {
             default:
                 return OffenderEvent.builder()
                         .eventType(xtag.getEventType())
+                        .eventDatetime(xtag.getNomisTimestamp())
                         .offenderId(longOf(xtag.getContent().getP_offender_id()))
                         .rootOffenderId(longOf(xtag.getContent().getP_root_offender_id()))
                         .bookingId(longOf(xtag.getContent().getP_offender_book_id()))
@@ -248,6 +244,8 @@ public class OffenderEventsTransformer {
         return OffenderEvent.builder()
                 .eventType("OFFENDER_TRANSFER-OUT_OF_LIDS")
                 .bookingId(longOf(xtag.getContent().getP_offender_book_id()))
+                .eventDatetime(xtag.getNomisTimestamp())
+                .nomisEventType(xtag.getEventType())
                 .build();
     }
 
@@ -255,6 +253,8 @@ public class OffenderEventsTransformer {
         return OffenderEvent.builder()
                 .eventType("COURT_SENTENCE-CHANGED")
                 .bookingId(longOf(xtag.getContent().getP_offender_book_id()))
+                .eventDatetime(xtag.getNomisTimestamp())
+                .nomisEventType(xtag.getEventType())
                 .build();
     }
 
@@ -267,6 +267,8 @@ public class OffenderEventsTransformer {
                 .alertType(xtag.getContent().getP_alert_type())
                 .alertCode(xtag.getContent().getP_alert_type())
                 .expiryDateTime(localDateTimeOf(xtag.getContent().getP_expiry_date(), xtag.getContent().getP_expiry_time()))
+                .eventDatetime(xtag.getNomisTimestamp())
+                .nomisEventType(xtag.getEventType())
                 .build();
     }
 
@@ -280,6 +282,8 @@ public class OffenderEventsTransformer {
                 .primaryAddressFlag(xtag.getContent().getP_primary_addr_flag())
                 .mailAddressFlag(xtag.getContent().getP_mail_addr_flag())
                 .personId(longOf(xtag.getContent().getP_person_id()))
+                .eventDatetime(xtag.getNomisTimestamp())
+                .nomisEventType(xtag.getEventType())
                 .build();
     }
 
@@ -293,6 +297,8 @@ public class OffenderEventsTransformer {
                 .primaryAddressFlag(xtag.getContent().getP_primary_addr_flag())
                 .mailAddressFlag(xtag.getContent().getP_mail_addr_flag())
                 .personId(longOf(xtag.getContent().getP_person_id()))
+                .eventDatetime(xtag.getNomisTimestamp())
+                .nomisEventType(xtag.getEventType())
                 .build();
     }
 
@@ -306,6 +312,8 @@ public class OffenderEventsTransformer {
                 .primaryAddressFlag(xtag.getContent().getP_primary_addr_flag())
                 .mailAddressFlag(xtag.getContent().getP_mail_addr_flag())
                 .personId(longOf(xtag.getContent().getP_person_id()))
+                .eventDatetime(xtag.getNomisTimestamp())
+                .nomisEventType(xtag.getEventType())
                 .build();
     }
 
@@ -319,6 +327,8 @@ public class OffenderEventsTransformer {
                 .primaryAddressFlag(xtag.getContent().getP_primary_addr_flag())
                 .mailAddressFlag(xtag.getContent().getP_mail_addr_flag())
                 .personId(longOf(xtag.getContent().getP_person_id()))
+                .eventDatetime(xtag.getNomisTimestamp())
+                .nomisEventType(xtag.getEventType())
                 .build();
     }
 
@@ -332,6 +342,8 @@ public class OffenderEventsTransformer {
                 .primaryAddressFlag(xtag.getContent().getP_primary_addr_flag())
                 .mailAddressFlag(xtag.getContent().getP_mail_addr_flag())
                 .personId(longOf(xtag.getContent().getP_person_id()))
+                .eventDatetime(xtag.getNomisTimestamp())
+                .nomisEventType(xtag.getEventType())
                 .build();
     }
 
@@ -345,6 +357,8 @@ public class OffenderEventsTransformer {
                 .primaryAddressFlag(xtag.getContent().getP_primary_addr_flag())
                 .mailAddressFlag(xtag.getContent().getP_mail_addr_flag())
                 .personId(longOf(xtag.getContent().getP_person_id()))
+                .eventDatetime(xtag.getNomisTimestamp())
+                .nomisEventType(xtag.getEventType())
                 .build();
     }
 
@@ -359,6 +373,8 @@ public class OffenderEventsTransformer {
                 .primaryAddressFlag(xtag.getContent().getP_primary_addr_flag())
                 .mailAddressFlag(xtag.getContent().getP_mail_addr_flag())
                 .personId(longOf(xtag.getContent().getP_person_id()))
+                .eventDatetime(xtag.getNomisTimestamp())
+                .nomisEventType(xtag.getEventType())
                 .build();
     }
 
@@ -368,6 +384,7 @@ public class OffenderEventsTransformer {
                 .eventDatetime(xtag.getNomisTimestamp())
                 .bookingId(longOf(xtag.getContent().getP_offender_book_id()))
                 .sentenceSeq(longOf(xtag.getContent().getP_sentence_seq()))
+                .nomisEventType(xtag.getEventType())
                 .build();
     }
 
@@ -379,6 +396,7 @@ public class OffenderEventsTransformer {
                 .sentenceSeq(longOf(xtag.getContent().getP_sentence_seq()))
                 .conditionCode(xtag.getContent().getP_condition_code())
                 .offenderSentenceConditionId(longOf(xtag.getContent().getP_offender_sent_calculation_id()))
+                .nomisEventType(xtag.getEventType())
                 .build();
     }
 
@@ -387,6 +405,7 @@ public class OffenderEventsTransformer {
                 .eventType("OFFENDER_EMPLOYMENT-INSERTED")
                 .eventDatetime(xtag.getNomisTimestamp())
                 .bookingId(longOf(xtag.getContent().getP_offender_book_id()))
+                .nomisEventType(xtag.getEventType())
                 .build();
     }
 
@@ -395,6 +414,7 @@ public class OffenderEventsTransformer {
                 .eventType("OFFENDER_EMPLOYMENT-UPDATED")
                 .eventDatetime(xtag.getNomisTimestamp())
                 .bookingId(longOf(xtag.getContent().getP_offender_book_id()))
+                .nomisEventType(xtag.getEventType())
                 .build();
     }
 
@@ -403,6 +423,7 @@ public class OffenderEventsTransformer {
                 .eventType("OFFENDER_EMPLOYMENT-DELETED")
                 .eventDatetime(xtag.getNomisTimestamp())
                 .bookingId(longOf(xtag.getContent().getP_offender_book_id()))
+                .nomisEventType(xtag.getEventType())
                 .build();
     }
 
@@ -411,6 +432,8 @@ public class OffenderEventsTransformer {
                 .eventType("PHONE-INSERTED")
                 .ownerId(longOf(xtag.getContent().getP_owner_id()))
                 .ownerClass(xtag.getContent().getP_owner_class())
+                .eventDatetime(xtag.getNomisTimestamp())
+                .nomisEventType(xtag.getEventType())
                 .build();
     }
 
@@ -419,6 +442,8 @@ public class OffenderEventsTransformer {
                 .eventType("PHONE-UPDATED")
                 .ownerId(longOf(xtag.getContent().getP_owner_id()))
                 .ownerClass(xtag.getContent().getP_owner_class())
+                .eventDatetime(xtag.getNomisTimestamp())
+                .nomisEventType(xtag.getEventType())
                 .build();
     }
 
@@ -427,6 +452,8 @@ public class OffenderEventsTransformer {
                 .eventType("PHONE-DELETED")
                 .ownerId(longOf(xtag.getContent().getP_owner_id()))
                 .ownerClass(xtag.getContent().getP_owner_class())
+                .eventDatetime(xtag.getNomisTimestamp())
+                .nomisEventType(xtag.getEventType())
                 .build();
     }
 
@@ -437,6 +464,8 @@ public class OffenderEventsTransformer {
                 .resultSeq(longOf(xtag.getContent().getP_result_seq()))
                 .agencyIncidentId(longOf(xtag.getContent().getP_agency_incident_id()))
                 .chargeSeq(longOf(xtag.getContent().getP_charge_seq()))
+                .eventDatetime(xtag.getNomisTimestamp())
+                .nomisEventType(xtag.getEventType())
                 .build();
     }
 
@@ -450,6 +479,8 @@ public class OffenderEventsTransformer {
                 .oicOffenceId(longOf(xtag.getContent().getP_oic_offence_id()))
                 .pleaFindingCode(longOf(xtag.getContent().getP_plea_finding_code()))
                 .findingCode(longOf(xtag.getContent().getP_finding_code()))
+                .eventDatetime(xtag.getNomisTimestamp())
+                .nomisEventType(xtag.getEventType())
                 .build();
     }
 
@@ -457,6 +488,8 @@ public class OffenderEventsTransformer {
         return OffenderEvent.builder()
                 .eventType("HEARING_DATE-CHANGED")
                 .oicHearingId(longOf(xtag.getContent().getP_oic_hearing_id()))
+                .eventDatetime(xtag.getNomisTimestamp())
+                .nomisEventType(xtag.getEventType())
                 .build();
     }
 
@@ -466,6 +499,7 @@ public class OffenderEventsTransformer {
                 .eventDatetime(xtag.getNomisTimestamp())
                 .bookingId(longOf(xtag.getContent().getP_offender_book_id()))
                 .sentenceCalculationId(longOf(xtag.getContent().getP_offender_sent_calculation_id()))
+                .nomisEventType(xtag.getEventType())
                 .build();
     }
 
@@ -474,6 +508,7 @@ public class OffenderEventsTransformer {
                 .eventType("OFFENDER_PROFILE_DETAILS-UPDATED")
                 .eventDatetime(xtag.getNomisTimestamp())
                 .bookingId(longOf(xtag.getContent().getP_offender_book_id()))
+                .nomisEventType(xtag.getEventType())
                 .build();
     }
 
@@ -482,6 +517,7 @@ public class OffenderEventsTransformer {
                 .eventType("OFFENDER_PROFILE_DETAILS-INSERTED")
                 .eventDatetime(xtag.getNomisTimestamp())
                 .bookingId(longOf(xtag.getContent().getP_offender_book_id()))
+                .nomisEventType(xtag.getEventType())
                 .build();
     }
 
@@ -492,6 +528,7 @@ public class OffenderEventsTransformer {
                 .rootOffenderId(longOf(xtag.getContent().getP_root_offender_id()))
                 .bookingId(longOf(xtag.getContent().getP_offender_book_id()))
                 .alertSeq(longOf(xtag.getContent().getP_alert_seq()))
+                .nomisEventType(xtag.getEventType())
                 .build();
     }
 
@@ -503,6 +540,7 @@ public class OffenderEventsTransformer {
                 .bookingId(longOf(xtag.getContent().getP_offender_book_id()))
                 .alertSeq(longOf(xtag.getContent().getP_alert_seq()))
                 .alertDateTime(localDateTimeOf(xtag.getContent().getP_old_alert_date(), xtag.getContent().getP_old_alert_time()))
+                .nomisEventType(xtag.getEventType())
                 .build();
     }
 
@@ -512,6 +550,7 @@ public class OffenderEventsTransformer {
                 .eventDatetime(xtag.getNomisTimestamp())
                 .bookingId(longOf(xtag.getContent().getP_offender_book_id()))
                 .assessmentSeq(longOf(xtag.getContent().getP_assessment_seq()))
+                .nomisEventType(xtag.getEventType())
                 .build();
     }
 
@@ -521,6 +560,7 @@ public class OffenderEventsTransformer {
                 .eventDatetime(xtag.getNomisTimestamp())
                 .bookingId(longOf(xtag.getContent().getP_offender_book_id()))
                 .imprisonmentStatusSeq(longOf(xtag.getContent().getP_imprison_status_seq()))
+                .nomisEventType(xtag.getEventType())
                 .build();
     }
 
@@ -532,6 +572,7 @@ public class OffenderEventsTransformer {
                 .rootOffenderId(longOf(xtag.getContent().getP_root_offender_id()))
                 .identifierType(xtag.getContent().getP_identifier_type())
                 .identifierValue(xtag.getContent().getP_identifier_value())
+                .nomisEventType(xtag.getEventType())
                 .build();
     }
 
@@ -542,6 +583,7 @@ public class OffenderEventsTransformer {
                 .offenderId(longOf(xtag.getContent().getP_offender_id()))
                 .rootOffenderId(longOf(xtag.getContent().getP_root_offender_id()))
                 .identifierType(xtag.getContent().getP_identifier_type())
+                .nomisEventType(xtag.getEventType())
                 .build();
     }
 
@@ -550,6 +592,7 @@ public class OffenderEventsTransformer {
                 .eventType("EDUCATION_LEVEL-INSERTED")
                 .eventDatetime(xtag.getNomisTimestamp())
                 .bookingId(longOf(xtag.getContent().getP_offender_book_id()))
+                .nomisEventType(xtag.getEventType())
                 .build();
     }
 
@@ -558,6 +601,7 @@ public class OffenderEventsTransformer {
                 .eventType("EDUCATION_LEVEL-UPDATED")
                 .eventDatetime(xtag.getNomisTimestamp())
                 .bookingId(longOf(xtag.getContent().getP_offender_book_id()))
+                .nomisEventType(xtag.getEventType())
                 .build();
     }
 
@@ -566,6 +610,7 @@ public class OffenderEventsTransformer {
                 .eventType("EDUCATION_LEVEL-DELETED")
                 .eventDatetime(xtag.getNomisTimestamp())
                 .bookingId(longOf(xtag.getContent().getP_offender_book_id()))
+                .nomisEventType(xtag.getEventType())
                 .build();
     }
 
@@ -575,6 +620,7 @@ public class OffenderEventsTransformer {
                 .eventDatetime(xtag.getNomisTimestamp())
                 .bookingId(longOf(xtag.getContent().getP_offender_book_id()))
                 .personId(longOf(xtag.getContent().getP_person_id()))
+                .nomisEventType(xtag.getEventType())
                 .build();
     }
 
@@ -584,6 +630,7 @@ public class OffenderEventsTransformer {
                 .eventDatetime(xtag.getNomisTimestamp())
                 .bookingId(longOf(xtag.getContent().getP_offender_book_id()))
                 .personId(longOf(xtag.getContent().getP_person_id()))
+                .nomisEventType(xtag.getEventType())
                 .build();
     }
 
@@ -593,6 +640,7 @@ public class OffenderEventsTransformer {
                 .eventDatetime(xtag.getNomisTimestamp())
                 .bookingId(longOf(xtag.getContent().getP_offender_book_id()))
                 .personId(longOf(xtag.getContent().getP_person_id()))
+                .nomisEventType(xtag.getEventType())
                 .build();
     }
 
@@ -602,6 +650,7 @@ public class OffenderEventsTransformer {
                 .eventDatetime(xtag.getNomisTimestamp())
                 .offenderId(longOf(xtag.getContent().getP_offender_id()))
                 .rootOffenderId(longOf(xtag.getContent().getP_root_offender_id()))
+                .nomisEventType(xtag.getEventType())
                 .build();
     }
 
@@ -612,6 +661,7 @@ public class OffenderEventsTransformer {
                 .offenderId(longOf(xtag.getContent().getP_offender_id()))
                 .rootOffenderId(longOf(xtag.getContent().getP_root_offender_id()))
                 .aliasOffenderId(longOf(xtag.getContent().getP_alias_offender_id()))
+                .nomisEventType(xtag.getEventType())
                 .build();
     }
 
@@ -621,6 +671,7 @@ public class OffenderEventsTransformer {
                 .eventDatetime(xtag.getNomisTimestamp())
                 .addressId(longOf(xtag.getContent().getP_address_id()))
                 .addressUsage(xtag.getContent().getP_address_usage())
+                .nomisEventType(xtag.getEventType())
                 .build();
     }
 
@@ -630,6 +681,7 @@ public class OffenderEventsTransformer {
                 .eventDatetime(xtag.getNomisTimestamp())
                 .addressId(longOf(xtag.getContent().getP_address_id()))
                 .addressUsage(xtag.getContent().getP_address_usage())
+                .nomisEventType(xtag.getEventType())
                 .build();
     }
 
@@ -639,6 +691,7 @@ public class OffenderEventsTransformer {
                 .eventDatetime(xtag.getNomisTimestamp())
                 .addressId(longOf(xtag.getContent().getP_address_id()))
                 .addressUsage(xtag.getContent().getP_address_usage())
+                .nomisEventType(xtag.getEventType())
                 .build();
     }
 
@@ -649,6 +702,7 @@ public class OffenderEventsTransformer {
                 .offenderId(longOf(xtag.getContent().getP_offender_id()))
                 .rootOffenderId(longOf(xtag.getContent().getP_root_offender_id()))
                 .bookingId(longOf(xtag.getContent().getP_offender_book_id()))
+                .nomisEventType(xtag.getEventType())
                 .build();
     }
 
@@ -659,6 +713,7 @@ public class OffenderEventsTransformer {
                 .offenderId(longOf(xtag.getContent().getP_offender_id()))
                 .bookingId(longOf(xtag.getContent().getP_offender_book_id()))
                 .identifierType(xtag.getContent().getP_identifier_type())
+                .nomisEventType(xtag.getEventType())
                 .build();
     }
 
@@ -669,6 +724,7 @@ public class OffenderEventsTransformer {
                 .offenderId(longOf(xtag.getContent().getP_offender_id()))
                 .rootOffenderId(longOf(xtag.getContent().getP_root_offender_id()))
                 .bookingId(longOf(xtag.getContent().getP_offender_book_id()))
+                .nomisEventType(xtag.getEventType())
                 .build();
     }
 
@@ -679,6 +735,7 @@ public class OffenderEventsTransformer {
                 .offenderId(longOf(xtag.getContent().getP_offender_id()))
                 .previousOffenderId(longOf(xtag.getContent().getP_old_offender_id()))
                 .bookingId(longOf(xtag.getContent().getP_offender_book_id()))
+                .nomisEventType(xtag.getEventType())
                 .build();
     }
 
@@ -695,17 +752,21 @@ public class OffenderEventsTransformer {
                 .escortCode(xtag.getContent().getP_escort_code())
                 .fromAgencyLocationId(longOf(xtag.getContent().getP_from_agy_loc_id()))
                 .toAgencyLocationId(longOf(xtag.getContent().getP_to_agy_loc_id()))
+                .nomisEventType(xtag.getEventType())
                 .build();
     }
 
     private String externalMovementEventOf(Xtag xtag) {
         String del = xtag.getContent().getP_record_deleted();
         switch (del) {
-            case "N": return "EXTERNAL_MOVEMENT_RECORD-INSERTED";
-            case "Y": return "EXTERNAL_MOVEMENT_RECORD-DELETED";
-            default: return Strings.isNullOrEmpty(del) ?
-                    "" :
-                    "EXTERNAL_MOVEMENT_RECORD-UPDATED";
+            case "N":
+                return "EXTERNAL_MOVEMENT_RECORD-INSERTED";
+            case "Y":
+                return "EXTERNAL_MOVEMENT_RECORD-DELETED";
+            default:
+                return Strings.isNullOrEmpty(del) ?
+                        "" :
+                        "EXTERNAL_MOVEMENT_RECORD-UPDATED";
         }
     }
 
@@ -715,6 +776,7 @@ public class OffenderEventsTransformer {
                 .eventDatetime(xtag.getNomisTimestamp())
                 .bookingId(longOf(xtag.getContent().getP_offender_book_id()))
                 .movementSeq(longOf(xtag.getContent().getP_movement_seq()))
+                .nomisEventType(xtag.getEventType())
                 .build();
     }
 
@@ -724,6 +786,7 @@ public class OffenderEventsTransformer {
                 .eventDatetime(xtag.getNomisTimestamp())
                 .bookingId(longOf(xtag.getContent().getP_offender_book_id()))
                 .movementSeq(longOf(xtag.getContent().getP_movement_seq()))
+                .nomisEventType(xtag.getEventType())
                 .build();
     }
 
@@ -732,6 +795,7 @@ public class OffenderEventsTransformer {
                 .eventType("MATERNITY_STATUS-INSERTED")
                 .eventDatetime(xtag.getNomisTimestamp())
                 .bookingId(longOf(xtag.getContent().getP_offender_book_id()))
+                .nomisEventType(xtag.getEventType())
                 .build();
     }
 
@@ -740,6 +804,7 @@ public class OffenderEventsTransformer {
                 .eventType("MATERNITY_STATUS-UPDATED")
                 .eventDatetime(xtag.getNomisTimestamp())
                 .bookingId(longOf(xtag.getContent().getP_offender_book_id()))
+                .nomisEventType(xtag.getEventType())
                 .build();
     }
 
@@ -749,6 +814,7 @@ public class OffenderEventsTransformer {
                 .eventDatetime(xtag.getNomisTimestamp())
                 .bookingId(longOf(xtag.getContent().getP_offender_book_id()))
                 .riskPredictorId(longOf(xtag.getContent().getP_offender_risk_predictor_id()))
+                .nomisEventType(xtag.getEventType())
                 .build();
     }
 
@@ -758,6 +824,7 @@ public class OffenderEventsTransformer {
                 .eventDatetime(xtag.getNomisTimestamp())
                 .bookingId(longOf(xtag.getContent().getP_offender_book_id()))
                 .sanctionSeq(longOf(xtag.getContent().getP_sanction_seq()))
+                .nomisEventType(xtag.getEventType())
                 .build();
     }
 
@@ -771,6 +838,7 @@ public class OffenderEventsTransformer {
                 .previousBookingNumber(Optional.ofNullable(xtag.getContent().getP_old_prison_num())
                         .orElse(Optional.ofNullable(xtag.getContent().getP_old_prision_num())
                                 .orElse(xtag.getContent().getP_old_prison_number())))
+                .nomisEventType(xtag.getEventType())
                 .build();
     }
 

@@ -1,4 +1,4 @@
-package uk.gov.justice.digital.nomis.mongodb.entity;
+package uk.gov.justice.digital.nomis.xtag;
 
 import lombok.Builder;
 import lombok.Data;

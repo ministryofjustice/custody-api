@@ -1,12 +1,12 @@
 package uk.gov.justice.digital.nomis.service;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.justice.digital.nomis.api.OffenderEvent;
 import uk.gov.justice.digital.nomis.jpa.filters.OffenderEventsFilter;
-import uk.gov.justice.digital.nomis.jpa.filters.XtagEventsFilter;
 import uk.gov.justice.digital.nomis.jpa.repository.OffenderEventsRepository;
-import uk.gov.justice.digital.nomis.jpa.repository.XtagEventsRepository;
 import uk.gov.justice.digital.nomis.service.transformer.OffenderEventsTransformer;
 
 import java.time.LocalDate;
@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 public class OffenderEventsService {
@@ -28,59 +27,61 @@ public class OffenderEventsService {
 
     private final OffenderEventsTransformer offenderEventsTransformer;
     private final OffenderEventsRepository offenderEventsRepository;
-    private final XtagEventsRepository xtagEventsRepository;
-
+    private final XtagEventsService xtagEventsService;
 
     @Autowired
     public OffenderEventsService(OffenderEventsTransformer offenderEventsTransformer,
                                  OffenderEventsRepository offenderEventsRepository,
-                                 XtagEventsRepository xtagEventsRepository) {
+                                 XtagEventsService xtagEventsService) {
         this.offenderEventsTransformer = offenderEventsTransformer;
         this.offenderEventsRepository = offenderEventsRepository;
-        this.xtagEventsRepository = xtagEventsRepository;
+        this.xtagEventsService = xtagEventsService;
     }
 
     public Optional<List<OffenderEvent>> getEvents(Optional<LocalDateTime> maybeFrom,
-                              Optional<LocalDateTime> maybeTo,
-                              Optional<Set<String>> maybeTypeFilter) {
+                                                   Optional<LocalDateTime> maybeTo,
+                                                   Optional<Set<String>> maybeTypeFilter) {
         LocalDateTime from = maybeFrom.orElse(maybeTo.map(to -> to.minusDays(1)).orElse(LocalDate.now().atStartOfDay()));
         LocalDateTime to = maybeTo.orElse(from.plusDays(1));
 
-        Set<String> typeFilter = maybeTypeFilter
-                .map(types -> types.stream().map(String::toUpperCase).collect(Collectors.toSet()))
-                .orElse(Collections.EMPTY_SET);
-
-        return getFilteredOffenderEvents(typeFilter,
-                OffenderEventsFilter.builder().from(from).to(to).types(maybeTypeFilter).build(),
-                XtagEventsFilter.builder().from(from).to(to).build());
+        final OffenderEventsFilter oeFilter = OffenderEventsFilter.builder().from(from).to(to).types(maybeTypeFilter).build();
+        return getFilteredOffenderEvents(oeFilter);
     }
 
     public Optional<List<OffenderEvent>> getEventsForOffenderId(Long offenderId,
-                                           Optional<LocalDateTime> maybeFrom,
-                                           Optional<LocalDateTime> maybeTo,
-                                           Optional<Set<String>> maybeTypeFilter) {
+                                                                Optional<LocalDateTime> maybeFrom,
+                                                                Optional<LocalDateTime> maybeTo,
+                                                                Optional<Set<String>> maybeTypeFilter) {
         LocalDateTime from = maybeFrom.orElse(maybeTo.map(to -> to.minusDays(1)).orElse(LocalDate.now().atStartOfDay()));
         LocalDateTime to = maybeTo.orElse(from.plusDays(1));
 
-        Set<String> typeFilter = maybeTypeFilter
-                .map(types -> types.stream().map(String::toUpperCase).collect(Collectors.toSet()))
-                .orElse(Collections.EMPTY_SET);
-
-        return getFilteredOffenderEvents(typeFilter,
-                OffenderEventsFilter.builder().from(from).to(to).types(maybeTypeFilter).offenderId(offenderId).build(),
-                XtagEventsFilter.builder().from(from).to(to).build());
+        final OffenderEventsFilter offenderEventsFilter = OffenderEventsFilter.builder().from(from).to(to).types(maybeTypeFilter).offenderId(Optional.of(offenderId)).build();
+        return getFilteredOffenderEvents(offenderEventsFilter);
     }
 
-    private Optional<List<OffenderEvent>> getFilteredOffenderEvents(Set<String> typeFilter, OffenderEventsFilter oeFilter, XtagEventsFilter xtFilter) {
-        Optional<Stream<OffenderEvent>> offenderEvents = Optional.ofNullable(offenderEventsRepository.findAll(oeFilter))
-                .map(ev -> ev.stream().map(offenderEventsTransformer::offenderEventOf));
+    private Optional<List<OffenderEvent>> getFilteredOffenderEvents(OffenderEventsFilter oeFilter) {
 
-        Optional<Stream<OffenderEvent>> xtagEvents = Optional.ofNullable(xtagEventsRepository.findAll(xtFilter))
-                .map(ev -> ev.stream().map(offenderEventsTransformer::offenderEventOf));
+        List<OffenderEvent> offenderEvents = Optional.ofNullable(offenderEventsRepository.findAll(oeFilter))
+                .map(ev -> ev.stream()
+                        .map(offenderEventsTransformer::offenderEventOf)
+                        .collect(Collectors.toList()))
+                .orElse(Collections.emptyList());
 
-        return Optional.of(Stream.concat(offenderEvents.orElse(Stream.empty()), xtagEvents.orElse(Stream.empty()))
+        List<OffenderEvent> xtagEvents = xtagEventsService.findAll(oeFilter)
+                .stream()
+                .filter(oe -> oeFilter.getOffenderId().map(id -> oe.getOffenderId().equals(id)).orElse(true))
+                .collect(Collectors.toList());
+
+        Set<String> typeFilter = oeFilter.getTypes()
+                .map(types -> types.stream().map(String::toUpperCase).collect(Collectors.toSet()))
+                .orElse(ImmutableSet.of());
+
+        List<OffenderEvent> allEvents = ImmutableList.<OffenderEvent>builder().addAll(offenderEvents).addAll(xtagEvents).build();
+
+        return Optional.of(allEvents.stream()
                 .filter(oe -> typeFilter.isEmpty() || typeFilter.contains(oe.getEventType()))
                 .sorted(BY_OFFENDER_EVENT_TIMESTAMP)
                 .collect(Collectors.toList()));
+
     }
 }

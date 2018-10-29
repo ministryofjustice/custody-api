@@ -3,6 +3,7 @@ package uk.gov.justice.digital.nomis.jpa.filters;
 import com.google.common.collect.ImmutableList;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
+import lombok.Value;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.format.annotation.DateTimeFormat;
 import uk.gov.justice.digital.nomis.jpa.entity.OffenderEvent;
@@ -18,6 +19,7 @@ import java.util.Optional;
 import java.util.Set;
 
 @Builder
+@Value
 @EqualsAndHashCode
 public class OffenderEventsFilter implements Specification<OffenderEvent> {
 
@@ -32,7 +34,8 @@ public class OffenderEventsFilter implements Specification<OffenderEvent> {
     @Builder.Default
     private Optional<Set<String>> types = Optional.empty();
 
-    private Long offenderId;
+    @Builder.Default
+    private Optional<Long> offenderId = Optional.empty();
 
     @Override
     public Predicate toPredicate(Root<OffenderEvent> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
@@ -48,6 +51,7 @@ public class OffenderEventsFilter implements Specification<OffenderEvent> {
         Root alertsTable = root;
         Path eventTimestamp = alertsTable.get("eventTimestamp");
         Path eventType = root.get("eventType");
+        Path rootOffenderId = root.get("rootOffenderId");
 
         ImmutableList.Builder<Predicate> predicateBuilder = ImmutableList.builder();
 
@@ -59,6 +63,8 @@ public class OffenderEventsFilter implements Specification<OffenderEvent> {
             filter.add("CASE_NOTE");
             predicateBuilder.add(valueInList(cb, eventType, filter));
         });
+
+        offenderId.ifPresent(id -> predicateBuilder.add(cb.equal(rootOffenderId, id)));
 
         ImmutableList<Predicate> predicates = predicateBuilder.build();
 

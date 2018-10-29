@@ -48,7 +48,7 @@ public class OffenderEventsController {
                                                          @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) final @RequestParam("to") Optional<LocalDateTime> maybeTo,
                                                          final @RequestParam("type") Optional<Set<String>> maybeTypeFilter) {
         return offenderEventsService.getEvents(maybeFrom, maybeTo, maybeTypeFilter)
-                .map(physicalsList -> new ResponseEntity<>(physicalsList, HttpStatus.OK))
+                .map(events -> new ResponseEntity<>(events, HttpStatus.OK))
                 .orElse(new ResponseEntity<>(NOT_FOUND));
     }
 
@@ -67,7 +67,7 @@ public class OffenderEventsController {
                                                                      @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) final @RequestParam("to") Optional<LocalDateTime> maybeTo,
                                                                      final @RequestParam("type") Optional<Set<String>> maybeTypeFilter) {
         return offenderEventsService.getEventsForOffenderId(offenderId, maybeFrom, maybeTo, maybeTypeFilter)
-                .map(physicalsList -> new ResponseEntity<>(physicalsList, HttpStatus.OK))
+                .map(events -> new ResponseEntity<>(events, HttpStatus.OK))
                 .orElse(new ResponseEntity<>(NOT_FOUND));
     }
 }
