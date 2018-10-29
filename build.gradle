@@ -74,7 +74,6 @@ configurations {
 // In this section you declare the dependencies for your production and test code
 dependencies {
     compile files('lib/ojdbc8-12.2.0.1.jar')
-    compile files('lib/aqapi.jar')
 
     compile 'com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.8.0'
     compile 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.8.0'
