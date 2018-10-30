@@ -77,7 +77,7 @@ public class OffenderEventsService {
 
         List<OffenderEvent> xtagEvents = xtagEventsService.findAll(oeFilter)
                 .stream()
-                .filter(oe -> oeFilter.getOffenderId().map(id -> oe.getOffenderId().equals(id)).orElse(true))
+                .filter(oe -> isOffenderRelated(oeFilter, oe))
                 .collect(Collectors.toList());
 
         Set<String> typeFilter = oeFilter.getTypes()
@@ -91,5 +91,12 @@ public class OffenderEventsService {
                 .sorted(BY_OFFENDER_EVENT_TIMESTAMP)
                 .collect(Collectors.toList()));
 
+    }
+
+    private Boolean isOffenderRelated(OffenderEventsFilter oeFilter, OffenderEvent oe) {
+        return oeFilter.getOffenderId().map(id -> id.equals(oe.getOffenderId()) ||
+                id.equals(oe.getRootOffenderId()) ||
+                (id.equals(oe.getOwnerId()) && "OFF".equals(oe.getOwnerClass())))
+                .orElse(true);
     }
 }

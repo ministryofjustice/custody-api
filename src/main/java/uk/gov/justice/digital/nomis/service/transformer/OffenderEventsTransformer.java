@@ -186,7 +186,7 @@ public class OffenderEventsTransformer {
             case "A2_CALLBACK":
                 return hearingDateChangedEventOf(xtag);
             case "A2_RESULT":
-                return xtag.getContent().getP_delete_flag().equals("Y") ?
+                return "Y".equals(xtag.getContent().getP_delete_flag()) ?
                         hearingResultDeletedEventOf(xtag) :
                         hearingResultChangedEventOf(xtag);
             case "PHONES_INS":
