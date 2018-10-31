@@ -49,9 +49,9 @@ public class MilitaryRecordsController {
             @ApiImplicitParam(name = "size", dataType = "int", paramType = "query",
                     value = "Number of records per page."),
             @ApiImplicitParam(name = "from", dataType = "date", paramType = "query",
-                    value = "ISO 8601 Date Time, eg 2017-07-24T09:18:15"),
+                    value = "ISO 8601 Date Time without zone or offset (local date time), eg 2017-07-24T09:18:15"),
             @ApiImplicitParam(name = "to", dataType = "date", paramType = "query",
-                    value = "ISO 8601 Date Time, eg 2017-07-24T09:18:15")})
+                    value = "ISO 8601 Date Time without zone or offset (local date time), eg 2017-07-24T09:18:15")})
     public PagedResources<Resource<MilitaryRecord>> getMilitaryRecords(final @ApiIgnore Pageable pageable,
                                                                        final PagedResourcesAssembler<MilitaryRecord> assembler,
                                                                        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) final @RequestParam("from") Optional<LocalDateTime> maybeFrom,

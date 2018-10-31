@@ -3,7 +3,7 @@ server:
 
 spring:
   datasource:
-    url: 'jdbc:h2:mem:testdb;Mode=Oracle'
+    url: 'jdbc:h2:mem:testdb;Mode=Oracle;INIT=CREATE SCHEMA IF NOT EXISTS API_OWNER'
     type: com.zaxxer.hikari.HikariDataSource
 
   h2:

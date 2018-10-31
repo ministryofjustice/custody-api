@@ -29,11 +29,11 @@ public class OffenderEvent {
     @Column(name = "AGY_LOC_ID")
     private String agencyLocId;
 
-    @Column(name = "EVENT_DATA_1")
+    @Column(name = "EVENT_DATA_1", length = 4000)
     private String eventData1;
-    @Column(name = "EVENT_DATA_2")
+    @Column(name = "EVENT_DATA_2", length = 4000)
     private String eventData2;
-    @Column(name = "EVENT_DATA_3")
+    @Column(name = "EVENT_DATA_3", length = 4000)
     private String eventData3;
 
     @Column(name = "CREATE_USER_ID")

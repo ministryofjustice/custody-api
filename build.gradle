@@ -31,6 +31,7 @@ apply plugin: 'java'
 def dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
 def dateOnlyFormat = new SimpleDateFormat("yyyy-MM-dd")
 def today = dateOnlyFormat.format(new Date())
+def profile = project.findProperty('spring.profiles.active')
 version today
 
 springBoot {
@@ -97,8 +98,9 @@ dependencies {
     compile 'com.microsoft.azure:applicationinsights-logging-logback:2.1.2'
 
     compileOnly 'org.projectlombok:lombok:1.16.18'
-
+    
     testRuntime 'com.h2database:h2:1.4.196'
+
     runtime 'com.h2database:h2:1.4.196'
 
     testCompile 'org.codehaus.groovy.modules.http-builder:http-builder:0.7.1'
