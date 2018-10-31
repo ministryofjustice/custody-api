@@ -1,4 +1,4 @@
-# New Nomis API
+# Custody API
 New Tech Nomis: Offender API.
 
 The service provides REST access to the Nomis Oracle DB offender information.
