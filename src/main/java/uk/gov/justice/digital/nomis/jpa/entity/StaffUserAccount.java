@@ -1,22 +1,8 @@
 package uk.gov.justice.digital.nomis.jpa.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
-import javax.persistence.PrimaryKeyJoinColumn;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -40,6 +26,10 @@ public class StaffUserAccount {
 
     @Column(name = "STAFF_USER_TYPE", nullable = false)
     private String type;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "WORKING_CASELOAD_ID")
+    private Caseload activeCaseload;
 
     @OneToMany
     @JoinColumn(name = "USERNAME")

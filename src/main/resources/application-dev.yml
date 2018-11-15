@@ -2,6 +2,7 @@ spring:
   datasource:
     data: 'classpath:R__1_2__ADDRESSES.sql,
           classpath:R__1_4__ASSESSMENTS.sql,
+          classpath:R__1_5_1__CASELOADS.sql,
           classpath:R__1_6__CONTACT_PERSON_TYPES.sql,
           classpath:R__1_9__HO_CODES.sql,
           classpath:R__1_10__IMPRISONMENT_STATUSES.sql,
@@ -15,6 +16,7 @@ spring:
           classpath:R__2_2__OFFENCES.sql,
           classpath:R__2_3__REFERENCE_CODES.sql,
           classpath:R__3_2__AGENCY_INTERNAL_LOCATIONS.sql,
+          classpath:R__3_3__CASELOAD_AGENCY_LOCATIONS.sql,
           classpath:R__3_4__COURSE_ACTIVITIES.sql,
           classpath:R__3_5__IEP_LEVELS.sql,
           classpath:R__3_6_1__OFFENDER_BOOKINGS.sql,
