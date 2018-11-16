@@ -10,15 +10,15 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder(toBuilder = true)
-@EqualsAndHashCode(of = {"agencyLocationId", "caseload"})
+@EqualsAndHashCode(of = {"agencyLocationId", "caseloadId"})
 @Embeddable
-@ToString(of = {"agencyLocationId", "caseload"})
+@ToString(of = {"agencyLocationId", "caseloadId"})
 public class CaseloadAgencyIdentity implements Serializable {
 
     @Column(name = "AGY_LOC_ID")
     private String agencyLocationId;
 
     @Column(name = "caseload_id")
-    private String caseload;
+    private String caseloadId;
 
 }

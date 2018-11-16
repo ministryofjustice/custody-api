@@ -21,7 +21,9 @@ public class CaseloadTransformer {
                 .id(caseload.getId())
                 .name(caseload.getName())
                 .type(caseload.getType())
-                .agencyLocations(caseload.getAgencyLocations().stream().map(agency -> referenceDataTransformer.agencyLocationOf(agency.getAgencyLocation())).collect(Collectors.toList()))
+                .agencies(caseload.getAgencyLocations().stream()
+                        .map(agency -> referenceDataTransformer.agencyLocationOf(agency.getAgencyLocation()))
+                        .collect(Collectors.toList()))
                 .build();
     }
 
