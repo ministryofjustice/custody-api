@@ -1,5 +1,6 @@
 package uk.gov.justice.digital.nomis.jpa.entity;
 
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -10,7 +11,10 @@ import lombok.ToString;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import java.util.List;
 
 @Entity
 @Table(name = "CASELOADS")
@@ -32,4 +36,7 @@ public class Caseload {
     @Column(name = "CASELOAD_TYPE")
     private String type;
 
+    @OneToMany
+    @JoinColumn(name = "CASELOAD_ID")
+    private List<CaseloadAgencyLocation> agencyLocations;
 }

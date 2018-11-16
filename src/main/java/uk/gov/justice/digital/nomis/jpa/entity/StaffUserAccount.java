@@ -10,6 +10,7 @@ import lombok.ToString;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -40,6 +41,10 @@ public class StaffUserAccount {
 
     @Column(name = "STAFF_USER_TYPE", nullable = false)
     private String type;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "WORKING_CASELOAD_ID")
+    private Caseload activeCaseload;
 
     @OneToMany
     @JoinColumn(name = "USERNAME")

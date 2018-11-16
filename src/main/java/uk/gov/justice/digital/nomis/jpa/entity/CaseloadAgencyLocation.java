@@ -15,29 +15,28 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import java.io.Serializable;
-import java.time.LocalDate;
 
 @Entity
-@Table(name = "USER_ACCESSIBLE_CASELOADS")
+@Table(name = "CASELOAD_AGENCY_LOCATIONS")
 @Data()
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder(toBuilder = true)
-@EqualsAndHashCode(of = {"caseload", "staffUser"})
-@ToString(of = {"caseload", "staffUser", "startDate"})
-public class UserAccessibleCaseload implements Serializable {
+@EqualsAndHashCode(of = {"caseload", "agencyLocation"})
+@ToString(of = {"caseload", "agencyLocation", "updateAllowedFlag"})
+public class CaseloadAgencyLocation implements Serializable {
 
     @EmbeddedId
-    private UserCaseloadIdentity id;
+    private CaseloadAgencyIdentity id;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "CASELOAD_ID", updatable = false, insertable = false)
     private Caseload caseload;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "USERNAME", updatable = false, insertable = false)
-    private StaffUserAccount staffUser;
+    @JoinColumn(name = "AGY_LOC_ID", updatable = false, insertable = false)
+    private AgencyLocation agencyLocation;
 
-    @Column(name = "START_DATE")
-    private LocalDate startDate;
+    @Column(name = "UPDATE_ALLOWED_FLAG")
+    private String updateAllowedFlag;
 }
