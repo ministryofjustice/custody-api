@@ -11,23 +11,23 @@ import org.hibernate.validator.constraints.NotBlank;
 
 import java.util.Map;
 
-@ApiModel(description = "Staff User")
+@ApiModel(description = "NOMIS Staff User")
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class StaffUser {
+public class NomisStaffUser {
 
-    @ApiModelProperty(required = true, value = "Identifies the staff user by username.", example = "ITAG_USER", position = 0)
+    @ApiModelProperty(required = true, value = "Identifies the NOMIS staff user by username.", example = "ITAG_USER", position = 0)
     @NotBlank
     private String username;
 
-    @ApiModelProperty(required = true, value = "Identifies the staff user by staff ID.", example = "3423234", position = 1)
+    @ApiModelProperty(required = true, value = "Identifies the NOMIS staff user by staff ID.", example = "3423234", position = 1)
     @NotBlank
     private Long staffId;
 
-    @ApiModelProperty(required = true, value = "First name of the member of staff", example = "John", position = 2)
+    @ApiModelProperty(required = true, value = "First name of the member of NOMIS staff", example = "John", position = 2)
     @NotBlank
     private String firstName;
 
@@ -39,10 +39,10 @@ public class StaffUser {
     @NotBlank
     private String status;
 
-    @ApiModelProperty(value = "Current active caseload for this staff user", example = "MDI", position = 5)
-    private String activeCaseload;
+    @ApiModelProperty(value = "Current active NOMIS caseload for this staff user", example = "MDI", position = 5)
+    private String activeNomisCaseload;
 
-    @ApiModelProperty(value = "Map of Caseload that this staff user has access to", position = 6)
-    private Map<String, Caseload> caseloads;
+    @ApiModelProperty(value = "Map of NOMIS Caseload that this staff user has access to", position = 6)
+    private Map<String, NomisCaseload> nomisCaseloads;
 }
 

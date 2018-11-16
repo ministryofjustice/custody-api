@@ -2,7 +2,7 @@ package uk.gov.justice.digital.nomis.service.transformer;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import uk.gov.justice.digital.nomis.api.StaffUser;
+import uk.gov.justice.digital.nomis.api.NomisStaffUser;
 import uk.gov.justice.digital.nomis.jpa.entity.StaffUserAccount;
 
 import java.util.stream.Collectors;
@@ -17,28 +17,28 @@ public class StaffUserTransformer {
         this.caseloadTransformer = caseloadTransformer;
     }
 
-    public StaffUser userOf(StaffUserAccount staffUserAccount) {
-        StaffUser staffUser = StaffUser.builder()
+    public NomisStaffUser userOf(StaffUserAccount staffUserAccount) {
+        NomisStaffUser nomisStaffUser = NomisStaffUser.builder()
                 .username(staffUserAccount.getUsername())
                 .firstName(staffUserAccount.getStaff().getFirstName())
                 .lastName(staffUserAccount.getStaff().getLastName())
                 .staffId(staffUserAccount.getStaff().getStaffId())
                 .status(staffUserAccount.getStaff().getStatus())
-                .caseloads(staffUserAccount.getCaseloads().stream()
+                .nomisCaseloads(staffUserAccount.getCaseloads().stream()
                         .collect(Collectors.toMap(uac -> uac.getCaseload().getId(), uac -> caseloadTransformer.caseloadsOf(uac.getCaseload()))))
                 .build();
 
         // mark which caseload is current
         if (staffUserAccount.getActiveCaseload() != null) {
-            staffUser.getCaseloads().values().stream()
+            nomisStaffUser.getNomisCaseloads().values().stream()
                     .filter(c -> c.getId().equals(staffUserAccount.getActiveCaseload().getId()))
                     .findFirst()
                     .ifPresent(f -> f.setCurrentActive(true));
 
-            staffUser.setActiveCaseload(staffUserAccount.getActiveCaseload().getId());
+            nomisStaffUser.setActiveNomisCaseload(staffUserAccount.getActiveCaseload().getId());
         }
 
-        return staffUser;
+        return nomisStaffUser;
 
 
     }

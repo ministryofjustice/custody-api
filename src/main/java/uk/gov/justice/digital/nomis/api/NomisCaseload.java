@@ -11,18 +11,18 @@ import org.hibernate.validator.constraints.NotBlank;
 
 import java.util.List;
 
-@ApiModel(description = "Caseload")
+@ApiModel(description = "NOMIS Caseload")
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class Caseload {
+public class NomisCaseload {
     @ApiModelProperty(required = true, value = "Identifier for the caseload", example = "CADM_I", position = 0)
     @NotBlank
     private String id;
 
-    @ApiModelProperty(required = true, value = "Name of the caseload.", example = "Central Caseload", position = 1)
+    @ApiModelProperty(required = true, value = "Name of the caseload.", example = "Central NomisCaseload", position = 1)
     @NotBlank
     private String name;
 

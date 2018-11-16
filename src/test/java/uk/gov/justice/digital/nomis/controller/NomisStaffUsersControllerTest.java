@@ -14,8 +14,8 @@ import org.springframework.boot.context.embedded.LocalServerPort;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import uk.gov.justice.digital.nomis.api.Caseload;
-import uk.gov.justice.digital.nomis.api.StaffUser;
+import uk.gov.justice.digital.nomis.api.NomisCaseload;
+import uk.gov.justice.digital.nomis.api.NomisStaffUser;
 
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -24,7 +24,7 @@ import static org.hamcrest.Matchers.greaterThan;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @RunWith(SpringJUnit4ClassRunner.class)
 @ActiveProfiles("dev")
-public class StaffUsersControllerTest {
+public class NomisStaffUsersControllerTest {
 
     @LocalServerPort
     int port;
@@ -46,60 +46,60 @@ public class StaffUsersControllerTest {
 
     @Test
     public void canGetUserDetails() {
-        StaffUser staffUser = given()
+        NomisStaffUser nomisStaffUser = given()
                 .when()
                 .auth().oauth2(validOauthToken)
-                .get("/staffusers/ITAG_USER")
+                .get("/nomis-staff-users/ITAG_USER")
                 .then()
                 .statusCode(200)
                 .extract()
                 .body()
-                .as(StaffUser.class);
+                .as(NomisStaffUser.class);
 
-        assertThat(staffUser.getUsername()).isEqualTo("ITAG_USER");
-        assertThat(staffUser.getStaffId()).isEqualTo(1);
-        assertThat(staffUser.getFirstName()).isEqualTo("ITAG");
-        assertThat(staffUser.getLastName()).isEqualTo("USER");
-        assertThat(staffUser.getStatus()).isEqualTo("ACTIVE");
-        assertThat(staffUser.getCaseloads().values().size()).isEqualTo(2);
-        String activeCaseload = staffUser.getActiveCaseload();
+        assertThat(nomisStaffUser.getUsername()).isEqualTo("ITAG_USER");
+        assertThat(nomisStaffUser.getStaffId()).isEqualTo(1);
+        assertThat(nomisStaffUser.getFirstName()).isEqualTo("ITAG");
+        assertThat(nomisStaffUser.getLastName()).isEqualTo("USER");
+        assertThat(nomisStaffUser.getStatus()).isEqualTo("ACTIVE");
+        assertThat(nomisStaffUser.getNomisCaseloads().values().size()).isEqualTo(2);
+        String activeCaseload = nomisStaffUser.getActiveNomisCaseload();
         assertThat(activeCaseload).isEqualTo("MDI");
-        Caseload mdiCaseload = staffUser.getCaseloads().get(activeCaseload);
-        assertThat(mdiCaseload.getAgencies().size()).isEqualTo(1);
-        assertThat(mdiCaseload.isCurrentActive()).isTrue();
-        assertThat(mdiCaseload.getAgencies().get(0).getAgencyLocationId()).isEqualTo("MDI");
+        NomisCaseload mdiNomisCaseload = nomisStaffUser.getNomisCaseloads().get(activeCaseload);
+        assertThat(mdiNomisCaseload.getAgencies().size()).isEqualTo(1);
+        assertThat(mdiNomisCaseload.isCurrentActive()).isTrue();
+        assertThat(mdiNomisCaseload.getAgencies().get(0).getAgencyLocationId()).isEqualTo("MDI");
     }
 
     @Test
     public void canGetUserDetailsMultipleAgencies() {
-        StaffUser staffUser = given()
+        NomisStaffUser nomisStaffUser = given()
                 .when()
                 .auth().oauth2(validOauthToken)
-                .get("/staffusers/ITAG_USER_ADM")
+                .get("/nomis-staff-users/ITAG_USER_ADM")
                 .then()
                 .statusCode(200)
                 .extract()
                 .body()
-                .as(StaffUser.class);
+                .as(NomisStaffUser.class);
 
-        assertThat(staffUser.getUsername()).isEqualTo("ITAG_USER_ADM");
-        assertThat(staffUser.getStaffId()).isEqualTo(1);
-        assertThat(staffUser.getFirstName()).isEqualTo("ITAG");
-        assertThat(staffUser.getLastName()).isEqualTo("USER");
-        assertThat(staffUser.getStatus()).isEqualTo("ACTIVE");
-        assertThat(staffUser.getCaseloads().values().size()).isEqualTo(2);
-        String activeCaseload = staffUser.getActiveCaseload();
+        assertThat(nomisStaffUser.getUsername()).isEqualTo("ITAG_USER_ADM");
+        assertThat(nomisStaffUser.getStaffId()).isEqualTo(1);
+        assertThat(nomisStaffUser.getFirstName()).isEqualTo("ITAG");
+        assertThat(nomisStaffUser.getLastName()).isEqualTo("USER");
+        assertThat(nomisStaffUser.getStatus()).isEqualTo("ACTIVE");
+        assertThat(nomisStaffUser.getNomisCaseloads().values().size()).isEqualTo(2);
+        String activeCaseload = nomisStaffUser.getActiveNomisCaseload();
         assertThat(activeCaseload).isNull();
-        Caseload mdiCaseload = staffUser.getCaseloads().get("CADM");
-        assertThat(mdiCaseload.getAgencies().size()).isEqualTo(4);
+        NomisCaseload mdiNomisCaseload = nomisStaffUser.getNomisCaseloads().get("CADM");
+        assertThat(mdiNomisCaseload.getAgencies().size()).isEqualTo(4);
     }
 
     @Test
-    public void canGetAllOffenders() {
+    public void canGetAllStaffUsers() {
         given()
                 .when()
                 .auth().oauth2(validOauthToken)
-                .get("/staffusers")
+                .get("/nomis-staff-users")
                 .then()
                 .statusCode(200)
                 .body("page.totalElements", greaterThan(0));
@@ -109,7 +109,7 @@ public class StaffUsersControllerTest {
     public void userDetailsAreAuthorized() {
         given()
                 .when()
-                .get("/staffusers/ITAG_USER")
+                .get("/nomis-staff-users/ITAG_USER")
                 .then()
                 .statusCode(401);
     }

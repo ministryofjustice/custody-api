@@ -2,7 +2,8 @@ package uk.gov.justice.digital.nomis.service.transformer;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import uk.gov.justice.digital.nomis.api.Caseload;
+import uk.gov.justice.digital.nomis.api.NomisCaseload;
+import uk.gov.justice.digital.nomis.jpa.entity.Caseload;
 
 import java.util.stream.Collectors;
 
@@ -16,8 +17,8 @@ public class CaseloadTransformer {
         this.referenceDataTransformer = referenceDataTransformer;
     }
 
-    public Caseload caseloadsOf(uk.gov.justice.digital.nomis.jpa.entity.Caseload caseload) {
-        return Caseload.builder()
+    public NomisCaseload caseloadsOf(Caseload caseload) {
+        return NomisCaseload.builder()
                 .id(caseload.getId())
                 .name(caseload.getName())
                 .type(caseload.getType())
