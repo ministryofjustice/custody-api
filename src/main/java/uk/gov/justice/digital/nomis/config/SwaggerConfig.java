@@ -11,9 +11,11 @@ import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.service.ApiInfo;
 import springfox.documentation.service.Contact;
 import springfox.documentation.spi.DocumentationType;
+import springfox.documentation.spring.web.paths.RelativePathProvider;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
+import javax.servlet.ServletContext;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.Collections;
@@ -31,10 +33,16 @@ public class SwaggerConfig {
     private ApplicationContext applicationContext;
 
     @Bean
-    public Docket offenderApi() {
+    public Docket offenderApi(ServletContext servletContext) {
         Docket docket = new Docket(DocumentationType.SWAGGER_2)
                 .useDefaultResponseMessages(false)
                 .apiInfo(apiInfo())
+                .pathProvider(new RelativePathProvider(servletContext) {
+                    @Override
+                    public String getApplicationBasePath() {
+                        return "/custodyapi";
+                    }
+                })
                 .select()
                 .apis(RequestHandlerSelectors.any())
                 .paths(Predicates
@@ -64,14 +72,14 @@ public class SwaggerConfig {
         return new ApiInfo(
                 "Custody API Documentation",
                 "A RESTful API service for accessing HMPPS Custody Information.",
-                buildProperties.getVersion(), "", contactInfo(), "", "",
+                buildProperties.getVersion(), "", contactInfo(), "Apache 2.0", "http://www.apache.org/licenses/LICENSE-2.0",
                 Collections.emptyList());
     }
 
     private Contact contactInfo() {
         return new Contact(
-                "Benezet IT Ltd",
+                "HMPPS Digital Studio",
                 "",
-                "hmpps.enquiries@benezet.co.uk");
+                "feedback@digital.justice.gov.uk");
     }
 }

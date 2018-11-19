@@ -67,9 +67,6 @@ repositories {
     mavenLocal()
 }
 
-configurations {
-    compile.exclude module: "spring-boot-starter-tomcat"
-}
 
 // In this section you declare the dependencies for your production and test code
 dependencies {
@@ -78,7 +75,6 @@ dependencies {
     compile 'com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.8.0'
     compile 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.8.0'
     compile 'org.springframework.boot:spring-boot-starter-web'
-    compile 'org.springframework.boot:spring-boot-starter-jetty'
     compile 'org.springframework.boot:spring-boot-starter-data-jpa'
     compile 'org.springframework.boot:spring-boot-starter-actuator'
     compile 'org.springframework.boot:spring-boot-starter-security'
