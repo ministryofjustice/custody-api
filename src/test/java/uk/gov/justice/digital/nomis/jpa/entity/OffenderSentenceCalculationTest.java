@@ -25,7 +25,7 @@ public class OffenderSentenceCalculationTest {
     }
 
     @Test
-    public void firstNonNullDateOBehavesAppropriately() {
+    public void firstNonNullDateOfBehavesAppropriately() {
         final OffenderSentCalculation offenderSentenceCalculation = OffenderSentCalculation.builder().build();
 
         final Timestamp now = Timestamp.valueOf(LocalDateTime.now());

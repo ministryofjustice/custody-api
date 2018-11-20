@@ -25,7 +25,7 @@ public class SentencesService {
 
     private static final Comparator<? super OffenderSentence> BY_SENTENCE_PRIORITY = Comparator
             .comparing(OffenderSentence::getSentenceStatus)
-                .thenComparing(OffenderSentence::getSentenceSeq);
+            .thenComparing(OffenderSentence::getSentenceSeq);
     private final OffenderSentencesRepository offenderSentencesRepository;
     private final OffenderRepository offenderRepository;
     private final SentenceTransformer sentenceTransformer;
@@ -81,5 +81,4 @@ public class SentencesService {
                         .map(sentenceTransformer::sentenceOf)
                         .collect(Collectors.toList()));
     }
-
 }
