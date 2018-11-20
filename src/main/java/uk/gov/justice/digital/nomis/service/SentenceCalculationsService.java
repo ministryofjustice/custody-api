@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.gov.justice.digital.nomis.api.SentenceCalculation;
 import uk.gov.justice.digital.nomis.jpa.entity.Offender;
 import uk.gov.justice.digital.nomis.jpa.entity.OffenderBooking;
+import uk.gov.justice.digital.nomis.jpa.filters.SentenceCalculationsFilter;
 import uk.gov.justice.digital.nomis.jpa.repository.OffenderRepository;
 import uk.gov.justice.digital.nomis.jpa.repository.OffenderSentenceCalculationsRepository;
 import uk.gov.justice.digital.nomis.service.transformer.SentenceCalculationsTransformer;
@@ -17,12 +18,12 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional(readOnly = true)
 public class SentenceCalculationsService {
-
-
 
     private static final Comparator<SentenceCalculation> BY_CALCULATION_DATE = Comparator
             .comparing(SentenceCalculation::getSentenceCalculationId)
@@ -38,10 +39,12 @@ public class SentenceCalculationsService {
         this.offenderRepository = offenderRepository;
     }
 
-
-    @Transactional
-    public Page<SentenceCalculation> getSentenceCalculations(Pageable pageable) {
-        Page<uk.gov.justice.digital.nomis.jpa.entity.OffenderSentCalculation> rawSentenceCalcsPage = sentenceCalculationsRepository.findAll(pageable);
+    public Page<SentenceCalculation> getSentenceCalculations(Pageable pageable, Set<Long> bookingIds) {
+        Page<uk.gov.justice.digital.nomis.jpa.entity.OffenderSentCalculation> rawSentenceCalcsPage = sentenceCalculationsRepository.findAll(
+                SentenceCalculationsFilter.builder()
+                        .bookingIds(bookingIds)
+                        .build(),
+                pageable);
 
         List<SentenceCalculation> sentenceCalculations = rawSentenceCalcsPage.getContent()
                 .stream()

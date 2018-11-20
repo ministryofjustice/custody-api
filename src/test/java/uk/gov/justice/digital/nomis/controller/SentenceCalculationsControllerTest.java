@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.restassured.RestAssured;
 import io.restassured.config.ObjectMapperConfig;
 import io.restassured.config.RestAssuredConfig;
+import org.assertj.core.groups.Tuple;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -14,7 +15,9 @@ import org.springframework.boot.context.embedded.LocalServerPort;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import uk.gov.justice.digital.nomis.api.HealthProblem;
+import uk.gov.justice.digital.nomis.api.SentenceCalculation;
+
+import java.util.List;
 
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -56,7 +59,7 @@ public class SentenceCalculationsControllerTest {
 
     @Test
     public void canGetOffenderSentenceCalculations() {
-        HealthProblem[] healthProblems = given()
+        SentenceCalculation[] sentenceCalculations = given()
                 .when()
                 .auth().oauth2(validOauthToken)
                 .get("/offenders/offenderId/-1001/sentenceCalculations")
@@ -64,9 +67,26 @@ public class SentenceCalculationsControllerTest {
                 .statusCode(200)
                 .extract()
                 .body()
-                .as(HealthProblem[].class);
+                .as(SentenceCalculation[].class);
 
-        assertThat(healthProblems.length).isGreaterThan(0);
+        assertThat(sentenceCalculations.length).isGreaterThan(0);
+    }
+
+    @Test
+    public void canGetBookingIdSentenceCalculations() {
+        List<SentenceCalculation> sentenceCalculations = given()
+                .when()
+                .auth().oauth2(validOauthToken)
+                .get("/sentenceCalculations?bookingId=-6&bookingId=-5")
+                .then()
+                .statusCode(200)
+                .extract()
+                .body()
+                .path("_embedded.sentenceCalculationList");
+
+        assertThat(sentenceCalculations).asList().extracting("sentenceCalculationId", "bookingId", "calcReasonCode", "releaseDate").
+                contains(Tuple.tuple(-6, -5, "NEW", "2023-05-07"),
+                        Tuple.tuple(-7, -6, "NEW", "2018-05-15"));
     }
 
     @Test
