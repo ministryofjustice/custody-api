@@ -13,7 +13,7 @@ https://circleci.com/gh/noms-digital-studio/custody-api
 ./gradlew build
 ```
 
-### Assessmble the app
+### Assemble the app
 ```
 ./gradlew assemble
 ```
@@ -21,7 +21,7 @@ https://circleci.com/gh/noms-digital-studio/custody-api
 This makes the JAR executable by including a manifest. 
 
 ### Start the application dev profile
-This profile starts the application additional configuration this mode uses an in memory H2 (empty) database and is
+This profile starts the application additional configuration. This mode uses an in memory H2 (empty) database and is
 populated with a sample data set
 
 ```
@@ -34,7 +34,7 @@ SPRING_PROFILES_ACTIVE=oracle SPRING_DATASOURCE_URL=jdbc:oracle:thin:@<VM Oracle
 ```
 
 ### Additional configuration
-The application is conigured with conventional Spring parameters.
+The application is configured with conventional Spring parameters.
 The Spring documentation can be found here:
 
 https://docs.spring.io/spring-boot/docs/current/reference/html/common-application-properties.html

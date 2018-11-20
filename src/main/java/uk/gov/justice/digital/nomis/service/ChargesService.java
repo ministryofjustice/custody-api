@@ -11,17 +11,16 @@ import uk.gov.justice.digital.nomis.jpa.entity.Offence;
 import uk.gov.justice.digital.nomis.jpa.entity.Offender;
 import uk.gov.justice.digital.nomis.jpa.entity.OffenderBooking;
 import uk.gov.justice.digital.nomis.jpa.entity.OffenderCharge;
+import uk.gov.justice.digital.nomis.jpa.filters.ChargesFilter;
 import uk.gov.justice.digital.nomis.jpa.repository.OffenderChargesRepository;
 import uk.gov.justice.digital.nomis.jpa.repository.OffenderRepository;
 import uk.gov.justice.digital.nomis.service.transformer.ChargesTransformer;
 
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional(readOnly = true)
 public class ChargesService {
 
     private static final Comparator<OffenderCharge> BY_OFFENCE_RANK = Comparator
@@ -42,10 +41,12 @@ public class ChargesService {
         this.chargesTransformer = chargesTransformer;
     }
 
-    @Transactional
-    public Page<Charge> getCharges(Pageable pageable) {
-
-        Page<OffenderCharge> offenderCharges = offenderChargesRepository.findAll(pageable);
+    public Page<Charge> getCharges(Pageable pageable, Set<Long> bookingIds) {
+        Page<OffenderCharge> offenderCharges = offenderChargesRepository.findAll(
+                ChargesFilter.builder()
+                        .bookingIds(bookingIds)
+                        .build(),
+                pageable);
 
         List<Charge> chargesList = offenderCharges.getContent()
                 .stream()

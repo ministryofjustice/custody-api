@@ -25,6 +25,7 @@ import uk.gov.justice.digital.nomis.service.ChargesService;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
@@ -46,10 +47,12 @@ public class ChargesController {
                     value = "Results page you want to retrieve (0..N)"),
             @ApiImplicitParam(name = "size", dataType = "int", paramType = "query",
                     value = "Number of records per page.")})
-    public PagedResources<Resource<Charge>> getCharges(final @ApiIgnore Pageable pageable,
-                                                       final PagedResourcesAssembler<Charge> assembler) {
+    public PagedResources<Resource<Charge>> getCharges(
+            final @ApiIgnore Pageable pageable,
+            @RequestParam(value = "bookingId", required = false) Set<Long> bookingId,
+            final PagedResourcesAssembler<Charge> assembler) {
 
-        Page<Charge> charges = chargesService.getCharges(pageable);
+        Page<Charge> charges = chargesService.getCharges(pageable, bookingId);
         return assembler.toResource(charges);
     }
 

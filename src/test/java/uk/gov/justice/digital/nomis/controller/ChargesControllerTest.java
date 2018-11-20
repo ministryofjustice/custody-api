@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.restassured.RestAssured;
 import io.restassured.config.ObjectMapperConfig;
 import io.restassured.config.RestAssuredConfig;
+import org.assertj.core.groups.Tuple;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -15,6 +16,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import uk.gov.justice.digital.nomis.api.Charge;
+
+import java.util.List;
 
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -67,6 +70,23 @@ public class ChargesControllerTest {
                 .as(Charge[].class);
 
         assertThat(charges.length).isGreaterThan(0);
+    }
+
+    @Test
+    public void canGetBookingIdCharges() {
+        List<Charge> charges = given()
+                .when()
+                .auth().oauth2(validOauthToken)
+                .get("/charges?bookingId=-2&bookingId=-3")
+                .then()
+                .statusCode(200)
+                .extract()
+                .body()
+                .path("_embedded.chargeList");
+
+        assertThat(charges).asList().extracting("chargeId", "bookingId", "chargeStatus", "mostSeriousCharge").
+                contains(Tuple.tuple(-3, -2, "A", true),
+                        Tuple.tuple(-4, -3, "A", false));
     }
 
     @Test

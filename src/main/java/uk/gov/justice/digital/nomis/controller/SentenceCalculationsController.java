@@ -25,6 +25,7 @@ import uk.gov.justice.digital.nomis.service.SentenceCalculationsService;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
@@ -48,9 +49,10 @@ public class SentenceCalculationsController {
                     value = "Number of records per page.")})
     public PagedResources<Resource<SentenceCalculation>> getSentenceCalculations(
             final @ApiIgnore Pageable pageable,
+            @RequestParam(value = "bookingId", required = false) Set<Long> bookingId,
             final PagedResourcesAssembler<SentenceCalculation> assembler) {
 
-        Page<SentenceCalculation> sentenceCalculations = sentenceCalculationsService.getSentenceCalculations(pageable);
+        Page<SentenceCalculation> sentenceCalculations = sentenceCalculationsService.getSentenceCalculations(pageable, bookingId);
         return assembler.toResource(sentenceCalculations);
     }
 
