@@ -3,6 +3,7 @@ package uk.gov.justice.digital.nomis.controller;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,6 +50,9 @@ public class SentenceCalculationsController {
                     value = "Number of records per page.")})
     public PagedResources<Resource<SentenceCalculation>> getSentenceCalculations(
             final @ApiIgnore Pageable pageable,
+            @ApiParam(allowMultiple = true,
+                    value = "Optionally specifies multiple individual offenders' bookings (i.e. prison terms)",
+                    example = "/sentenceCalculations?bookingId=1001&bookingId=2002")
             @RequestParam(value = "bookingId", required = false) Set<Long> bookingId,
             final PagedResourcesAssembler<SentenceCalculation> assembler) {
 
