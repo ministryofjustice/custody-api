@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.restassured.RestAssured;
 import io.restassured.config.ObjectMapperConfig;
 import io.restassured.config.RestAssuredConfig;
+import org.assertj.core.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -18,7 +19,7 @@ import uk.gov.justice.digital.nomis.api.Offender;
 
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -129,6 +130,38 @@ public class OffenderControllerTest {
                 .get("/offenders/nomsId/A1234AA")
                 .then()
                 .statusCode(401);
+    }
+
+    @Test
+    public void activeOffendersByPrisonIsAuthorized() {
+        given()
+                .when()
+                .get("/offenders/prison/MDI")
+                .then()
+                .statusCode(401);
+    }
+
+    @Test
+    public void canGetActiveOffendersByPrison() {
+        given()
+                .when()
+                .auth().oauth2(validOauthToken)
+                .get("/offenders/prison/MDI")
+                .then()
+                .statusCode(200)
+                .body("page.totalElements", greaterThan(0))
+                .body("_embedded.offenders[0].surname", equalTo("TRESCOTHICK"))
+                .body("_embedded.offenders.activeBooking.activeFlag", not(contains(is(false))));
+    }
+
+    @Test
+    public void getActiveOffendersByPrisonReturns404WhenPrisonNotFound() {
+        given()
+                .when()
+                .auth().oauth2(validOauthToken)
+                .get("/offenders/prison/ZZZZZZZ")
+                .then()
+                .statusCode(404);
     }
 
 

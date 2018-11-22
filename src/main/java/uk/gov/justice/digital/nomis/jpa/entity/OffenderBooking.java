@@ -1,25 +1,15 @@
 package uk.gov.justice.digital.nomis.jpa.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.OrderBy;
 
-import javax.persistence.Column;
-import javax.persistence.ConstraintMode;
-import javax.persistence.Entity;
-import javax.persistence.ForeignKey;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.List;
 
 @Data
+@ToString(exclude = {"offender"})
 @Entity
 @Table(name = "OFFENDER_BOOKINGS")
 @Builder
@@ -258,5 +248,7 @@ public class OffenderBooking {
     @JoinColumn(name = "LIVING_UNIT_ID", insertable = false, updatable = false)
     private AgencyInternalLocation livingUnit;
 
-
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "OFFENDER_ID", nullable = false, insertable = false, updatable = false)
+    private Offender offender;
 }
