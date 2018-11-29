@@ -93,6 +93,7 @@ dependencies {
     compile 'com.microsoft.azure:applicationinsights-web:2.1.2'
     compile 'com.microsoft.azure:applicationinsights-logging-logback:2.1.2'
 
+    annotationProcessor 'org.projectlombok:lombok:1.16.18'
     compileOnly 'org.projectlombok:lombok:1.16.18'
     
     testRuntime 'com.h2database:h2:1.4.196'
