@@ -36,7 +36,7 @@ jobs:
           # fallback to using the latest cache if no exact match is found
           - v1-dependencies-
 
-      - run: gradle dependencies
+      - run: ./gradlew dependencies
 
       - save_cache:
           paths:
@@ -53,7 +53,7 @@ jobs:
           path: build/reports/tests
 
       # Assemble
-      - run: gradle assemble
+      - run: ./gradlew assemble
 
       - store_artifacts:
           path: build/libs

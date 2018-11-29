@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.Set;
 
-@Builder
+@Builder(toBuilder = true)
 @Value
 @EqualsAndHashCode
 public class OffenderEventsFilter implements Specification<OffenderEvent> {
