@@ -265,7 +265,7 @@ public class OffenderEventsTransformer {
                 .rootOffenderId(longOf(xtag.getContent().getP_root_offender_id()))
                 .alertDateTime(localDateTimeOf(xtag.getContent().getP_old_alert_date(), xtag.getContent().getP_old_alert_time()))
                 .alertType(xtag.getContent().getP_alert_type())
-                .alertCode(xtag.getContent().getP_alert_type())
+                .alertCode(xtag.getContent().getP_alert_code())
                 .expiryDateTime(localDateTimeOf(xtag.getContent().getP_expiry_date(), xtag.getContent().getP_expiry_time()))
                 .eventDatetime(xtag.getNomisTimestamp())
                 .nomisEventType(xtag.getEventType())
