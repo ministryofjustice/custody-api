@@ -31,22 +31,22 @@ public class XtagEventsService {
     }
 
     private OffenderEventsFilter fudgedXtagFilterOf(OffenderEventsFilter oeFilter) {
-        // Xtag events are in UTC all year round at rest in Oracle.
+        // Xtag events are in British Summer Time all year round at rest in Oracle.
         // So we have to compensate when filtering by date. The Nomis data set
         // is stored at rest as Europe/London and so is affected by daylight savings.
         final Instant now = Instant.now();
 
         return oeFilter.toBuilder()
-                .from(asUtc(oeFilter.getFrom(), now))
-                .to(asUtc(oeFilter.getTo(), now))
+                .from(asUtcPlusOne(oeFilter.getFrom(), now))
+                .to(asUtcPlusOne(oeFilter.getTo(), now))
                 .build();
     }
 
-    public static LocalDateTime asUtc(LocalDateTime localDateTime, Instant now) {
+    public static LocalDateTime asUtcPlusOne(LocalDateTime localDateTime, Instant now) {
         if (ZoneId.of("Europe/London").getRules().isDaylightSavings(now)) {
-            return localDateTime.minusHours(1);
+            return localDateTime;
         }
-        return localDateTime;
+        return localDateTime.plusHours(1L);
 
     }
 }

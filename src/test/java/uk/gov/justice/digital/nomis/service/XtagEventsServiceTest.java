@@ -19,9 +19,9 @@ public class XtagEventsServiceTest {
 
         Instant aWinterDate = ZonedDateTime.of(2020,1,1,0,0,0,0,ZoneId.of("Europe/London")).toInstant();
 
-        final LocalDateTime actual = XtagEventsService.asUtc(NOW, aWinterDate);
+        final LocalDateTime actual = XtagEventsService.asUtcPlusOne(NOW, aWinterDate);
 
-        assertThat(actual).isEqualTo(NOW);
+        assertThat(actual).isEqualTo(NOW.plusHours(1L));
     }
 
     @Test
@@ -29,9 +29,9 @@ public class XtagEventsServiceTest {
 
         Instant aSummerDate = ZonedDateTime.of(2020,7,1,0,0,0,0,ZoneId.of("Europe/London")).toInstant();
 
-        final LocalDateTime actual = XtagEventsService.asUtc(NOW, aSummerDate);
+        final LocalDateTime actual = XtagEventsService.asUtcPlusOne(NOW, aSummerDate);
 
-        assertThat(actual).isEqualTo(NOW.minusHours(1));
+        assertThat(actual).isEqualTo(NOW);
     }
 
 }
