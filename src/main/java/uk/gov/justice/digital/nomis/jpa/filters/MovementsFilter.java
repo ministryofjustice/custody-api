@@ -13,22 +13,20 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
 
 @Builder
 @EqualsAndHashCode
 public class MovementsFilter implements Specification<OffenderExternalMovement> {
 
-    @Builder.Default
-    private Optional<List<String>> contactTypes = Optional.empty();
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     @Builder.Default
     private Optional<LocalDateTime> from = Optional.empty();
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     @Builder.Default
     private Optional<LocalDateTime> to = Optional.empty();
-    private Long offenderId;
+    @Builder.Default
+    private Optional<Long> bookingId = Optional.empty();
 
     @Override
     public Predicate toPredicate(Root<OffenderExternalMovement> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
@@ -37,6 +35,8 @@ public class MovementsFilter implements Specification<OffenderExternalMovement> 
         from.ifPresent(localDateTime -> predicateBuilder.add(cb.greaterThanOrEqualTo(root.get("movementTime"), Timestamp.valueOf(localDateTime))));
 
         to.ifPresent(localDateTime -> predicateBuilder.add(cb.lessThanOrEqualTo(root.get("movementTime"), Timestamp.valueOf(localDateTime))));
+
+        bookingId.ifPresent(bookingId -> predicateBuilder.add(cb.equal(root.get("id").get("offenderBooking").get("offenderBookId"), bookingId)));
 
         ImmutableList<Predicate> predicates = predicateBuilder.build();
 

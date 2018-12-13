@@ -44,10 +44,14 @@ public class MovementsService {
     }
 
     @Transactional
-    public Page<ExternalMovement> getMovements(Pageable pageable, Optional<LocalDateTime> maybeFrom, Optional<LocalDateTime> maybeTo) {
+    public Page<ExternalMovement> getMovements(Pageable pageable,
+                                               Optional<LocalDateTime> maybeFrom,
+                                               Optional<LocalDateTime> maybeTo,
+                                               Optional<Long> maybeBookingId) {
         MovementsFilter movementsFilter = MovementsFilter.builder()
                 .from(maybeFrom)
                 .to(maybeTo)
+                .bookingId(maybeBookingId)
                 .build();
 
         Page<OffenderExternalMovement> externalMovements = externalMovementsRepository.findAll(movementsFilter, pageable);
