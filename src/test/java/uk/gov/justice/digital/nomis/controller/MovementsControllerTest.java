@@ -16,6 +16,8 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import uk.gov.justice.digital.nomis.api.ExternalMovement;
 
+import java.util.List;
+
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
@@ -52,6 +54,22 @@ public class MovementsControllerTest {
                 .then()
                 .statusCode(200)
                 .body("page.totalElements", greaterThan(0));
+    }
+
+
+    @Test
+    public void canFilterMovementsByBookingId() {
+        final List<ExternalMovement> externalMovements = given()
+                .when()
+                .auth().oauth2(validOauthToken)
+                .queryParam("bookingId", -17)
+                .get("/movements")
+                .then()
+                .statusCode(200)
+                .body("page.totalElements", greaterThan(0))
+                .extract().jsonPath().getList("_embedded.externalMovementList", ExternalMovement.class);
+
+        assertThat(externalMovements).extracting("bookingId").containsOnly(-17L);
     }
 
     @Test
