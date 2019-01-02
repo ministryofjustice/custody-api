@@ -30,7 +30,7 @@ public class IEPService {
 
 
     public Optional<List<OffenderIepLevel>> iepsForOffenderId(Long offenderId) {
-        return Optional.ofNullable(offenderRepository.findOne(offenderId))
+        return offenderRepository.findById(offenderId)
                 .map(offender -> offender.getOffenderBookings()
                         .stream()
                         .flatMap(offenderBooking -> offenderBooking.getOffenderIepLevels().stream())

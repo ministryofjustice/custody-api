@@ -66,10 +66,10 @@ public class AssessmentsTransformer {
 
     private KeyValue getSecurityCategoryOf(uk.gov.justice.digital.nomis.jpa.entity.OffenderAssessment oa) {
         return Optional.ofNullable(oa.getReviewSupLevelType() != null ?
-                referenceCodesRepository.findOne(ReferenceCodePK.builder()
+                referenceCodesRepository.findById(ReferenceCodePK.builder()
                         .code(oa.getReviewSupLevelType())
                         .domain(SUP_LVL_TYPE)
-                        .build()) : null)
+                        .build()).orElse(null) : null)
                 .map(rc -> KeyValue.builder().code(rc.getCode()).description(rc.getDescription()).build())
                 .orElse(null);
     }

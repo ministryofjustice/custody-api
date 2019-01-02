@@ -32,7 +32,7 @@ public class OffenderProgrammeProfilesService {
     }
 
     public Optional<List<ProgrammeProfile>> offenderProgrammeProfilesForOffenderId(Long offenderId, Optional<LocalDateTime> maybeFrom, Optional<LocalDateTime> maybeTo) {
-        final Optional<Offender> maybeOffender = Optional.ofNullable(offenderRepository.findOne(offenderId));
+        final Optional<Offender> maybeOffender = offenderRepository.findById(offenderId);
 
         final Optional<List<OffenderBooking>> maybeOffenderBookings = maybeOffender.map(Offender::getOffenderBookings);
 
@@ -55,7 +55,7 @@ public class OffenderProgrammeProfilesService {
     }
 
     public Optional<List<ProgrammeProfile>> offenderProgrammeProfilesForOffenderIdAndBookingId(Long offenderId, Long bookingId, Optional<LocalDateTime> maybeFrom, Optional<LocalDateTime> maybeTo) {
-        Optional<Offender> maybeOffender = Optional.ofNullable(offenderRepository.findOne(offenderId));
+        Optional<Offender> maybeOffender = offenderRepository.findById(offenderId);
 
         LocalDateTime from = maybeFrom.orElse(maybeTo.orElse(LocalDate.now().atStartOfDay()));
         LocalDateTime to = maybeTo.orElse(from.toLocalDate().plusDays(1).atStartOfDay().minusNanos(1));

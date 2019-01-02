@@ -56,7 +56,7 @@ public class OffenderService {
 
     @Transactional
     public Optional<Offender> getOffenderByOffenderId(Long offenderId) {
-        Optional<uk.gov.justice.digital.nomis.jpa.entity.Offender> maybeOffender = Optional.ofNullable(offenderRepository.findOne(offenderId));
+        Optional<uk.gov.justice.digital.nomis.jpa.entity.Offender> maybeOffender = offenderRepository.findById(offenderId);
 
         return maybeOffender.map(offenderTransformer::offenderOf);
     }

@@ -25,7 +25,7 @@ public class PhysicalsService {
 
     public Optional<List<Physicals>> physicalsForOffenderId(Long offenderId) {
 
-        return Optional.ofNullable(offenderRepository.findOne(offenderId))
+        return offenderRepository.findById(offenderId)
                 .map(offender ->
                         offender.getOffenderBookings().stream()
                                 .map(physicalsTransformer::physicalsOf)

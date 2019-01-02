@@ -59,7 +59,7 @@ public class MilitaryRecordsService {
 
     @Transactional
     public Optional<List<MilitaryRecord>> getMilitaryRecordsForOffenderId(Long offenderId) {
-        Optional<Offender> maybeOffender = Optional.ofNullable(offenderRepository.findOne(offenderId));
+        Optional<Offender> maybeOffender = offenderRepository.findById(offenderId);
 
         Optional<List<OffenderBooking>> maybeBookings = maybeOffender.map(o -> o.getOffenderBookings());
 
@@ -71,7 +71,7 @@ public class MilitaryRecordsService {
     }
 
     public Optional<List<MilitaryRecord>> getMilitaryRecordsForOffenderIdAndBookingId(Long offenderId, Long bookingId) {
-        Optional<Offender> maybeOffender = Optional.ofNullable(offenderRepository.findOne(offenderId));
+        Optional<Offender> maybeOffender = offenderRepository.findById(offenderId);
 
         Optional<OffenderBooking> maybeBooking = maybeOffender
                 .flatMap(offender -> offender.getOffenderBookings()

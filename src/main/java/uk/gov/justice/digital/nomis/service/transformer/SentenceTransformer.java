@@ -9,8 +9,6 @@ import uk.gov.justice.digital.nomis.jpa.entity.OffenderSentence;
 import uk.gov.justice.digital.nomis.jpa.entity.SentenceCalcTypePK;
 import uk.gov.justice.digital.nomis.jpa.repository.SentenceCalcTypeRepository;
 
-import java.util.Optional;
-
 @Component
 public class SentenceTransformer {
 
@@ -75,11 +73,11 @@ public class SentenceTransformer {
     }
 
     private SentenceCalculationType sentenceCalculationTypeOf(OffenderSentence os) {
-        return Optional.ofNullable(os.getSentenceCategory() != null && os.getSentenceCalcType() != null ?
-        sentenceCalcTypeRepository.findOne(SentenceCalcTypePK.builder()
+        return os.getSentenceCategory() != null && os.getSentenceCalcType() != null ?
+        sentenceCalcTypeRepository.findById(SentenceCalcTypePK.builder()
                 .sentenceCalcType(os.getSentenceCalcType())
                 .sentenceCategory(os.getSentenceCategory())
-                .build()): null)
+                .build())
                 .map(sct -> SentenceCalculationType.builder()
                         .active(typesTransformer.isActiveOf(sct.getActiveFlag()))
                         .description(sct.getDescription())
@@ -90,6 +88,6 @@ public class SentenceTransformer {
                         .sentenceType(sct.getSentenceType())
                         .sentenceCalculationType(sct.getSentenceCalcType())
                         .build())
-                .orElse(null);
+                .orElse(null) : null;
     }
 }

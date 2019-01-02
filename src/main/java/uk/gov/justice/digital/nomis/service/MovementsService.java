@@ -68,7 +68,7 @@ public class MovementsService {
     @Transactional
     public Optional<List<ExternalMovement>> getOffenderMovements(Long offenderId) {
         Optional<List<uk.gov.justice.digital.nomis.jpa.entity.OffenderExternalMovement>> maybeOffenderMovements =
-                Optional.ofNullable(offenderRepository.findOne(offenderId))
+                offenderRepository.findById(offenderId)
                         .map(offender -> offender.getOffenderBookings().stream()
                                 .map(OffenderBooking::getOffenderExternalMovements).
                                         flatMap(Collection::stream).
@@ -82,7 +82,7 @@ public class MovementsService {
     }
 
     public Optional<List<ExternalMovement>> movementsForOffenderIdAndBookingId(Long offenderId, Long bookingId) {
-        Optional<Offender> maybeOffender = Optional.ofNullable(offenderRepository.findOne(offenderId));
+        Optional<Offender> maybeOffender = offenderRepository.findById(offenderId);
 
         return maybeOffender.flatMap(
                 offender -> offender.getOffenderBookings()

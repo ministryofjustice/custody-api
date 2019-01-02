@@ -53,7 +53,7 @@ public class SentencesService {
 
     @Transactional
     public Optional<List<Sentence>> sentencesForOffenderId(Long offenderId) {
-        Optional<List<OffenderSentence>> maybeOffenderSentences = Optional.ofNullable(offenderRepository.findOne(offenderId))
+        Optional<List<OffenderSentence>> maybeOffenderSentences = offenderRepository.findById(offenderId)
                 .map(offender -> offender.getOffenderBookings().stream()
                         .map(OffenderBooking::getOffenderSentences).
                                 flatMap(Collection::stream).
@@ -68,7 +68,7 @@ public class SentencesService {
 
     @Transactional
     public Optional<List<Sentence>> sentencesForOffenderIdAndBookingId(Long offenderId, Long bookingId) {
-        Optional<Offender> maybeOffender = Optional.ofNullable(offenderRepository.findOne(offenderId));
+        Optional<Offender> maybeOffender = offenderRepository.findById(offenderId);
 
         return maybeOffender.flatMap(
                 offender -> offender.getOffenderBookings()

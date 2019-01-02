@@ -41,7 +41,7 @@ public class RehabDecisionService {
 
     public Optional<List<RehabDecision>> rehabDecisionsForOffenderId(Long offenderId) {
 
-        final Optional<List<RehabDecision>> maybeRehabDecisions = Optional.ofNullable(offenderRepository.findOne(offenderId))
+        final Optional<List<RehabDecision>> maybeRehabDecisions = offenderRepository.findById(offenderId)
                 .map(offender ->
                         offender.getOffenderBookings()
                                 .stream()

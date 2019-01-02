@@ -46,7 +46,7 @@ public class CaseNotesService {
         LocalDateTime from = maybeFrom.orElse(maybeTo.map(to -> to.minusDays(1)).orElse(LocalDate.now().atStartOfDay()));
         LocalDateTime to = maybeTo.orElse(from.plusDays(1));
 
-        return Optional.ofNullable(offenderRepository.findOne(offenderId))
+        return offenderRepository.findById(offenderId)
                 .map(offender -> offender.getOffenderBookings().stream()
                 .flatMap(ob -> offenderCaseNotesRepository.findAll(OffenderCaseNotesFilter.builder()
                         .bookingId(ob.getOffenderBookId())
@@ -69,7 +69,7 @@ public class CaseNotesService {
         LocalDateTime from = maybeFrom.orElse(maybeTo.map(to -> to.minusDays(1)).orElse(LocalDate.now().atStartOfDay()));
         LocalDateTime to = maybeTo.orElse(from.plusDays(1));
 
-        return Optional.ofNullable(offenderRepository.findOne(offenderId))
+        return offenderRepository.findById(offenderId)
                 .map(offender -> offender.getOffenderBookings().stream()
                 .filter(ob -> ob.getOffenderBookId().equals(bookingId))
                 .flatMap(ob -> offenderCaseNotesRepository.findAll(OffenderCaseNotesFilter.builder()

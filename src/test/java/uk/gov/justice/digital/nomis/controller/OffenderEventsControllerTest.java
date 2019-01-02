@@ -8,14 +8,14 @@ import io.restassured.config.RestAssuredConfig;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Matchers;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.embedded.LocalServerPort;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import uk.gov.justice.digital.nomis.api.OffenderEvent;
@@ -58,7 +58,7 @@ public class OffenderEventsControllerTest {
         LocalDateTime to = from.plusDays(1L);
 
         OffenderEventsFilter filter = OffenderEventsFilter.builder().from(from).to(to).build();
-        Mockito.when(xtagEventsService.findAll(Matchers.eq(filter))).thenReturn(someXtagEvents(from));
+        Mockito.when(xtagEventsService.findAll(ArgumentMatchers.eq(filter))).thenReturn(someXtagEvents(from));
 
         final OffenderEvent[] offenderEvents = given()
                 .when()
@@ -87,7 +87,7 @@ public class OffenderEventsControllerTest {
         LocalDateTime to = from.plusDays(1L);
 
         OffenderEventsFilter filter = OffenderEventsFilter.builder().from(from).to(to).build();
-        Mockito.when(xtagEventsService.findAll(Matchers.eq(filter))).thenReturn(someXtagEvents(from));
+        Mockito.when(xtagEventsService.findAll(ArgumentMatchers.eq(filter))).thenReturn(someXtagEvents(from));
 
         final OffenderEvent[] offenderEvents = given()
                 .when()
@@ -113,7 +113,7 @@ public class OffenderEventsControllerTest {
         LocalDateTime to = from.plusDays(1L);
 
         OffenderEventsFilter filter = OffenderEventsFilter.builder().from(from).to(to).offenderId(Optional.of(-1001L)).build();
-        Mockito.when(xtagEventsService.findAll(Matchers.eq(filter))).thenReturn(someXtagEvents(from));
+        Mockito.when(xtagEventsService.findAll(ArgumentMatchers.eq(filter))).thenReturn(someXtagEvents(from));
 
         final OffenderEvent[] offenderEvents = given()
                 .when()

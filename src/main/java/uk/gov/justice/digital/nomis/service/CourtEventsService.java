@@ -33,7 +33,7 @@ public class CourtEventsService {
 
     public Optional<List<CourtEvent>> courtEventsForOffenderId(Long offenderId) {
 
-        return Optional.ofNullable(offenderRepository.findOne(offenderId))
+        return offenderRepository.findById(offenderId)
                 .map(offender -> offender.getOffenderBookings()
                         .stream()
                         .flatMap(offenderBooking -> offenderBooking.getCourtEvents().stream())

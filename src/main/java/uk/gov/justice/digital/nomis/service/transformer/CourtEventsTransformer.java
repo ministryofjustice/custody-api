@@ -63,8 +63,8 @@ public class CourtEventsTransformer {
     }
 
     private OutcomeReason outcomeReasonOf(uk.gov.justice.digital.nomis.jpa.entity.CourtEvent ce) {
-        return Optional.ofNullable(ce.getOutcomeReasonCode() != null ?
-            offenceResultsCodeRepository.findOne(ce.getOutcomeReasonCode()): null)
+        return ce.getOutcomeReasonCode() != null ?
+            offenceResultsCodeRepository.findById(ce.getOutcomeReasonCode())
                 .map(orc -> OutcomeReason.builder()
                         .Code(orc.getResultCode())
                         .Description(orc.getDescription())
@@ -74,7 +74,7 @@ public class CourtEventsTransformer {
                         .ExpiryDate(typesTransformer.localDateTimeOf(orc.getExpiryDate()))
                         .Conviction(typesTransformer.ynToBoolean(orc.getConvictionFlag()))
                         .build())
-                .orElse(null);
+                .orElse(null) : null;
     }
 
     private List<Charge> courtEventChargesOf(List<CourtEventCharge> charges) {

@@ -14,7 +14,6 @@ import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
-import javax.servlet.ServletContext;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.Collections;
@@ -32,7 +31,7 @@ public class SwaggerConfig {
     private ApplicationContext applicationContext;
 
     @Bean
-    public Docket offenderApi(ServletContext servletContext) {
+    public Docket offenderApi() {
         Docket docket = new Docket(DocumentationType.SWAGGER_2)
                 .useDefaultResponseMessages(false)
                 .apiInfo(apiInfo())

@@ -53,8 +53,8 @@ public class OffenderProgrammeProfileTransformer {
                 .build();
     }
 
-    public Activity activityAndSchedulesOf(CourseActivity courseActivity, LocalDateTime from, LocalDateTime to) {
-        return Optional.ofNullable(courseActivity)
+    public Activity activityAndSchedulesOf(Optional<CourseActivity> courseActivity, LocalDateTime from, LocalDateTime to) {
+        return courseActivity
                 .map(ca -> activityOf(ca).toBuilder()
                         .schedules(courseSchedulesRepository.findAll(CourseSchedulesFilter.builder()
                                 .courseActivityId(ca.getCrsActyId())

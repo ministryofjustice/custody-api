@@ -36,13 +36,13 @@ public class IndividualSchedulesService {
     }
 
     public Optional<List<IndividualSchedule>> individualSchedulesForOffenderId(Long offenderId) {
-        Optional<Offender> maybeOffender = Optional.ofNullable(offenderRepository.findOne(offenderId));
+        Optional<Offender> maybeOffender = offenderRepository.findById(offenderId);
 
         return maybeOffender.map(this::individualSchedulesOfOffender);
     }
 
     public Optional<List<IndividualSchedule>> individualSchedulesForOffenderIdAndBookingId(Long offenderId, Long bookingId) {
-        Optional<Offender> maybeOffender = Optional.ofNullable(offenderRepository.findOne(offenderId));
+        Optional<Offender> maybeOffender = offenderRepository.findById(offenderId);
 
         return maybeOffender.map(o -> this.individualScheduleOfOffender(o, bookingId));
     }
@@ -69,9 +69,9 @@ public class IndividualSchedulesService {
                 .sorted(BY_RETURN_DATE)
                 .map(ois -> individualScheduleTransformer.individualScheduleOf(
                         ois,
-                        ois.getEscortCode() != null ? referenceCodesRepository.findOne(ReferenceCodePK.builder()
+                        ois.getEscortCode() != null ? referenceCodesRepository.findById(ReferenceCodePK.builder()
                                 .code(ois.getEscortCode())
                                 .domain(ESCORT)
-                                .build()) : null));
+                                .build()).orElse(null) : null));
     }
 }

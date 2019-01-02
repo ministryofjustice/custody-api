@@ -46,7 +46,7 @@ public class HealthProblemsService {
 
     public Optional<List<HealthProblem>> healthProblemsForOffenderId(Long offenderId) {
 
-        Optional<List<OffenderHealthProblem>> maybeOffenderHealthProblems = Optional.ofNullable(offenderRepository.findOne(offenderId))
+        Optional<List<OffenderHealthProblem>> maybeOffenderHealthProblems = offenderRepository.findById(offenderId)
                 .map(offender ->
                         offender.getOffenderBookings().stream()
                                 .map(OffenderBooking::getOffenderHealthProblems)
@@ -57,7 +57,7 @@ public class HealthProblemsService {
     }
 
     public Optional<List<HealthProblem>> healthProblemsForOffenderIdAndBookingId(Long offenderId, Long bookingId) {
-        Optional<Offender> maybeOffender = Optional.ofNullable(offenderRepository.findOne(offenderId));
+        Optional<Offender> maybeOffender = offenderRepository.findById(offenderId);
 
         return maybeOffender.flatMap(
                 offender -> offender.getOffenderBookings()

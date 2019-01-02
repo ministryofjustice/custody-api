@@ -59,7 +59,7 @@ public class AlertsService {
 
     public Optional<List<Alert>> getOffenderAlerts(Long offenderId, Optional<String> maybeAlertCode, Optional<String> maybeAlertStatus, Optional<String> maybeAlertType) {
 
-        final Optional<Offender> maybeOffender = Optional.ofNullable(offenderRepository.findOne(offenderId));
+        final Optional<Offender> maybeOffender = offenderRepository.findById(offenderId);
 
         final Optional<List<OffenderBooking>> maybeOffenderBookings = maybeOffender.map(Offender::getOffenderBookings);
 
@@ -88,7 +88,7 @@ public class AlertsService {
     }
 
     public Optional<List<Alert>> offenderAlertsForOffenderIdAndBookingId(Long offenderId, Long bookingId, Optional<String> maybeAlertCode, Optional<String> maybeAlertStatus, Optional<String> maybeAlertType) {
-        Optional<Offender> maybeOffender = Optional.ofNullable(offenderRepository.findOne(offenderId));
+        Optional<Offender> maybeOffender = offenderRepository.findById(offenderId);
 
         return maybeOffender.flatMap(
                 offender -> offender.getOffenderBookings()

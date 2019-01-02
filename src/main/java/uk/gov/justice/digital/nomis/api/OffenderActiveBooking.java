@@ -1,8 +1,10 @@
 package uk.gov.justice.digital.nomis.api;
 
 import io.swagger.annotations.ApiModelProperty;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.hateoas.core.Relation;
 
 import java.time.LocalDate;
@@ -10,6 +12,8 @@ import java.time.LocalDate;
 @Data
 @Builder
 @Relation(collectionRelation = "offenders")
+@NoArgsConstructor
+@AllArgsConstructor
 public class OffenderActiveBooking {
     @ApiModelProperty(required = true, value = "Display id of the offender", example = "G3641VI", position = 0)
     private String nomsId;

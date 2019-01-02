@@ -59,30 +59,30 @@ public class OffenderCaseNotesTransformer {
 
     private KeyValue subTypeOf(String caseNoteSubType) {
         return Optional.ofNullable(caseNoteSubType != null ?
-                referenceCodesRepository.findOne(ReferenceCodePK.builder()
+                referenceCodesRepository.findById(ReferenceCodePK.builder()
                         .code(caseNoteSubType)
                         .domain(TASK_SUBTYPE)
-                        .build()) : null)
+                        .build()).orElse(null) : null)
                 .map(rc -> KeyValue.builder().code(rc.getCode()).description(rc.getDescription()).build())
                 .orElse(null);
     }
 
     private KeyValue typeOf(String caseNoteType) {
         return Optional.ofNullable(caseNoteType != null ?
-                referenceCodesRepository.findOne(ReferenceCodePK.builder()
+                referenceCodesRepository.findById(ReferenceCodePK.builder()
                         .code(caseNoteType)
                         .domain(TASK_TYPE)
-                        .build()) : null)
+                        .build()).orElse(null) : null)
                 .map(rc -> KeyValue.builder().code(rc.getCode()).description(rc.getDescription()).build())
                 .orElse(null);
     }
 
     private KeyValue sourceOf(String noteSourceCode) {
         return Optional.ofNullable(noteSourceCode != null ?
-                referenceCodesRepository.findOne(ReferenceCodePK.builder()
+                referenceCodesRepository.findById(ReferenceCodePK.builder()
                         .code(noteSourceCode)
                         .domain(NOTE_SOURCE)
-                        .build()) : null)
+                        .build()).orElse(null) : null)
                 .map(rc -> KeyValue.builder().code(rc.getCode()).description(rc.getDescription()).build())
                 .orElse(null);
     }

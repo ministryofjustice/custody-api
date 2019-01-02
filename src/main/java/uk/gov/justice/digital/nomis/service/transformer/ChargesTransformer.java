@@ -88,8 +88,8 @@ public class ChargesTransformer {
     }
 
     private OffenceResult offenceResultOf(String rc) {
-        return Optional.ofNullable(rc != null ?
-                offenceResultsCodeRepository.findOne(rc): null)
+        return rc != null ?
+                offenceResultsCodeRepository.findById(rc)
                 .map(orc -> OffenceResult.builder()
                         .Code(orc.getResultCode())
                         .Description(orc.getDescription())
@@ -99,7 +99,7 @@ public class ChargesTransformer {
                         .ExpiryDate(typesTransformer.localDateTimeOf(orc.getExpiryDate()))
                         .Conviction(typesTransformer.ynToBoolean(orc.getConvictionFlag()))
                         .build())
-                .orElse(null);
+                .orElse(null) : null;
     }
 
     private Order orderOf(OffenderCharge oc) {
