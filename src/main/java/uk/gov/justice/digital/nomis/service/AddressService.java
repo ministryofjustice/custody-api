@@ -94,7 +94,7 @@ public class AddressService {
     @Transactional
     public Optional<List<Address>> getOffenderAddresses(Long offenderId) {
 
-        return Optional.ofNullable(offenderRepository.findOne(offenderId))
+        return offenderRepository.findById(offenderId)
                 .map(offender -> offender.getOffenderAddresses()
                         .stream()
                         .sorted(BY_ADDRESS_MODIFIED)

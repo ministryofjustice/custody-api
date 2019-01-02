@@ -148,20 +148,20 @@ public class OffenderTransformer {
 
     private KeyValue ethnicityOf(Offender o) {
         return Optional.ofNullable(o.getRaceCode() != null ?
-                referenceCodesRepository.findOne(ReferenceCodePK.builder()
+                referenceCodesRepository.findById(ReferenceCodePK.builder()
                         .code(o.getRaceCode())
                         .domain(ETHNICITY)
-                        .build()) : null)
+                        .build()).orElse(null) : null)
                 .map(rc -> KeyValue.builder().code(rc.getCode()).description(rc.getDescription()).build())
                 .orElse(null);
     }
 
     private KeyValue genderOf(Offender o) {
         return Optional.ofNullable(o.getSexCode() != null ?
-                referenceCodesRepository.findOne(ReferenceCodePK.builder()
+                referenceCodesRepository.findById(ReferenceCodePK.builder()
                         .code(o.getSexCode())
                         .domain(SEX)
-                        .build()) : null)
+                        .build()).orElse(null) : null)
                 .map(rc -> KeyValue.builder().code(rc.getCode()).description(rc.getDescription()).build())
                 .orElse(null);
     }

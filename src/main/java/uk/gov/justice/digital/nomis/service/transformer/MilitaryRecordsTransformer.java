@@ -49,10 +49,10 @@ public class MilitaryRecordsTransformer {
 
     private KeyValue getReferenceDataOf(String code, String domain) {
         return Optional.ofNullable(code != null ?
-                referenceCodesRepository.findOne(ReferenceCodePK.builder()
+                referenceCodesRepository.findById(ReferenceCodePK.builder()
                         .code(code)
                         .domain(domain)
-                        .build()) : null)
+                        .build()).orElse(null) : null)
                 .map(rc -> KeyValue.builder().code(rc.getCode()).description(rc.getDescription()).build())
                 .orElse(null);
     }

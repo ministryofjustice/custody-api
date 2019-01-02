@@ -147,7 +147,7 @@ public class AddressesTransformer {
     }
 
     private KeyValue referenceOf(String code, String domain) {
-        return Optional.ofNullable(referenceCodesRepository.findOne(ReferenceCodePK.builder().code(code).domain(domain).build()))
+        return referenceCodesRepository.findById(ReferenceCodePK.builder().code(code).domain(domain).build())
                 .map(rc -> KeyValue.builder().code(rc.getCode()).description(rc.getDescription()).build())
                 .orElse(null);
     }

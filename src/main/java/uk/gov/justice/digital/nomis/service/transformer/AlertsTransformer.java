@@ -45,10 +45,10 @@ public class AlertsTransformer {
 
     private KeyValue alertCodeOf(OffenderAlert alert) {
         return Optional.ofNullable(alert.getAlertCode() != null ?
-                referenceCodesRepository.findOne(ReferenceCodePK.builder()
+                referenceCodesRepository.findById(ReferenceCodePK.builder()
                         .code(alert.getAlertCode())
                         .domain(ALERT_CODE)
-                        .build()) : null)
+                        .build()).orElse(null) : null)
                 .map(rc -> KeyValue.builder().code(rc.getCode()).description(rc.getDescription()).build())
                 .orElse(null);
     }

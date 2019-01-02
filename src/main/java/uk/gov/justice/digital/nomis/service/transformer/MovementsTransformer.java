@@ -69,10 +69,10 @@ public class MovementsTransformer {
 
     private KeyValue getEscortCodeOf(OffenderExternalMovement em) {
         return Optional.ofNullable(em.getEscortCode() != null ?
-                referenceCodesRepository.findOne(ReferenceCodePK.builder()
+                referenceCodesRepository.findById(ReferenceCodePK.builder()
                         .code(em.getEscortCode())
                         .domain(ESCORT)
-                        .build()) : null)
+                        .build()).orElse(null) : null)
                 .map(rc -> KeyValue.builder().code(rc.getCode()).description(rc.getDescription()).build())
                 .orElse(null);
     }

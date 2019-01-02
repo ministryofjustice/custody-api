@@ -35,7 +35,7 @@ public class DiaryDetailService {
 
     public Optional<List<DiaryDetail>> diaryDetailsForOffenderId(Long offenderId) {
 
-        Optional<Offender> maybeOffender = Optional.ofNullable(offenderRepository.findOne(offenderId));
+        Optional<Offender> maybeOffender = offenderRepository.findById(offenderId);
 
         return maybeOffender.map(this::diaryDetailsOfOffender);
     }
@@ -66,11 +66,11 @@ public class DiaryDetailService {
                 .map(offenderIndSchedule ->
                         diaryDetailTransformer.diaryDetailOf(
                                 offenderIndSchedule,
-                                offenderIndSchedule.getEscortCode() != null ? referenceCodesRepository.findOne(
+                                offenderIndSchedule.getEscortCode() != null ? referenceCodesRepository.findById(
                                         ReferenceCodePK.builder()
                                                 .code(offenderIndSchedule.getEscortCode())
                                                 .domain(ESCORT)
-                                                .build()) : null));
+                                                .build()).orElse(null) : null));
 
         return Stream.of(
                 courtEventDiaryDetailStream,

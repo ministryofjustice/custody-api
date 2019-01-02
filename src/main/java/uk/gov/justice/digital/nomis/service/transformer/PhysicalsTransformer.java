@@ -42,10 +42,10 @@ public class PhysicalsTransformer {
                         .stream()
                         .map(det -> {
                             Optional<ProfileCode> pc = Optional.ofNullable(det.getProfileCode() != null && det.getProfileType() != null ?
-                                    profileCodesRepository.findOne(ProfileCodePK.builder()
+                                    profileCodesRepository.findById(ProfileCodePK.builder()
                                     .profileCode(det.getProfileCode())
                                     .profileType(det.getProfileType())
-                                    .build()) : null);
+                                    .build()).orElse(null) : null);
 
                             return ProfileDetails.builder()
                                     .caseloadType(det.getCaseloadType())

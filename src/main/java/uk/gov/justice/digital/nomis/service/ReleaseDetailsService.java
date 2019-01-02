@@ -45,7 +45,7 @@ public class ReleaseDetailsService {
     }
 
     public Optional<List<ReleaseDetails>> releaseDetailsForOffenderId(Long offenderId) {
-        Optional<List<OffenderReleaseDetails>> maybeReleaseDetails = Optional.ofNullable(offenderRepository.findOne(offenderId))
+        Optional<List<OffenderReleaseDetails>> maybeReleaseDetails = offenderRepository.findById(offenderId)
                 .map(offender -> offender.getOffenderBookings()
                                 .stream()
                                 .map(OffenderBooking::getOffenderReleaseDetails)
@@ -59,7 +59,7 @@ public class ReleaseDetailsService {
     }
 
     public Optional<ReleaseDetails> releaseDetailsForOffenderIdAndBookingId(Long offenderId, Long bookingId) {
-        Optional<Offender> maybeOffender = Optional.ofNullable(offenderRepository.findOne(offenderId));
+        Optional<Offender> maybeOffender = offenderRepository.findById(offenderId);
 
         return maybeOffender.flatMap(offender -> offender.getOffenderBookings()
                         .stream()

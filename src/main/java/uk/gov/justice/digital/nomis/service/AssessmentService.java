@@ -65,7 +65,7 @@ public class AssessmentService {
 
     @Transactional
     public Optional<List<OffenderAssessment>> getOffenderAssessments(Long offenderId) {
-        Optional<List<uk.gov.justice.digital.nomis.jpa.entity.OffenderAssessment>> maybeOffenderAssessments = Optional.ofNullable(offenderRepository.findOne(offenderId))
+        Optional<List<uk.gov.justice.digital.nomis.jpa.entity.OffenderAssessment>> maybeOffenderAssessments = offenderRepository.findById(offenderId)
                 .map(offender ->
                         offender.getOffenderBookings()
                                 .stream()
@@ -81,7 +81,7 @@ public class AssessmentService {
     }
 
     public Optional<List<OffenderAssessment>> assessmentsForOffenderIdAndBookingId(Long offenderId, Long bookingId) {
-        Optional<Offender> maybeOffender = Optional.ofNullable(offenderRepository.findOne(offenderId));
+        Optional<Offender> maybeOffender = offenderRepository.findById(offenderId);
 
         return maybeOffender.flatMap(
                 offender -> offender.getOffenderBookings()

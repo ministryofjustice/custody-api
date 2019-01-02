@@ -70,10 +70,10 @@ public class RehabDecisionTransformer {
 
     private KeyValue getDecisionCodeOf(OffenderRehabDecision em) {
         return Optional.ofNullable(em.getDecisionCode() != null ?
-                referenceCodesRepository.findOne(ReferenceCodePK.builder()
+                referenceCodesRepository.findById(ReferenceCodePK.builder()
                         .code(em.getDecisionCode())
                         .domain(ALL_DEC)
-                        .build()) : null)
+                        .build()).orElse(null) : null)
                 .map(rc -> KeyValue.builder().code(rc.getCode()).description(rc.getDescription()).build())
                 .orElse(null);
     }

@@ -56,7 +56,7 @@ public class SentenceCalculationsService {
     }
 
     public Optional<List<SentenceCalculation>> sentenceCalculationsForOffenderId(Long offenderId) {
-        Optional<List<uk.gov.justice.digital.nomis.jpa.entity.OffenderSentCalculation>> maybeSentenceCalculations = Optional.ofNullable(offenderRepository.findOne(offenderId))
+        Optional<List<uk.gov.justice.digital.nomis.jpa.entity.OffenderSentCalculation>> maybeSentenceCalculations = offenderRepository.findById(offenderId)
                 .map(offender ->
                         offender.getOffenderBookings()
                                 .stream()
@@ -74,7 +74,7 @@ public class SentenceCalculationsService {
     }
 
     public Optional<List<SentenceCalculation>> sentenceCalculationsForOffenderIdAndBookingId(Long offenderId, Long bookingId) {
-        Optional<Offender> maybeOffender = Optional.ofNullable(offenderRepository.findOne(offenderId));
+        Optional<Offender> maybeOffender = offenderRepository.findById(offenderId);
 
         return maybeOffender.flatMap(
                 offender -> offender.getOffenderBookings()

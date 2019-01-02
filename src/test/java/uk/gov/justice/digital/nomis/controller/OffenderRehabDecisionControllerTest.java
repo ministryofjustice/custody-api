@@ -11,8 +11,8 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.embedded.LocalServerPort;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import uk.gov.justice.digital.nomis.api.RehabDecision;
@@ -57,7 +57,7 @@ public class OffenderRehabDecisionControllerTest {
 
         assertThat(rehabDecisions.length).isGreaterThan(0);
 
-        assertThat(rehabDecisions).extracting("offenderRehabDecisionId").isEqualTo(new Long[]{2L, 3L, 1L});
+        assertThat(rehabDecisions).extracting("offenderRehabDecisionId").isEqualTo(ImmutableList.of(2L, 3L, 1L));
 
         assertThat(rehabDecisions[0].getProviders()).extracting("offenderRehabProviderId").isEqualTo(ImmutableList.of(2L, 3L, 1L));
     }

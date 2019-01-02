@@ -29,7 +29,7 @@ public class StaffUsersService {
 
     public Optional<NomisStaffUser> staffUserForUsername(String username) {
 
-        return Optional.ofNullable(staffUserAccountRepository.findOne(username))
+        return staffUserAccountRepository.findById(username)
                 .map(staffUserTransformer::userOf);
     }
 

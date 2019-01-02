@@ -63,7 +63,7 @@ public class ImprisonStatusService {
     @Transactional
     public Optional<List<OffenderImprisonmentStatus>> offenderImprisonStatusForOffenderId(Long offenderId) {
 
-        Optional<Stream<OffenderImprisonStatus>> maybeImprisonStatuses = Optional.ofNullable(offenderRepository.findOne(offenderId))
+        Optional<Stream<OffenderImprisonStatus>> maybeImprisonStatuses = offenderRepository.findById(offenderId)
                 .map(offender -> offender.getOffenderBookings()
                         .stream()
                         .map(OffenderBooking::getOffenderImprisonStatuses)
@@ -76,7 +76,7 @@ public class ImprisonStatusService {
     }
 
     public Optional<List<OffenderImprisonmentStatus>> offenderImprisonStatusForOffenderIdAndBookingId(Long offenderId, Long bookingId) {
-        Optional<Offender> maybeOffender = Optional.ofNullable(offenderRepository.findOne(offenderId));
+        Optional<Offender> maybeOffender = offenderRepository.findById(offenderId);
 
         return maybeOffender.flatMap(
                 offender -> offender.getOffenderBookings()

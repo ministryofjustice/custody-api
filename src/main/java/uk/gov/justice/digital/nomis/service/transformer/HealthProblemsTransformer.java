@@ -40,10 +40,10 @@ public class HealthProblemsTransformer {
 
     private KeyValue problemCodeOf(OffenderHealthProblem offenderHealthProblem) {
         return Optional.ofNullable(offenderHealthProblem.getProblemCode() != null ?
-                referenceCodesRepository.findOne(ReferenceCodePK.builder()
+                referenceCodesRepository.findById(ReferenceCodePK.builder()
                         .code(offenderHealthProblem.getProblemCode())
                         .domain(HEALTH_PBLM)
-                        .build()) : null)
+                        .build()).orElse(null) : null)
                 .map(pc -> KeyValue.builder().code(pc.getCode()).description(pc.getDescription()).build())
                 .orElse(null);
     }

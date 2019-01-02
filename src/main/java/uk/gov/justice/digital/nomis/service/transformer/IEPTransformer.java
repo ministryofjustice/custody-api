@@ -54,10 +54,10 @@ public class IEPTransformer {
 
     private KeyValue getIepLevelOf(uk.gov.justice.digital.nomis.jpa.entity.IepLevel iep) {
         return Optional.ofNullable(iep.getIepLevel() != null ?
-                referenceCodesRepository.findOne(ReferenceCodePK.builder()
+                referenceCodesRepository.findById(ReferenceCodePK.builder()
                         .code(iep.getIepLevel())
                         .domain(IEP_LEVEL)
-                        .build()) : null)
+                        .build()).orElse(null) : null)
                 .map(rc -> KeyValue.builder().code(rc.getCode()).description(rc.getDescription()).build())
                 .orElse(null);
     }
