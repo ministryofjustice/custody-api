@@ -1,10 +1,15 @@
 package uk.gov.justice.digital.nomis.xtag;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+
 
 @Data
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class XtagContent {
     private String xtag;
 

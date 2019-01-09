@@ -92,7 +92,7 @@ public class OffenderEventsTransformer {
                 .build());
     }
 
-    private XtagContent xtagContentOf(Map<String, String> map) {
+    public XtagContent xtagContentOf(Map<String, String> map) {
         try {
             String stringValue = objectMapper.writeValueAsString(map);
             return objectMapper.readValue(stringValue, XtagContent.class);
