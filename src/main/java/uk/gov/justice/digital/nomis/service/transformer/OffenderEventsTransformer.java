@@ -20,8 +20,11 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Optional;
@@ -87,9 +90,17 @@ public class OffenderEventsTransformer {
 
         return offenderEventOf(Xtag.builder()
                 .eventType(maybeType.orElse("?"))
-                .nomisTimestamp(enqTime.toLocalDateTime())
+                .nomisTimestamp(xtagFudgedTimestampOf(enqTime.toLocalDateTime()))
                 .content(maybeMap.map(this::xtagContentOf).orElse(null))
                 .build());
+    }
+
+    public static LocalDateTime xtagFudgedTimestampOf(LocalDateTime xtagEnqueueTime) {
+        final ZoneId london = ZoneId.of("Europe/London");
+        if (london.getRules().isDaylightSavings(xtagEnqueueTime.atZone(london).toInstant())) {
+            return xtagEnqueueTime;
+        }
+        return xtagEnqueueTime.minusHours(1L);
     }
 
     public XtagContent xtagContentOf(Map<String, String> map) {
