@@ -55,8 +55,9 @@ public class OffenderEventsController {
     @ApiOperation(value = "Get events", notes = NOTES)
     public ResponseEntity<List<OffenderEvent>> getEvents(@DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) final @RequestParam("from") Optional<LocalDateTime> maybeFrom,
                                                          @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) final @RequestParam("to") Optional<LocalDateTime> maybeTo,
-                                                         final @RequestParam("type") Optional<Set<String>> maybeTypeFilter) {
-        return offenderEventsService.getEvents(maybeFrom, maybeTo, maybeTypeFilter)
+                                                         final @RequestParam("type") Optional<Set<String>> maybeTypeFilter,
+                                                         final @RequestParam("sortBy") Optional<SortTypes> maybeSortBy) {
+        return offenderEventsService.getEvents(maybeFrom, maybeTo, maybeTypeFilter, maybeSortBy)
                 .map(events -> new ResponseEntity<>(events, HttpStatus.OK))
                 .orElse(new ResponseEntity<>(NOT_FOUND));
     }
@@ -76,9 +77,20 @@ public class OffenderEventsController {
     public ResponseEntity<List<OffenderEvent>> getEventsByOffenderId(@PathVariable("offenderId") Long offenderId,
                                                                      @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) final @RequestParam("from") Optional<LocalDateTime> maybeFrom,
                                                                      @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) final @RequestParam("to") Optional<LocalDateTime> maybeTo,
-                                                                     final @RequestParam("type") Optional<Set<String>> maybeTypeFilter) {
-        return offenderEventsService.getEventsForOffenderId(offenderId, maybeFrom, maybeTo, maybeTypeFilter)
+                                                                     final @RequestParam("type") Optional<Set<String>> maybeTypeFilter,
+                                                                     final @RequestParam("sortBy") Optional<SortTypes> maybeSortBy) {
+        return offenderEventsService.getEventsForOffenderId(offenderId, maybeFrom, maybeTo, maybeTypeFilter, maybeSortBy)
                 .map(events -> new ResponseEntity<>(events, HttpStatus.OK))
                 .orElse(new ResponseEntity<>(NOT_FOUND));
+    }
+
+    public enum SortTypes {
+        TIMESTAMP_ASC ("TIMESTAMP_ASC"),
+        TIMESTAMP_DESC("TIMESTAMP_DESC");
+
+        private String sortType;
+        SortTypes(String sortType) {
+            this.sortType = sortType;
+        }
     }
 }

@@ -23,6 +23,7 @@ import uk.gov.justice.digital.nomis.jpa.filters.OffenderEventsFilter;
 import uk.gov.justice.digital.nomis.service.XtagEventsService;
 
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -79,6 +80,97 @@ public class OffenderEventsControllerTest {
         assertThat(events).extracting("eventType").contains("KA-KS");
         assertThat(events).extracting("offenderId").contains(-1001L, -1002L);
 
+    }
+
+    @Test
+    public void defaultSortOrderIsByEventTimestampDesc() {
+        LocalDateTime from = LocalDateTime.of(2018, 10, 29, 0, 0);
+        LocalDateTime to = from.plusDays(1L);
+
+        OffenderEventsFilter filter = OffenderEventsFilter.builder().from(from).to(to).build();
+        Mockito.when(xtagEventsService.findAll(ArgumentMatchers.eq(filter))).thenReturn(someXtagEvents(from));
+
+        final OffenderEvent[] offenderEvents = given()
+                .when()
+                .auth().oauth2(validOauthToken)
+                .queryParam("from", from.toString())
+                .queryParam("to", to.toString())
+                .get("/events")
+                .then()
+                .statusCode(200)
+                .extract()
+                .body()
+                .as(OffenderEvent[].class);
+
+        assertThat(offenderEvents).isSortedAccordingTo(Comparator.comparing(OffenderEvent::getEventDatetime).reversed());
+    }
+
+
+    @Test
+    public void canSpecifyOrderByEventTimestampDesc() {
+        LocalDateTime from = LocalDateTime.of(2018, 10, 29, 0, 0);
+        LocalDateTime to = from.plusDays(1L);
+
+        OffenderEventsFilter filter = OffenderEventsFilter.builder().from(from).to(to).build();
+        Mockito.when(xtagEventsService.findAll(ArgumentMatchers.eq(filter))).thenReturn(someXtagEvents(from));
+
+        final OffenderEvent[] offenderEvents = given()
+                .when()
+                .auth().oauth2(validOauthToken)
+                .queryParam("from", from.toString())
+                .queryParam("to", to.toString())
+                .queryParam("sortBy", "TIMESTAMP_DESC")
+                .get("/events")
+                .then()
+                .statusCode(200)
+                .extract()
+                .body()
+                .as(OffenderEvent[].class);
+
+        assertThat(offenderEvents).isSortedAccordingTo(Comparator.comparing(OffenderEvent::getEventDatetime).reversed());
+    }
+
+    @Test
+    public void canSpecifyOrderByEventTimestampAsc() {
+        LocalDateTime from = LocalDateTime.of(2018, 10, 29, 0, 0);
+        LocalDateTime to = from.plusDays(1L);
+
+        OffenderEventsFilter filter = OffenderEventsFilter.builder().from(from).to(to).build();
+        Mockito.when(xtagEventsService.findAll(ArgumentMatchers.eq(filter))).thenReturn(someXtagEvents(from));
+
+        final OffenderEvent[] offenderEvents = given()
+                .when()
+                .auth().oauth2(validOauthToken)
+                .queryParam("from", from.toString())
+                .queryParam("to", to.toString())
+                .queryParam("sortBy", "TIMESTAMP_ASC")
+                .get("/events")
+                .then()
+                .statusCode(200)
+                .extract()
+                .body()
+                .as(OffenderEvent[].class);
+
+        assertThat(offenderEvents).isSortedAccordingTo(Comparator.comparing(OffenderEvent::getEventDatetime));
+    }
+
+    @Test
+    public void cannotSpecifyMadeUpSortOrder() {
+        LocalDateTime from = LocalDateTime.of(2018, 10, 29, 0, 0);
+        LocalDateTime to = from.plusDays(1L);
+
+        OffenderEventsFilter filter = OffenderEventsFilter.builder().from(from).to(to).build();
+        Mockito.when(xtagEventsService.findAll(ArgumentMatchers.eq(filter))).thenReturn(someXtagEvents(from));
+
+        given()
+                .when()
+                .auth().oauth2(validOauthToken)
+                .queryParam("from", from.toString())
+                .queryParam("to", to.toString())
+                .queryParam("sortBy", "POPULARITY")
+                .get("/events")
+                .then()
+                .statusCode(400);
     }
 
     @Test
