@@ -5,6 +5,7 @@ import com.google.common.collect.ImmutableSet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.justice.digital.nomis.api.OffenderEvent;
+import uk.gov.justice.digital.nomis.controller.OffenderEventsController;
 import uk.gov.justice.digital.nomis.jpa.filters.OffenderEventsFilter;
 import uk.gov.justice.digital.nomis.jpa.repository.OffenderEventsRepository;
 import uk.gov.justice.digital.nomis.service.transformer.OffenderEventsTransformer;
@@ -22,8 +23,9 @@ import java.util.stream.Collectors;
 public class OffenderEventsService {
 
     private static final Comparator<uk.gov.justice.digital.nomis.api.OffenderEvent> BY_OFFENDER_EVENT_TIMESTAMP =
-            Comparator.comparing(uk.gov.justice.digital.nomis.api.OffenderEvent::getEventDatetime)
-                    .reversed();
+            Comparator.comparing(uk.gov.justice.digital.nomis.api.OffenderEvent::getEventDatetime);
+
+    private static final Comparator<uk.gov.justice.digital.nomis.api.OffenderEvent> BY_OFFENDER_EVENT_TIMESTAMP_DESC = BY_OFFENDER_EVENT_TIMESTAMP.reversed();
 
     private final OffenderEventsTransformer offenderEventsTransformer;
     private final OffenderEventsRepository offenderEventsRepository;
@@ -40,12 +42,13 @@ public class OffenderEventsService {
 
     public Optional<List<OffenderEvent>> getEvents(Optional<LocalDateTime> maybeFrom,
                                                    Optional<LocalDateTime> maybeTo,
-                                                   Optional<Set<String>> maybeTypeFilter) {
+                                                   Optional<Set<String>> maybeTypeFilter,
+                                                   Optional<OffenderEventsController.SortTypes> maybeSortBy) {
         LocalDateTime from = fromOrDefault(maybeFrom, maybeTo);
         LocalDateTime to = toOrDefault(maybeTo, from);
 
         final OffenderEventsFilter oeFilter = OffenderEventsFilter.builder().from(from).to(to).types(maybeTypeFilter).build();
-        return getFilteredOffenderEvents(oeFilter);
+        return getFilteredOffenderEvents(oeFilter, maybeSortBy);
     }
 
     private LocalDateTime toOrDefault(Optional<LocalDateTime> maybeTo, LocalDateTime from) {
@@ -59,15 +62,16 @@ public class OffenderEventsService {
     public Optional<List<OffenderEvent>> getEventsForOffenderId(Long offenderId,
                                                                 Optional<LocalDateTime> maybeFrom,
                                                                 Optional<LocalDateTime> maybeTo,
-                                                                Optional<Set<String>> maybeTypeFilter) {
+                                                                Optional<Set<String>> maybeTypeFilter,
+                                                                Optional<OffenderEventsController.SortTypes> maybeSortBy) {
         LocalDateTime from = fromOrDefault(maybeFrom, maybeTo);
         LocalDateTime to = toOrDefault(maybeTo, from);
 
         final OffenderEventsFilter offenderEventsFilter = OffenderEventsFilter.builder().from(from).to(to).types(maybeTypeFilter).offenderId(Optional.of(offenderId)).build();
-        return getFilteredOffenderEvents(offenderEventsFilter);
+        return getFilteredOffenderEvents(offenderEventsFilter, maybeSortBy);
     }
 
-    private Optional<List<OffenderEvent>> getFilteredOffenderEvents(OffenderEventsFilter oeFilter) {
+    private Optional<List<OffenderEvent>> getFilteredOffenderEvents(OffenderEventsFilter oeFilter, Optional<OffenderEventsController.SortTypes> maybeSortBy) {
 
         List<OffenderEvent> offenderEvents = Optional.ofNullable(offenderEventsRepository.findAll(oeFilter))
                 .map(ev -> ev.stream()
@@ -88,9 +92,15 @@ public class OffenderEventsService {
 
         return Optional.of(allEvents.stream()
                 .filter(oe -> typeFilter.isEmpty() || typeFilter.contains(oe.getEventType()))
-                .sorted(BY_OFFENDER_EVENT_TIMESTAMP)
+                .sorted(sortFunctionOf(maybeSortBy))
                 .collect(Collectors.toList()));
 
+    }
+
+    private Comparator<? super OffenderEvent> sortFunctionOf(Optional<OffenderEventsController.SortTypes> maybeSortBy) {
+        return maybeSortBy.filter(sortTypes -> sortTypes.equals(OffenderEventsController.SortTypes.TIMESTAMP_ASC))
+                .map(sortTypes -> BY_OFFENDER_EVENT_TIMESTAMP)
+                .orElse(BY_OFFENDER_EVENT_TIMESTAMP_DESC);
     }
 
     private Boolean isOffenderRelated(OffenderEventsFilter oeFilter, OffenderEvent oe) {
