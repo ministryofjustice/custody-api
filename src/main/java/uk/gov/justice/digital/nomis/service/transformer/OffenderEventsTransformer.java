@@ -488,8 +488,8 @@ public class OffenderEventsTransformer {
                 .agencyIncidentId(longOf(xtag.getContent().getP_agency_incident_id()))
                 .chargeSeq(longOf(xtag.getContent().getP_charge_seq()))
                 .oicOffenceId(longOf(xtag.getContent().getP_oic_offence_id()))
-                .pleaFindingCode(longOf(xtag.getContent().getP_plea_finding_code()))
-                .findingCode(longOf(xtag.getContent().getP_finding_code()))
+                .pleaFindingCode(xtag.getContent().getP_plea_finding_code())
+                .findingCode(xtag.getContent().getP_finding_code())
                 .eventDatetime(xtag.getNomisTimestamp())
                 .nomisEventType(xtag.getEventType())
                 .build();
@@ -855,13 +855,15 @@ public class OffenderEventsTransformer {
 
     private String withEventTypeOf(uk.gov.justice.digital.nomis.jpa.entity.OffenderEvent event) {
         if (event.getEventType().equalsIgnoreCase("CASE_NOTE")) {
-            final String eventData1 = event.getEventData1();
+            final String eventData = event.getEventData1() +
+                    Optional.ofNullable(event.getEventData2()).orElse("") +
+                    Optional.ofNullable(event.getEventData3()).orElse("");
             try {
-                JsonNode json = new ObjectMapper().readTree(eventData1);
+                JsonNode json = new ObjectMapper().readTree(eventData);
 
                 return String.format("%s-%s", json.get("case_note").get("type").get("code").asText(), json.get("case_note").get("sub_type").get("code").asText());
             } catch (IOException e) {
-                log.error("Could not deserialize {} into JsonNode: {}", eventData1, e.getMessage());
+                log.error("Could not deserialize {} into JsonNode: {}", eventData, e.getMessage());
             }
         }
 
