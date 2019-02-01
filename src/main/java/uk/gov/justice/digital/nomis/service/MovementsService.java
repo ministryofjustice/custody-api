@@ -97,4 +97,12 @@ public class MovementsService {
                         .collect(Collectors.toList()));
 
     }
+
+    public Optional<ExternalMovement> movementForBookingIdAndSequence(Long bookingId, Long sequenceNumber) {
+        final OffenderExternalMovement.Pk pk = new OffenderExternalMovement.Pk();
+        pk.setMovementSeq(sequenceNumber);
+        pk.setOffenderBooking(OffenderBooking.builder().offenderBookId(bookingId).build());
+
+        return externalMovementsRepository.findById(pk).map(movementsTransformer::movementOf);
+    }
 }

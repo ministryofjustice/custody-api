@@ -79,4 +79,18 @@ public class MovementsController {
 
     }
 
+    @RequestMapping(path = "/movements/bookingId/{bookingId}/sequence/{sequenceNumber}", method = RequestMethod.GET)
+    @ResponseBody
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "sequenceNumber", dataType = "int", paramType = "query",
+                    value = "sequence number filter")
+    })
+    public ResponseEntity<ExternalMovement> getMovement(final @PathVariable("bookingId") Long bookingId,
+                                                        final @PathVariable("sequenceNumber") Long sequenceNumber) {
+
+        return movementsService.movementForBookingIdAndSequence(bookingId, sequenceNumber)
+                .map(movement -> new ResponseEntity<>(movement, HttpStatus.OK))
+                .orElse(new ResponseEntity<>(NOT_FOUND));
+    }
+
 }
