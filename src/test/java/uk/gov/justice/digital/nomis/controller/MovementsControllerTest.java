@@ -132,5 +132,49 @@ public class MovementsControllerTest {
 
     }
 
+    @Test
+    public void canGetOffenderMovementForBookingNumberAndSequence() {
+        ExternalMovement movement = given()
+                .when()
+                .auth().oauth2(validOauthToken)
+                .get("/movements/bookingId/-17/sequence/4")
+                .then()
+                .statusCode(200)
+                .extract()
+                .body()
+                .as(ExternalMovement.class);
+
+        assertThat(movement).isNotNull();
+        assertThat(movement.getSequenceNumber()).isEqualTo(4);
+    }
+
+    @Test
+    public void getOffenderMovementForUnknownBookingIsNotFound() {
+        given()
+                .when()
+                .auth().oauth2(validOauthToken)
+                .get("/movements/bookingId/666/sequence/4")
+                .then()
+                .statusCode(404);
+    }
+
+    @Test
+    public void getOffenderMovementForKnownBookingButUnknownSequenceIsNotFound() {
+        given()
+                .when()
+                .auth().oauth2(validOauthToken)
+                .get("/movements/bookingId/-17/sequence/666")
+                .then()
+                .statusCode(404);
+    }
+
+    @Test
+    public void movementsByBookingAndSequenceAreAuthorized() {
+        given()
+                .when()
+                .get("/movements/bookingId/1/sequence/1")
+                .then()
+                .statusCode(401);
+    }
 
 }
