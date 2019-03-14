@@ -23,6 +23,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.DateTimeParseException;
 import java.util.Arrays;
 import java.util.Map;
@@ -86,18 +87,20 @@ public class OffenderEventsTransformer {
     }
 
     private OffenderEvent getOffenderEvent(STRUCT s, Timestamp enqTime) throws SQLException {
-        final Optional<Datum> maybeStruct = Arrays.asList(s.getOracleAttributes()).stream().filter(a -> a instanceof STRUCT).findFirst();
-        final Optional<Datum> maybeRaw = Arrays.asList(s.getOracleAttributes()).stream().filter(a -> a instanceof RAW).findFirst();
+        final Optional<Datum> maybeStruct = Arrays.stream(s.getOracleAttributes()).filter(a -> a instanceof STRUCT).findFirst();
+        final Optional<Datum> maybeRaw = Arrays.stream(s.getOracleAttributes()).filter(a -> a instanceof RAW).findFirst();
 
-        final Optional<String> maybeType = maybeStruct.flatMap(d -> {
-            final STRUCT d1 = (STRUCT) d;
-            try {
-                return Optional.ofNullable(d1.getAttributes()[1].toString());
-            } catch (SQLException e) {
-                log.error("Failed to derive Type from STRUCT {} : {}", d, e.getMessage());
-                return Optional.empty();
+        Optional<String> maybeType = Optional.empty();
+        {
+            final Optional<STRUCT> struct = maybeStruct.filter(d -> d instanceof STRUCT).map(datum -> (STRUCT) datum);
+
+            if (struct.isPresent()) {
+                final Object[] attributes = struct.get().getAttributes();
+                if (attributes.length >= 2) {
+                    maybeType = Optional.ofNullable(attributes[1].toString());
+                }
             }
-        });
+        }
 
         final Optional<Map<String, String>> maybeMap = maybeRaw.flatMap(d -> {
             try {
@@ -126,8 +129,21 @@ public class OffenderEventsTransformer {
     }
 
     private Map<String, String> deserialize(byte[] bytes) throws IOException, ClassNotFoundException {
+
+        if (bytes == null) {
+            log.warn("No bytes to deserialize!");
+            return null;
+        }
+
         final Object o = new ObjectInputStream(new ByteArrayInputStream(bytes)).readObject();
-        return (Map<String, String>) o;
+
+        if (o instanceof Map) {
+            return (Map<String, String>) o;
+        } else {
+            log.warn("Can't deserialize bytes into Map. Deserialized is of type {}", o.getClass().toString());
+        }
+
+        return null;
     }
 
     private OffenderEvent offenderEventOf(Xtag xtag) {
@@ -136,131 +152,138 @@ public class OffenderEventsTransformer {
             return null;
         }
 
-        switch (xtag.getEventType()) {
-            case "P8_RESULT":
-                return riskScoreEventOf(xtag);
-            case "A3_RESULT":
-                return offenderSanctionEventOf(xtag);
-            case "P1_RESULT":
-            case "BOOK_UPD_OASYS":
-                return bookingNumberEventOf(xtag);
-            case "OFF_HEALTH_PROB_INS":
-                return maternityStatusInsertedEventOf(xtag);
-            case "OFF_HEALTH_PROB_UPD":
-                return maternityStatusUpdatedEventOf(xtag);
-            case "OFF_RECEP_OASYS":
-                return offenderMovementReceptionEventOf(xtag);
-            case "OFF_DISCH_OASYS":
-                return offenderMovementDischargeEventOf(xtag);
-            case "M1_RESULT":
-            case "M1_UPD_RESULT":
-                return externalMovementRecordEventOf(xtag);
-            case "OFF_UPD_OASYS":
-                return !Strings.isNullOrEmpty(xtag.getContent().getP_offender_book_id()) ?
-                        offenderBookingChangedEventOf(xtag) :
-                        offenderDetailsChangedEventOf(xtag);
-            case "ADDR_USG_INS":
-                return addressUsageInsertedEventOf(xtag);
-            case "ADDR_USG_UPD":
-                return xtag.getContent().getP_address_deleted().equals("Y") ?
-                        addressUsageDeletedEventOf(xtag) :
-                        addressUsageUpdatedEventOf(xtag);
-            case "P4_RESULT":
-                return offenderAliasChangedEventOf(xtag);
-            case "P2_RESULT":
-                return offenderUpdatedEventOf(xtag);
-            case "OFF_BKB_INS":
-                return offenderBookingInsertedEventOf(xtag);
-            case "OFF_BKB_UPD":
-                return offenderBookingReassignedEventOf(xtag);
-            case "OFF_CONT_PER_INS":
-                return contactPersonInsertedEventOf(xtag);
-            case "OFF_CONT_PER_UPD":
-                return xtag.getContent().getP_address_deleted().equals("Y") ?
-                        contactPersonDeletedEventOf(xtag) :
-                        contactPersonUpdatedEventOf(xtag);
-            case "OFF_EDUCATION_INS":
-                return educationLevelInsertedEventOf(xtag);
-            case "OFF_EDUCATION_UPD":
-                return educationLevelUpdatedEventOf(xtag);
-            case "OFF_EDUCATION_DEL":
-                return educationLevelDeletedEventOf(xtag);
-            case "P3_RESULT":
-                return (xtag.getContent().getP_identifier_type().equals("NOMISP3")) ?
-                        offenderBookingInsertedEventOf(xtag) :
-                        !Strings.isNullOrEmpty(xtag.getContent().getP_identifier_value()) ?
-                                offenderIdentifierInsertedEventOf(xtag) :
-                                offenderIdentifierDeletedEventOf(xtag);
-            case "S1_RESULT":
-                return !Strings.isNullOrEmpty(xtag.getContent().getP_imprison_status_seq()) ?
-                        imprisonmentStatusChangedEventOf(xtag) :
-                        !Strings.isNullOrEmpty(xtag.getContent().getP_assessment_seq()) ?
-                                assessmentChangedEventOf(xtag) :
-                                !Strings.isNullOrEmpty(xtag.getContent().getP_alert_date()) ?
-                                        alertUpdatedEventOf(xtag) :
-                                        alertInsertedEventOf(xtag);
-            case "OFF_IMP_STAT_OASYS":
-                return imprisonmentStatusChangedEventOf(xtag);
-            case "OFF_PROF_DETAIL_INS":
-                return offenderProfileDetailInsertedEventOf(xtag);
-            case "OFF_PROF_DETAIL_UPD":
-                return offenderProfileUpdatedEventOf(xtag);
-            case "S2_RESULT":
-                return sentenceCaclulationDateChangedEventOf(xtag);
-            case "A2_CALLBACK":
-                return hearingDateChangedEventOf(xtag);
-            case "A2_RESULT":
-                return "Y".equals(xtag.getContent().getP_delete_flag()) ?
-                        hearingResultDeletedEventOf(xtag) :
-                        hearingResultChangedEventOf(xtag);
-            case "PHONES_INS":
-                return phoneInsertedEventOf(xtag);
-            case "PHONES_UPD":
-                return phoneUpdatedEventOf(xtag);
-            case "PHONES_DEL":
-                return phoneDeletedEventOf(xtag);
-            case "OFF_EMPLOYMENTS_INS":
-                return offenderEmploymentInsertedEventOf(xtag);
-            case "OFF_EMPLOYMENTS_UPD":
-                return offenderEmploymentUpdatedEventOf(xtag);
-            case "OFF_EMPLOYMENTS_DEL":
-                return offenderEmploymentDeletedEventOf(xtag);
-            case "D5_RESULT":
-                return hdcConditionChanged(xtag);
-            case "D4_RESULT":
-                return hdcFineInserted(xtag);
-            case "ADDR_INS":
-                return personAddressInserted(xtag);
-            case "ADDR_UPD":
-                if (xtag.getContent().getP_owner_class().equals("PER")) {
+        log.info("Processing Xtag {}...", xtag);
+
+        try {
+            switch (xtag.getEventType()) {
+                case "P8_RESULT":
+                    return riskScoreEventOf(xtag);
+                case "A3_RESULT":
+                    return offenderSanctionEventOf(xtag);
+                case "P1_RESULT":
+                case "BOOK_UPD_OASYS":
+                    return bookingNumberEventOf(xtag);
+                case "OFF_HEALTH_PROB_INS":
+                    return maternityStatusInsertedEventOf(xtag);
+                case "OFF_HEALTH_PROB_UPD":
+                    return maternityStatusUpdatedEventOf(xtag);
+                case "OFF_RECEP_OASYS":
+                    return offenderMovementReceptionEventOf(xtag);
+                case "OFF_DISCH_OASYS":
+                    return offenderMovementDischargeEventOf(xtag);
+                case "M1_RESULT":
+                case "M1_UPD_RESULT":
+                    return externalMovementRecordEventOf(xtag);
+                case "OFF_UPD_OASYS":
+                    return !Strings.isNullOrEmpty(xtag.getContent().getP_offender_book_id()) ?
+                            offenderBookingChangedEventOf(xtag) :
+                            offenderDetailsChangedEventOf(xtag);
+                case "ADDR_USG_INS":
+                    return addressUsageInsertedEventOf(xtag);
+                case "ADDR_USG_UPD":
+                    return xtag.getContent().getP_address_deleted().equals("Y") ?
+                            addressUsageDeletedEventOf(xtag) :
+                            addressUsageUpdatedEventOf(xtag);
+                case "P4_RESULT":
+                    return offenderAliasChangedEventOf(xtag);
+                case "P2_RESULT":
+                    return offenderUpdatedEventOf(xtag);
+                case "OFF_BKB_INS":
+                    return offenderBookingInsertedEventOf(xtag);
+                case "OFF_BKB_UPD":
+                    return offenderBookingReassignedEventOf(xtag);
+                case "OFF_CONT_PER_INS":
+                    return contactPersonInsertedEventOf(xtag);
+                case "OFF_CONT_PER_UPD":
+                    return xtag.getContent().getP_address_deleted().equals("Y") ?
+                            contactPersonDeletedEventOf(xtag) :
+                            contactPersonUpdatedEventOf(xtag);
+                case "OFF_EDUCATION_INS":
+                    return educationLevelInsertedEventOf(xtag);
+                case "OFF_EDUCATION_UPD":
+                    return educationLevelUpdatedEventOf(xtag);
+                case "OFF_EDUCATION_DEL":
+                    return educationLevelDeletedEventOf(xtag);
+                case "P3_RESULT":
+                    return (xtag.getContent().getP_identifier_type().equals("NOMISP3")) ?
+                            offenderBookingInsertedEventOf(xtag) :
+                            !Strings.isNullOrEmpty(xtag.getContent().getP_identifier_value()) ?
+                                    offenderIdentifierInsertedEventOf(xtag) :
+                                    offenderIdentifierDeletedEventOf(xtag);
+                case "S1_RESULT":
+                    return !Strings.isNullOrEmpty(xtag.getContent().getP_imprison_status_seq()) ?
+                            imprisonmentStatusChangedEventOf(xtag) :
+                            !Strings.isNullOrEmpty(xtag.getContent().getP_assessment_seq()) ?
+                                    assessmentChangedEventOf(xtag) :
+                                    !Strings.isNullOrEmpty(xtag.getContent().getP_alert_date()) ?
+                                            alertUpdatedEventOf(xtag) :
+                                            alertInsertedEventOf(xtag);
+                case "OFF_IMP_STAT_OASYS":
+                    return imprisonmentStatusChangedEventOf(xtag);
+                case "OFF_PROF_DETAIL_INS":
+                    return offenderProfileDetailInsertedEventOf(xtag);
+                case "OFF_PROF_DETAIL_UPD":
+                    return offenderProfileUpdatedEventOf(xtag);
+                case "S2_RESULT":
+                    return sentenceCaclulationDateChangedEventOf(xtag);
+                case "A2_CALLBACK":
+                    return hearingDateChangedEventOf(xtag);
+                case "A2_RESULT":
+                    return "Y".equals(xtag.getContent().getP_delete_flag()) ?
+                            hearingResultDeletedEventOf(xtag) :
+                            hearingResultChangedEventOf(xtag);
+                case "PHONES_INS":
+                    return phoneInsertedEventOf(xtag);
+                case "PHONES_UPD":
+                    return phoneUpdatedEventOf(xtag);
+                case "PHONES_DEL":
+                    return phoneDeletedEventOf(xtag);
+                case "OFF_EMPLOYMENTS_INS":
+                    return offenderEmploymentInsertedEventOf(xtag);
+                case "OFF_EMPLOYMENTS_UPD":
+                    return offenderEmploymentUpdatedEventOf(xtag);
+                case "OFF_EMPLOYMENTS_DEL":
+                    return offenderEmploymentDeletedEventOf(xtag);
+                case "D5_RESULT":
+                    return hdcConditionChanged(xtag);
+                case "D4_RESULT":
+                    return hdcFineInserted(xtag);
+                case "ADDR_INS":
+                    return personAddressInserted(xtag);
+                case "ADDR_UPD":
+                    if (xtag.getContent().getP_owner_class().equals("PER")) {
+                        return xtag.getContent().getP_address_deleted().equals("N") ?
+                                personAddressUpdatedEventOf(xtag) :
+                                personAddressDeletedEventOf(xtag);
+                    }
+                    if (xtag.getContent().getP_owner_class().equals("OFF")) {
+                        return xtag.getContent().getP_address_deleted().equals("N") ?
+                                offenderAddressUpdatedEventOf(xtag) :
+                                offenderAddressDeletedEventOf(xtag);
+                    }
                     return xtag.getContent().getP_address_deleted().equals("N") ?
-                            personAddressUpdatedEventOf(xtag) :
-                            personAddressDeletedEventOf(xtag);
-                }
-                if (xtag.getContent().getP_owner_class().equals("OFF")) {
-                    return xtag.getContent().getP_address_deleted().equals("N") ?
-                            offenderAddressUpdatedEventOf(xtag) :
-                            offenderAddressDeletedEventOf(xtag);
-                }
-                return xtag.getContent().getP_address_deleted().equals("N") ?
-                        addressUpdatedEventOf(xtag) :
-                        addressDeletedEventOf(xtag);
-            case "S1_DEL_RESULT":
-                return alertDeletedEventOf(xtag);
-            case "OFF_SENT_OASYS":
-                return sentenceCaclulationDateChangedEventOf(xtag);
-            case "C_NOTIFICATION":
-                return courtSentenceChangedEventOf(xtag);
-            case "IEDT_OUT":
-                return offenderTransferOutOfLidsEventOf(xtag);
-            default:
-                return OffenderEvent.builder()
-                        .eventType(xtag.getEventType())
-                        .eventDatetime(xtag.getNomisTimestamp())
-                        .offenderId(longOf(xtag.getContent().getP_offender_id()))
-                        .rootOffenderId(longOf(xtag.getContent().getP_root_offender_id()))
-                        .bookingId(longOf(xtag.getContent().getP_offender_book_id()))
-                        .build();
+                            addressUpdatedEventOf(xtag) :
+                            addressDeletedEventOf(xtag);
+                case "S1_DEL_RESULT":
+                    return alertDeletedEventOf(xtag);
+                case "OFF_SENT_OASYS":
+                    return sentenceCaclulationDateChangedEventOf(xtag);
+                case "C_NOTIFICATION":
+                    return courtSentenceChangedEventOf(xtag);
+                case "IEDT_OUT":
+                    return offenderTransferOutOfLidsEventOf(xtag);
+                default:
+                    return OffenderEvent.builder()
+                            .eventType(xtag.getEventType())
+                            .eventDatetime(xtag.getNomisTimestamp())
+                            .offenderId(longOf(xtag.getContent().getP_offender_id()))
+                            .rootOffenderId(longOf(xtag.getContent().getP_root_offender_id()))
+                            .bookingId(longOf(xtag.getContent().getP_offender_book_id()))
+                            .build();
+            }
+        } catch (Throwable t) {
+            log.error("Caught throwable {} {}", t.getMessage(), t.getStackTrace());
+            throw t;
         }
     }
 
@@ -876,10 +899,10 @@ public class OffenderEventsTransformer {
     }
 
     public static LocalDate localDateOf(String date) {
-        final String pattern = "yyyy-MM-dd HH:mm:ss";
+        final String pattern = "[yyyy-MM-dd HH:mm:ss][dd-MMM-yyyy]";
         try {
             return Optional.ofNullable(date)
-                    .map(d -> LocalDateTime.parse(d, DateTimeFormatter.ofPattern(pattern)).toLocalDate())
+                    .map(d -> LocalDate.parse(d, new DateTimeFormatterBuilder().parseCaseInsensitive().appendPattern(pattern).toFormatter()))
                     .orElse(null);
         } catch (DateTimeParseException dtpe) {
             log.error("Unable to parse {} into a LocalDate using pattern {}", date, pattern);

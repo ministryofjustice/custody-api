@@ -28,8 +28,10 @@ public class OracleXtagEventsRepository implements XtagEventsRepository {
 
     private Optional<XtagEventNonJpa> xtagEventOf(ResultSet rs) {
 
+        XtagEventNonJpa xtagEventNonJpaWithoutOracleTypes = null;
+
         try {
-            return Optional.of(XtagEventNonJpa.builder()
+            xtagEventNonJpaWithoutOracleTypes = XtagEventNonJpa.builder()
                     .chainNo(rs.getLong("CHAIN_NO"))
                     .corrID(rs.getString("CORRID"))
                     .cscn(rs.getLong("CSCN"))
@@ -57,13 +59,20 @@ public class OracleXtagEventsRepository implements XtagEventsRepository {
                     .state(rs.getLong("STATE"))
                     .stepNo(rs.getLong("STEP_NO"))
                     .timeManagerInfo(rs.getTimestamp("TIME_MANAGER_INFO"))
+                    .build();
+
+
+            return Optional.of(xtagEventNonJpaWithoutOracleTypes.toBuilder()
                     .userData((STRUCT) rs.getObject("USER_DATA"))
                     .userProp((STRUCT) rs.getObject("USER_PROP"))
                     .build());
+
         } catch (SQLException e) {
             log.error(e.getMessage());
-            return Optional.empty();
+        } catch (Throwable t) {
+            log.error("Caught throwable building XtagEventNonJpa {}. Will return empty and continue! : {} {}",xtagEventNonJpaWithoutOracleTypes, t.getMessage(), t.getStackTrace());
         }
+        return Optional.empty();
     }
 
     @Override

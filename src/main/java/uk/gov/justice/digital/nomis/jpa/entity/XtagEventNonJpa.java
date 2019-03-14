@@ -7,7 +7,7 @@ import oracle.sql.STRUCT;
 import java.sql.Timestamp;
 
 @Value
-@Builder
+@Builder(toBuilder = true)
 public class XtagEventNonJpa {
     private String msgId;
     private String qName;

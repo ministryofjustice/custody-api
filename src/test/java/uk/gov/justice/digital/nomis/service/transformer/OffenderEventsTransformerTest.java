@@ -68,6 +68,7 @@ public class OffenderEventsTransformerTest {
     @Test
     public void localDateOfBehavesAppropriately() {
         assertThat(OffenderEventsTransformer.localDateOf("2019-02-14 10:11:12")).isEqualTo(LocalDate.of(2019, 02, 14));
+        assertThat(OffenderEventsTransformer.localDateOf("14-FEB-2019")).isEqualTo(LocalDate.of(2019, 02, 14));
         assertThat(OffenderEventsTransformer.localDateOf(null)).isNull();
         assertThat(OffenderEventsTransformer.localDateOf("Some rubbish")).isNull();
     }
