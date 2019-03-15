@@ -124,4 +124,13 @@ public class OffenderEventsTransformerTest {
                 .build())).isEqualTo(NOT_A_CASE_NOTE);
     }
 
+    @Test
+    public void unkownEventTypesAreHandledAppropriately() {
+        OffenderEventsTransformer transformer = new OffenderEventsTransformer(mock(TypesTransformer.class), mock(ObjectMapper.class));
+
+        assertThat(transformer.offenderEventOf((Xtag)null)).isNull();
+        assertThat(transformer.offenderEventOf(Xtag.builder().build())).isNull();
+        assertThat(transformer.offenderEventOf(Xtag.builder().eventType("meh").build())).isNotNull();
+    }
+
 }

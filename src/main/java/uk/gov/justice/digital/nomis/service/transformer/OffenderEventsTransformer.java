@@ -146,9 +146,9 @@ public class OffenderEventsTransformer {
         return null;
     }
 
-    private OffenderEvent offenderEventOf(Xtag xtag) {
-        if (xtag == null) {
-            log.warn("Null xtag");
+    public OffenderEvent offenderEventOf(Xtag xtag) {
+        if (xtag == null || xtag.getEventType() == null) {
+            log.warn("Bad xtag: {}", xtag);
             return null;
         }
 
@@ -276,9 +276,6 @@ public class OffenderEventsTransformer {
                     return OffenderEvent.builder()
                             .eventType(xtag.getEventType())
                             .eventDatetime(xtag.getNomisTimestamp())
-                            .offenderId(longOf(xtag.getContent().getP_offender_id()))
-                            .rootOffenderId(longOf(xtag.getContent().getP_root_offender_id()))
-                            .bookingId(longOf(xtag.getContent().getP_offender_book_id()))
                             .build();
             }
         } catch (Throwable t) {
