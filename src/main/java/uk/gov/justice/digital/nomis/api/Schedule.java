@@ -22,4 +22,5 @@ public class Schedule {
     private LocalTime startTime;
     private LocalTime endTime;
     private Long catchUpCourseScheduleId;
+    private String slotCategoryCode;
 }

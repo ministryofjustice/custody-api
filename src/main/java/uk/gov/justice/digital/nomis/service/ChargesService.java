@@ -70,11 +70,7 @@ public class ChargesService {
                                 .flatMap(Collection::stream)
                                 .collect(Collectors.toList()));
 
-        return maybeOffenderCharges.map(offenderCharges ->
-                offenderCharges.stream()
-                        .sorted(BY_OFFENCE_RANK)
-                        .map(chargesTransformer::chargeOf)
-                        .collect(Collectors.toList()));
+        return maybeOffenderCharges.map(this::bookingChargesOf);
     }
 
     public Optional<List<Charge>> chargesForOffenderIdAndBookingId(Long offenderId, Long bookingId) {
@@ -85,11 +81,15 @@ public class ChargesService {
                         .stream()
                         .filter(ob -> ob.getOffenderBookId().equals(bookingId))
                         .findFirst())
-                .map(ob -> ob.getOffenderCharges()
-                        .stream()
-                        .sorted(BY_OFFENCE_RANK)
-                        .map(chargesTransformer::chargeOf)
-                        .collect(Collectors.toList()));
+                .map(ob -> bookingChargesOf(ob.getOffenderCharges()));
+    }
+
+    public List<Charge> bookingChargesOf(List<OffenderCharge> offenderCharges) {
+        return offenderCharges
+                .stream()
+                .sorted(BY_OFFENCE_RANK)
+                .map(chargesTransformer::chargeOf)
+                .collect(Collectors.toList());
     }
 
 }

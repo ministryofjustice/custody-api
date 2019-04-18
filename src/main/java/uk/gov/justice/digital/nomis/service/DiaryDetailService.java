@@ -49,7 +49,7 @@ public class DiaryDetailService {
                 .collect(Collectors.toList());
     }
 
-    private Stream<DiaryDetail> diaryDetailsOfBooking(OffenderBooking offenderBooking) {
+    public Stream<DiaryDetail> diaryDetailsOfBooking(OffenderBooking offenderBooking) {
 
         final Stream<DiaryDetail> courtEventDiaryDetailStream = offenderBooking.getCourtEvents()
                 .stream()

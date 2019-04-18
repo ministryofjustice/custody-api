@@ -93,6 +93,7 @@ public class OffenderProgrammeProfileTransformer {
                         .scheduledDate(typesTransformer.localDateOf(cs.getScheduleDate()))
                         .sessionNo(cs.getSessionNo())
                         .startTime(typesTransformer.localDateTimeOf(cs.getStartTime()).toLocalTime())
+                        .slotCategoryCode(courseSchedule.getSlotCategoryCode())
                         .build())
                 .orElse(null);
     }

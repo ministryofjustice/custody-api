@@ -23,7 +23,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.justice.digital.nomis.api.Offender;
 import uk.gov.justice.digital.nomis.api.OffenderActiveBooking;
+import uk.gov.justice.digital.nomis.api.OffenderCDE;
 import uk.gov.justice.digital.nomis.service.OffenderService;
+import uk.gov.justice.digital.nomis.service.OfflocService;
 
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
@@ -32,10 +34,12 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 public class OffenderController {
 
     private final OffenderService offenderService;
+    private final OfflocService offlocService;
 
     @Autowired
-    public OffenderController(OffenderService offenderService) {
+    public OffenderController(OffenderService offenderService, OfflocService offlocService) {
         this.offenderService = offenderService;
+        this.offlocService = offlocService;
     }
 
     @RequestMapping(path = "/offenders", method = RequestMethod.GET)
@@ -92,6 +96,17 @@ public class OffenderController {
 
         Page<OffenderActiveBooking> offenders = offenderService.getOffendersByPrison(agencyLocationId, pageable);
         return new PagedResourcesAssembler<OffenderActiveBooking>(null, null).toResource(offenders);
+    }
+
+    @RequestMapping(path = "/offenders/offenderId/{offenderId}/all", method = RequestMethod.GET)
+    @ApiResponses({
+            @ApiResponse(code = 404, message = "Offender or booking not found"),
+            @ApiResponse(code = 200, message = "OK")})
+    public ResponseEntity<OffenderCDE> getFullFatOffender(@PathVariable("offenderId") Long offenderId) {
+
+        return offlocService.getFullFatOffenderByOffenderId(offenderId)
+                .map(offender -> new ResponseEntity<>(offender, HttpStatus.OK))
+                .orElse(new ResponseEntity<>(NOT_FOUND));
     }
 
 }

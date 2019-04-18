@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.justice.digital.nomis.api.OffenderIepLevel;
+import uk.gov.justice.digital.nomis.jpa.entity.OffenderBooking;
 import uk.gov.justice.digital.nomis.jpa.repository.OffenderRepository;
 import uk.gov.justice.digital.nomis.service.transformer.IEPTransformer;
 
@@ -40,6 +41,13 @@ public class IEPService {
                         .map(iepTransformer::offenderIepLevelOf)
                         .collect(Collectors.toList()));
 
+    }
+
+    public List<OffenderIepLevel> bookingIepsOf(OffenderBooking booking) {
+        return booking.getOffenderIepLevels().stream()
+                .sorted(BY_IEP_SEQ_REVERSED)
+                .map(iepTransformer::offenderIepLevelOf)
+                .collect(Collectors.toList());
     }
 
 }

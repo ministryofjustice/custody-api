@@ -20,7 +20,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Component
 public class OffenderTransformer {
@@ -54,19 +53,23 @@ public class OffenderTransformer {
         return Optional.ofNullable(offenderList)
                 .map(offenders -> offenders
                         .stream()
-                        .map(offender -> OffenderAlias.builder()
-                                .offenderId(offender.getOffenderId())
-                                .firstName(offender.getFirstName())
-                                .middleNames(combinedMiddlenamesOf(offender))
-                                .surname(offender.getLastName())
-                                .dateOfBirth(offender.getBirthDate().toLocalDateTime().toLocalDate())
-                                .identifiers(identifiersOf(offender.getOffenderIdentifiers()))
-                                .nomsId(offender.getOffenderIdDisplay())
-                                .gender(genderOf(offender))
-                                .ethnicity(ethnicityOf(offender))
-                                .build())
+                        .map(offender -> aliasOf(offender))
                         .collect(Collectors.toList()))
                 .orElse(Collections.emptyList());
+    }
+
+    public OffenderAlias aliasOf(Offender offender) {
+        return OffenderAlias.builder()
+                .offenderId(offender.getOffenderId())
+                .firstName(offender.getFirstName())
+                .middleNames(combinedMiddlenamesOf(offender))
+                .surname(offender.getLastName())
+                .dateOfBirth(offender.getBirthDate().toLocalDateTime().toLocalDate())
+                .identifiers(identifiersOf(offender.getOffenderIdentifiers()))
+                .nomsId(offender.getOffenderIdDisplay())
+                .gender(genderOf(offender))
+                .ethnicity(ethnicityOf(offender))
+                .build();
     }
 
     private List<Identifier> identifiersOf(List<OffenderIdentifier> offenderIdentifiers) {
@@ -116,8 +119,7 @@ public class OffenderTransformer {
     }
 
     private String combinedMiddlenamesOf(Offender offender) {
-        return middleNamesOf(offender.getMiddleName(), offender.getMiddleName2()).stream()
-                .collect(Collectors.joining(" "));
+        return String.join(" ", middleNamesOf(offender.getMiddleName(), offender.getMiddleName2()));
     }
 
     private List<String> middleNamesOf(String secondName, String thirdName) {
@@ -126,7 +128,7 @@ public class OffenderTransformer {
 
         return ImmutableList.of(maybeSecondName, maybeThirdName)
                 .stream()
-                .flatMap(o -> o.map(Stream::of).orElseGet(Stream::empty))
+                .flatMap(Optional::stream)
                 .collect(Collectors.toList());
     }
 

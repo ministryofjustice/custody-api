@@ -10,7 +10,7 @@ import java.time.LocalDate;
 
 @Data
 @EqualsAndHashCode(of = "programProfileId")
-@Builder
+@Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
 public class ProgrammeProfile {
