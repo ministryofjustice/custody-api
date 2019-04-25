@@ -11,8 +11,8 @@ public class SentenceCalculationDatesCDE {
         this.sentenceCalculation = sentenceCalculation;
     }
 
-    public static LocalDateTime optionalDateOf(LocalDateTime d1, LocalDateTime d2) {
-        return Optional.ofNullable(d1).orElse(Optional.ofNullable(d2).orElse(null));
+    public static Optional<LocalDateTime> optionalDateOf(LocalDateTime d1, LocalDateTime d2) {
+        return Optional.ofNullable((d1 != null) ? d1 : d2);
     }
 
     public YMD getEffectiveSentenceLength() {
@@ -27,75 +27,75 @@ public class SentenceCalculationDatesCDE {
         return sentenceCalculation.getEffectiveSentenceEndDate();
     }
 
-    public LocalDateTime getSed() {
+    public Optional<LocalDateTime> getSed() {
         return optionalDateOf(sentenceCalculation.getSedOverridedDate(), sentenceCalculation.getSedCalculatedDate());
     }
 
-    public LocalDateTime getHdced() {
+    public Optional<LocalDateTime> getHdced() {
         return optionalDateOf(sentenceCalculation.getHdcedOverridedDate(), sentenceCalculation.getHdcedCalculatedDate());
     }
 
-    public LocalDateTime getHdcad() {
+    public Optional<LocalDateTime> getHdcad() {
         return optionalDateOf(sentenceCalculation.getHdcadOverridedDate(), sentenceCalculation.getHdcadCalculatedDate());
     }
 
-    public LocalDateTime getEtd() {
+    public Optional<LocalDateTime> getEtd() {
         return optionalDateOf(sentenceCalculation.getEtdOverridedDate(), sentenceCalculation.getEtdCalculatedDate());
     }
 
-    public LocalDateTime getMtd() {
+    public Optional<LocalDateTime> getMtd() {
         return optionalDateOf(sentenceCalculation.getMtdOverridedDate(), sentenceCalculation.getMtdCalculatedDate());
     }
 
-    public LocalDateTime getLtd() {
+    public Optional<LocalDateTime> getLtd() {
         return optionalDateOf(sentenceCalculation.getLtdOverridedDate(), sentenceCalculation.getLtdCalculatedDate());
     }
 
-    public LocalDateTime getCrd() {
+    public Optional<LocalDateTime> getCrd() {
         return optionalDateOf(sentenceCalculation.getCrdOverridedDate(), sentenceCalculation.getCrdCalculatedDate());
     }
 
-    public LocalDateTime getPed() {
+    public Optional<LocalDateTime> getPed() {
         return optionalDateOf(sentenceCalculation.getPedOverridedDate(), sentenceCalculation.getPedCalculatedDate());
     }
 
-    public LocalDateTime getApd() {
+    public Optional<LocalDateTime> getApd() {
         return optionalDateOf(sentenceCalculation.getApdOverridedDate(), sentenceCalculation.getApdCalculatedDate());
     }
 
-    public LocalDateTime getNpd() {
+    public Optional<LocalDateTime> getNpd() {
         return optionalDateOf(sentenceCalculation.getNpdOverridedDate(), sentenceCalculation.getNpdCalculatedDate());
     }
 
-    public LocalDateTime getArd() {
+    public Optional<LocalDateTime> getArd() {
         return optionalDateOf(sentenceCalculation.getArdOverridedDate(), sentenceCalculation.getArdCalculatedDate());
     }
 
-    public LocalDateTime getLed() {
+    public Optional<LocalDateTime> getLed() {
         return optionalDateOf(sentenceCalculation.getLedOverridedDate(), sentenceCalculation.getLedCalculatedDate());
     }
 
-    public LocalDateTime getTused() {
+    public Optional<LocalDateTime> getTused() {
         return optionalDateOf(sentenceCalculation.getTusedOverridedDate(), sentenceCalculation.getTusedCalculatedDate());
     }
 
-    public LocalDateTime getPrrd() {
+    public Optional<LocalDateTime> getPrrd() {
         return optionalDateOf(sentenceCalculation.getPrrdOverridedDate(), sentenceCalculation.getPrrdCalculatedDate());
     }
 
-    public LocalDateTime getErsed() {
+    public Optional<LocalDateTime> getErsed() {
         return optionalDateOf(sentenceCalculation.getErsedOverridedDate(), null);
     }
 
-    public LocalDateTime getTersed() {
+    public Optional<LocalDateTime> getTersed() {
         return optionalDateOf(sentenceCalculation.getTersedOverridedDate(), null);
     }
 
-    public LocalDateTime getRotl() {
+    public Optional<LocalDateTime> getRotl() {
         return optionalDateOf(sentenceCalculation.getRotlOverridedDate(), null);
     }
 
-    public LocalDateTime getTariff() {
+    public Optional<LocalDateTime> getTariff() {
         return optionalDateOf(sentenceCalculation.getTariffOverridedDate(), sentenceCalculation.getTariffCalculatedDate());
     }
 }

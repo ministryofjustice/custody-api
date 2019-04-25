@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -77,6 +78,7 @@ import static uk.gov.justice.digital.nomis.service.EmploymentsService.BY_EMPLOYM
 
 @Service
 @Transactional(readOnly = true)
+@Slf4j
 public class OfflocService {
     private final OffenderRepository offenderRepository;
     private final AlertsTransformer alertsTransformer;
@@ -160,7 +162,8 @@ public class OfflocService {
         var highestRankedOffence = highestRankedOffenceOf(charges);
         var lastSequentialMovement = lastSequentialMovementOf(movements);
 
-        return maybeOffender.map(offender -> OffenderCDE.builder()
+        try {
+        var x = maybeOffender.map(offender -> OffenderCDE.builder()
                 .activeAlerts(activeAlertsOf(maybeMainBooking))
                 .activeTransfers(activeTransfersOf(maybeMainBooking))
                 .activityDetails(activityDetailsOf(maybeMainBooking, today))
@@ -205,12 +208,16 @@ public class OfflocService {
                 .offenderSentenceLength(offenderSentenceLengthOf(maybeSentenceCalc, offenderSentence))
                 .otherOffences(otherOffencesOf(charges, highestRankedOffence))
                 .offenderSentenceCalculations(maybeSentenceCalc.orElse(null))
-                .physicals(physicalsOf(maybeMainBooking))
+                    .physicals(physicalsOf(maybeMainBooking))
                 .previousBookingNos(previousBookingNumbersOf(maybeOffender, maybeMainBooking))
                 .receptionEmployment(receptionEmploymentOf(employments))
                 .releaseDetails(releaseDetailsOf(maybeMainBooking))
                 .build());
 
+        return x;} catch (Throwable t) {
+            log.error(t.getMessage());
+        }
+        return null;
     }
 
     private ReleaseDetails releaseDetailsOf(Optional<OffenderBooking> maybeMainBooking) {
@@ -220,7 +227,7 @@ public class OfflocService {
     }
 
     private Employment receptionEmploymentOf(List<Employment> employments) {
-        return Iterables.getLast(employments);
+        return (employments.isEmpty()) ? null : Iterables.getLast(employments);
     }
 
     private List<String> previousBookingNumbersOf(Optional<Offender> maybeOffender, Optional<OffenderBooking> maybeMainBooking) {
@@ -566,6 +573,8 @@ public class OfflocService {
                 .flatMap(sc -> ImmutableSet.of(sc.getHdced(), sc.getHdcad(), sc.getEtd(), sc.getMtd(), sc.getLtd(), sc.getCrd(),
                         sc.getPed(), sc.getApd(), sc.getNpd(), sc.getArd())
                         .stream()
+                        .filter(Optional::isPresent)
+                        .map(Optional::get)
                         .min(Comparator.naturalOrder())
                         .map(LocalDateTime::toLocalDate))
                 .orElse(null);
