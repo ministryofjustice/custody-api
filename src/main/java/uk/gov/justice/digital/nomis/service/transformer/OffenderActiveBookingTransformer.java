@@ -26,7 +26,7 @@ public class OffenderActiveBookingTransformer {
     }
 
 
-    private Booking bookingOf(OffenderBooking booking) {
+    public Booking bookingOf(OffenderBooking booking) {
         return Booking.builder()
                 .bookingSequence(booking.getBookingSeq())
                 .startDate(booking.getBookingBeginDate().toLocalDateTime().toLocalDate())

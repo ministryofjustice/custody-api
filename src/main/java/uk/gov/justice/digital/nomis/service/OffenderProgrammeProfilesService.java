@@ -16,6 +16,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -67,15 +68,19 @@ public class OffenderProgrammeProfilesService {
                         .stream()
                         .filter(ob -> ob.getOffenderBookId().equals(bookingId))
                         .findFirst())
-                .map(ob -> offenderProgramProfilesRepository
-                        .findAll(OffenderProgramProfilesFilter.builder()
-                                .bookingId(ob.getOffenderBookId())
-                                .from(from)
-                                .to(to)
-                                .build())
-                        .stream()
-                        .map(opp -> offenderProgrammeProfileTransformer.programmeProfileOf(opp, from, to))
-                        .collect(Collectors.toSet()))
+                .map(ob -> bookingOffenderProgrammeProfilesOf(from, to, ob))
                 .map(ImmutableList::copyOf);
+    }
+
+    public Set<ProgrammeProfile> bookingOffenderProgrammeProfilesOf(LocalDateTime from, LocalDateTime to, OffenderBooking ob) {
+        return offenderProgramProfilesRepository
+                .findAll(OffenderProgramProfilesFilter.builder()
+                        .bookingId(ob.getOffenderBookId())
+                        .from(from)
+                        .to(to)
+                        .build())
+                .stream()
+                .map(opp -> offenderProgrammeProfileTransformer.programmeProfileOf(opp, from, to))
+                .collect(Collectors.toSet());
     }
 }

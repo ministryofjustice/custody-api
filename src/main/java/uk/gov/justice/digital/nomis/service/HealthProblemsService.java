@@ -71,4 +71,12 @@ public class HealthProblemsService {
                         .collect(Collectors.toList()));
     }
 
+    public List<HealthProblem> bookingHealthProblemsOf(OffenderBooking booking) {
+
+        return booking.getOffenderHealthProblems()
+                .stream()
+                .map(healthProblemsTransformer::healthProblemOf)
+                .collect(Collectors.toList());
+    }
+
 }

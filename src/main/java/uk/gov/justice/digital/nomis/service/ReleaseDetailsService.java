@@ -15,6 +15,7 @@ import uk.gov.justice.digital.nomis.jpa.repository.OffenderRepository;
 import uk.gov.justice.digital.nomis.service.transformer.ReleaseDetailsTransformer;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -50,7 +51,7 @@ public class ReleaseDetailsService {
                 .map(offender -> offender.getOffenderBookings()
                                 .stream()
                                 .map(OffenderBooking::getOffenderReleaseDetails)
-                                .filter(x -> x != null)
+                                .filter(Objects::nonNull)
                                 .collect(Collectors.toList()));
 
         return maybeReleaseDetails.map(releaseDetails -> releaseDetails

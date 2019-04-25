@@ -95,4 +95,12 @@ public class AssessmentService {
                         .sorted(BY_ASSESSMENT_STATUS_SEQUENCE)
                         .collect(Collectors.toList()));
     }
+
+    @Transactional
+    public List<OffenderAssessment> bookingOffenderAssessmentsOf(OffenderBooking booking) {
+        return booking.getOffenderAssessments().stream()
+                .map(assessmentsTransformer::assessmentOf)
+                .sorted(BY_ASSESSMENT_STATUS_SEQUENCE)
+                .collect(Collectors.toList());
+    }
 }

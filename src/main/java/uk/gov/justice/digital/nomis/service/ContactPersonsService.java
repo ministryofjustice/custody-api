@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.gov.justice.digital.nomis.api.OffenderContactPerson;
 import uk.gov.justice.digital.nomis.jpa.entity.AddressPhone;
 import uk.gov.justice.digital.nomis.jpa.entity.AddressUsage;
+import uk.gov.justice.digital.nomis.jpa.entity.OffenderBooking;
 import uk.gov.justice.digital.nomis.jpa.repository.OffenderRepository;
 import uk.gov.justice.digital.nomis.service.transformer.ContactPersonsTransformer;
 
@@ -98,8 +99,16 @@ public class ContactPersonsService {
                         .sorted(BY_CONTACT_PRIORITY)
                         .map(contactPersonsTransformer::offenderContactPersonOf)
                         .collect(Collectors.toList()));
-
     }
+
+    public List<OffenderContactPerson> bookingContactPersonsOf(OffenderBooking booking) {
+
+        return booking.getOffenderContactPersons().stream()
+                        .sorted(BY_CONTACT_PRIORITY)
+                        .map(contactPersonsTransformer::offenderContactPersonOf)
+                        .collect(Collectors.toList());
+    }
+
 
 
 }

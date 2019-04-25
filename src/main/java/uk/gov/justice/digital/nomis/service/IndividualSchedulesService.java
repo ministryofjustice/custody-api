@@ -59,12 +59,12 @@ public class IndividualSchedulesService {
     private List<IndividualSchedule> individualScheduleOfOffender(Offender offender, Long bookingId) {
         return offender.getOffenderBookings()
                 .stream()
-                .filter(ob -> ob.getOffenderBookId() == bookingId)
+                .filter(ob -> ob.getOffenderBookId().equals(bookingId))
                 .flatMap(this::individualSchedulesOfBooking)
                 .collect(Collectors.toList());
     }
 
-    private Stream<IndividualSchedule> individualSchedulesOfBooking(OffenderBooking offenderBooking) {
+    public Stream<IndividualSchedule> individualSchedulesOfBooking(OffenderBooking offenderBooking) {
         return offenderBooking.getOffenderIndSchedules()
                 .stream()
                 .filter(offenderIndSchedule -> SCH.equals(offenderIndSchedule.getEventStatus()))

@@ -98,13 +98,13 @@ public class OffenderController {
         return new PagedResourcesAssembler<OffenderActiveBooking>(null, null).toResource(offenders);
     }
 
-    @RequestMapping(path = "/offenders/offenderId/{offenderId}/all", method = RequestMethod.GET)
+    @RequestMapping(path = "/offenders/offenderId/{offenderId}/cde", method = RequestMethod.GET)
     @ApiResponses({
-            @ApiResponse(code = 404, message = "Offender or booking not found"),
+            @ApiResponse(code = 404, message = "Offender not found"),
             @ApiResponse(code = 200, message = "OK")})
     public ResponseEntity<OffenderCDE> getFullFatOffender(@PathVariable("offenderId") Long offenderId) {
 
-        return offlocService.getFullFatOffenderByOffenderId(offenderId)
+        return offlocService.getCDEByOffenderId(offenderId)
                 .map(offender -> new ResponseEntity<>(offender, HttpStatus.OK))
                 .orElse(new ResponseEntity<>(NOT_FOUND));
     }

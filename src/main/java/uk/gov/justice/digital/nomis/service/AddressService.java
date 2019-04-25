@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.gov.justice.digital.nomis.api.Address;
 import uk.gov.justice.digital.nomis.jpa.entity.AddressPhone;
 import uk.gov.justice.digital.nomis.jpa.entity.AddressUsage;
+import uk.gov.justice.digital.nomis.jpa.entity.Offender;
 import uk.gov.justice.digital.nomis.jpa.repository.AddressRepository;
 import uk.gov.justice.digital.nomis.jpa.repository.OffenderRepository;
 import uk.gov.justice.digital.nomis.service.transformer.AddressesTransformer;
@@ -94,13 +95,15 @@ public class AddressService {
 
     @Transactional
     public Optional<List<Address>> getOffenderAddresses(Long offenderId) {
+        return offenderRepository.findById(offenderId).map(this::addressesOf);
+    }
 
-        return offenderRepository.findById(offenderId)
-                .map(offender -> offender.getOffenderAddresses()
-                        .stream()
-                        .sorted(BY_ADDRESS_MODIFIED)
-                        .map(addressesTransformer::addressOf)
-                        .collect(Collectors.toList()));
+    public List<Address> addressesOf(Offender offender) {
+        return offender.getOffenderAddresses()
+                .stream()
+                .sorted(BY_ADDRESS_MODIFIED)
+                .map(addressesTransformer::addressOf)
+                .collect(Collectors.toList());
     }
 
 }

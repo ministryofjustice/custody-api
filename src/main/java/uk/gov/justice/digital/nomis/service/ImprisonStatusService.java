@@ -26,17 +26,15 @@ import java.util.stream.Stream;
 @Transactional(readOnly = true)
 public class ImprisonStatusService {
 
-    private final ImprisonStatusTransformer imprisonStatusTransformer;
-    private final OffenderImprisonStatusesRepository offenderImprisonStatusesRepository;
-    private final OffenderRepository offenderRepository;
-
     private static final Comparator<OffenderImprisonStatus> BY_EFFECTIVE_STATUS = Comparator
             .comparing(OffenderImprisonStatus::getLatestStatus, Comparator.nullsLast(Comparator.naturalOrder()))
             .thenComparing(OffenderImprisonStatus::getEffectiveDate)
             .thenComparing(OffenderImprisonStatus::getEffectiveTime)
             .thenComparing(OffenderImprisonStatus::getImprisonStatusSeq)
             .reversed();
-
+    private final ImprisonStatusTransformer imprisonStatusTransformer;
+    private final OffenderImprisonStatusesRepository offenderImprisonStatusesRepository;
+    private final OffenderRepository offenderRepository;
     private final TypesTransformer typesTransformer;
 
     @Autowired
@@ -52,11 +50,7 @@ public class ImprisonStatusService {
     public Page<OffenderImprisonmentStatus> getOffenderImprisonStatuses(Pageable pageable) {
         Page<uk.gov.justice.digital.nomis.jpa.entity.OffenderImprisonStatus> rawImprisonStatusesPage = offenderImprisonStatusesRepository.findAll(pageable);
 
-        List<OffenderImprisonmentStatus> offenderImprisonmentStatuses = rawImprisonStatusesPage.getContent()
-                .stream()
-                .sorted(BY_EFFECTIVE_STATUS)
-                .map(imprisonStatusTransformer::offenderImprisonStatusOf)
-                .collect(Collectors.toList());
+        List<OffenderImprisonmentStatus> offenderImprisonmentStatuses = offenderImprisonmentStatusesOf(rawImprisonStatusesPage.getContent());
 
         return new PageImpl<>(offenderImprisonmentStatuses, pageable, rawImprisonStatusesPage.getTotalElements());
     }
@@ -84,11 +78,19 @@ public class ImprisonStatusService {
                         .stream()
                         .filter(ob -> ob.getOffenderBookId().equals(bookingId))
                         .findFirst())
-                .map(ob -> ob.getOffenderImprisonStatuses()
-                        .stream()
-                        .sorted(BY_EFFECTIVE_STATUS)
-                        .map(imprisonStatusTransformer::offenderImprisonStatusOf)
-                        .collect(Collectors.toList()));
+                .map(this::bookingOffenderImprisonmentStatusesOf);
+    }
+
+    public List<OffenderImprisonmentStatus> bookingOffenderImprisonmentStatusesOf(OffenderBooking booking) {
+        return offenderImprisonmentStatusesOf(booking.getOffenderImprisonStatuses());
+    }
+
+    public List<OffenderImprisonmentStatus> offenderImprisonmentStatusesOf(List<OffenderImprisonStatus> imprisonStatuses) {
+        return imprisonStatuses
+                .stream()
+                .sorted(BY_EFFECTIVE_STATUS)
+                .map(imprisonStatusTransformer::offenderImprisonStatusOf)
+                .collect(Collectors.toList());
     }
 
 }

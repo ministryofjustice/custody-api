@@ -18,7 +18,7 @@ public class OffenderCDE {
     @Builder.Default
     private OffenderAlias mainAlias = OffenderAlias.builder().build();
     @Builder.Default
-    private List<String> offenderIdentifiers = Collections.emptyList();
+    private List<Identifier> offenderIdentifiers = Collections.emptyList();
     @Builder.Default
     private OffenderAssessment offenderSecurityCategory = OffenderAssessment.builder().build();
     @Builder.Default
@@ -55,13 +55,11 @@ public class OffenderCDE {
     private Boolean isSexOffender;
     private Charge highestRankedOffence;
     @Builder.Default
-    private List<Offence> otherOffences = Collections.emptyList();
+    private List<Charge> otherOffences = Collections.emptyList();
     @Builder.Default
-    private List<Person> offenderContactPersons = Collections.emptyList();
-    private Person nextOfKin;
-    private Person offenderManager;
-    @Builder.Default
-    private List<Address> offenderAddresses = Collections.emptyList();
+    private List<OffenderContactPerson> offenderContactPersons = Collections.emptyList();
+    private OffenderContactPerson nextOfKin;
+    private OffenderContactPerson offenderManager;
     private Address offenderHomeAddress;
     private Address offenderReceptionAddress;
     private Address offenderDischargeAddress;
@@ -71,11 +69,11 @@ public class OffenderCDE {
     private Alert MAPPA;
     @Builder.Default
     private CheckHoldAlertCDE checkHoldAlerts = CheckHoldAlertCDE.builder().build();
-    private Physicals physicals;
+    private PhysicalsCDE physicals;
     private IepLevel IEPLevel;
-    private ImprisonmentStatus offenderImprisonmentStatus;
+    private OffenderImprisonmentStatus offenderImprisonmentStatus;
     private ReleaseDetails releaseDetails;
-    private String mostRecentConviction;
+    private CourtEvent mostRecentConviction;
     private EarliestSentenceAndConvictionCDE earliestSentenceAndConviction;
     private CourtEvent courtOutcome;
     private HealthProblem maternityStatus;

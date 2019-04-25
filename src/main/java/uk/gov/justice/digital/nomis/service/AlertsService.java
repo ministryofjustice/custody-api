@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 public class AlertsService {
 
-    private static final Comparator<OffenderAlert> BY_ALERT_DATE = Comparator
+    public static final Comparator<OffenderAlert> BY_ALERT_DATE = Comparator
             .comparing(OffenderAlert::getOffenderBookId)
             .thenComparing(OffenderAlert::getAlertDate, Comparator.reverseOrder()) // Earliest first
             .thenComparing(OffenderAlert::getAlertSeq, Comparator.reverseOrder()) // ASC
@@ -103,5 +103,13 @@ public class AlertsService {
                         .filter(alert -> shouldInclude(alert, maybeAlertCode, maybeAlertStatus, maybeAlertType))
                         .map(alertsTransformer::alertOf)
                         .collect(Collectors.toList()));
+    }
+
+    public List<Alert> offenderAlertsForBooking(OffenderBooking booking) {
+        return booking.getOffenderAlerts()
+                .stream()
+                .sorted(BY_ALERT_DATE)
+                .map(alertsTransformer::alertOf)
+                .collect(Collectors.toList());
     }
 }

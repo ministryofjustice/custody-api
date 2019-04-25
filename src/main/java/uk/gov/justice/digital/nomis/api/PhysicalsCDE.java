@@ -6,14 +6,17 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+import java.util.Map;
 
 @Data
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
-public class Physicals {
+public class PhysicalsCDE {
     private Long bookingId;
-    private List<IdentifyingMark> identifyingMarks;
+    private IdentifyingMarkCDE identifyingMarks;
     private List<PhysicalAttribute> physicalAttributes;
-    private List<ProfileDetails> profileDetails;
+    private Map<String,KeyValue> profileDetails;
+
+
 }

@@ -17,8 +17,8 @@ public class SentenceCalculationDatesCDETest {
 
         final ObjectMapper objectMapper = new CustodyApiApplication().objectMapper();
         final LocalDateTime now = LocalDateTime.now();
-        String expected = "{\"apd\":\"" + now.toString() + "\"}";
-        assertThat(objectMapper.writeValueAsString(new SentenceCalculationDatesCDE(SentenceCalculation.builder().apdOverridedDate(now).build()))).isEqualTo(expected);
+        String expected = "\"apd\":\"" + now.toString() + "\"";
+        assertThat(objectMapper.writeValueAsString(new SentenceCalculationDatesCDE(SentenceCalculation.builder().apdOverridedDate(now).build()))).contains(expected);
     }
 
     @Test

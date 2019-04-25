@@ -82,4 +82,14 @@ public class SentencesService {
                         .map(sentenceTransformer::sentenceOf)
                         .collect(Collectors.toList()));
     }
+
+    @Transactional
+    public List<Sentence> bookingSentencesOf(OffenderBooking booking) {
+        return booking.getOffenderSentences()
+                .stream()
+                .sorted(BY_SENTENCE_PRIORITY)
+                .map(sentenceTransformer::sentenceOf)
+                .collect(Collectors.toList());
+    }
+
 }
