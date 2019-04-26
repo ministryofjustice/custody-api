@@ -6,6 +6,7 @@ import org.junit.Test;
 import uk.gov.justice.digital.nomis.CustodyApiApplication;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -25,9 +26,9 @@ public class SentenceCalculationDatesCDETest {
     public void optionalDateOfBehavesCorrectly() {
         final LocalDateTime now = LocalDateTime.now();
         final LocalDateTime later = now.plusDays(1L);
-        assertThat(SentenceCalculationDatesCDE.optionalDateOf(now,later)).isEqualTo(now);
-        assertThat(SentenceCalculationDatesCDE.optionalDateOf(now,null)).isEqualTo(now);
-        assertThat(SentenceCalculationDatesCDE.optionalDateOf(null,later)).isEqualTo(later);
-        assertThat(SentenceCalculationDatesCDE.optionalDateOf(null,null)).isNull();
+        assertThat(SentenceCalculationDatesCDE.optionalDateOf(now,later)).isEqualTo(Optional.of(now));
+        assertThat(SentenceCalculationDatesCDE.optionalDateOf(now,null)).isEqualTo(Optional.of(now));
+        assertThat(SentenceCalculationDatesCDE.optionalDateOf(null,later)).isEqualTo(Optional.of(later));
+        assertThat(SentenceCalculationDatesCDE.optionalDateOf(null,null)).isEqualTo(Optional.empty());
     }
 }
