@@ -424,7 +424,7 @@ public class OfflocService {
 
         return maybeOffender.flatMap(o -> addressService.addressesOf(o)
                 .stream()
-                .filter(address -> address.getAddressUsages().stream().anyMatch(au -> au.getActive() && !usageCodes.contains(au.getUsage().getCode())))
+                .filter(address -> address.getAddressUsages().stream().anyMatch(au -> au.getActive() && usageCodes.contains(au.getUsage().getCode())))
                 .findFirst()).orElse(null);
 
     }
