@@ -896,7 +896,7 @@ public class OffenderEventsTransformer {
     }
 
     public static LocalDate localDateOf(String date) {
-        final String pattern = "[yyyy-MM-dd HH:mm:ss][dd-MMM-yyyy]";
+        final String pattern = "[yyyy-MM-dd HH:mm:ss][dd-MMM-yyyy][dd-MMM-yy]";
         try {
             return Optional.ofNullable(date)
                     .map(d -> LocalDate.parse(d, new DateTimeFormatterBuilder().parseCaseInsensitive().appendPattern(pattern).toFormatter()))

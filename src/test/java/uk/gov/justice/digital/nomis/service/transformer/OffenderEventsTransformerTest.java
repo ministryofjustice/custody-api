@@ -69,6 +69,7 @@ public class OffenderEventsTransformerTest {
     public void localDateOfBehavesAppropriately() {
         assertThat(OffenderEventsTransformer.localDateOf("2019-02-14 10:11:12")).isEqualTo(LocalDate.of(2019, 02, 14));
         assertThat(OffenderEventsTransformer.localDateOf("14-FEB-2019")).isEqualTo(LocalDate.of(2019, 02, 14));
+        assertThat(OffenderEventsTransformer.localDateOf("14-FEB-19")).isEqualTo(LocalDate.of(2019, 02, 14));
         assertThat(OffenderEventsTransformer.localDateOf(null)).isNull();
         assertThat(OffenderEventsTransformer.localDateOf("Some rubbish")).isNull();
     }
@@ -83,24 +84,24 @@ public class OffenderEventsTransformerTest {
 
     @Test
     public void localDateTimeOfDateAndTimeBehavesAppropriately() {
-        assertThat(OffenderEventsTransformer.localDateTimeOf("2019-02-14 00:00:00","1970-01-01 10:11:12")).isEqualTo(LocalDateTime.of(2019, 02, 14, 10, 11, 12));
+        assertThat(OffenderEventsTransformer.localDateTimeOf("2019-02-14 00:00:00", "1970-01-01 10:11:12")).isEqualTo(LocalDateTime.of(2019, 02, 14, 10, 11, 12));
         assertThat(OffenderEventsTransformer.localDateTimeOf(null, "1970-01-01 10:11:12")).isNull();
         assertThat(OffenderEventsTransformer.localDateTimeOf(null, "Some rubbish")).isNull();
         assertThat(OffenderEventsTransformer.localDateTimeOf(null, null)).isNull();
-        assertThat(OffenderEventsTransformer.localDateTimeOf( "2019-02-14 00:00:00", "Some rubbish")).isEqualTo(LocalDateTime.of(2019, 02, 14, 00, 00, 00));
-        assertThat(OffenderEventsTransformer.localDateTimeOf( "2019-02-14 00:00:00", null)).isEqualTo(LocalDateTime.of(2019, 02, 14, 00, 00, 00));
+        assertThat(OffenderEventsTransformer.localDateTimeOf("2019-02-14 00:00:00", "Some rubbish")).isEqualTo(LocalDateTime.of(2019, 02, 14, 00, 00, 00));
+        assertThat(OffenderEventsTransformer.localDateTimeOf("2019-02-14 00:00:00", null)).isEqualTo(LocalDateTime.of(2019, 02, 14, 00, 00, 00));
     }
 
     @Test
     public void externalMovementRecordEventOfHandlesAgyLocIdsAsStrings() {
 
-        var transformer = new OffenderEventsTransformer(null,null);
+        var transformer = new OffenderEventsTransformer(null, null);
         assertThat(transformer.externalMovementRecordEventOf(Xtag.builder().content(
                 XtagContent.builder()
                         .p_from_agy_loc_id("BARBECUE")
                         .p_to_agy_loc_id("SAUCE")
                         .build()
-        ).build())).extracting("fromAgencyLocationId","toAgencyLocationId").containsOnly("BARBECUE","SAUCE");
+        ).build())).extracting("fromAgencyLocationId", "toAgencyLocationId").containsOnly("BARBECUE", "SAUCE");
 
     }
 
@@ -111,7 +112,7 @@ public class OffenderEventsTransformerTest {
         assertThat(transformer.caseNoteEventTypeOf(OffenderEvent.builder()
                 .eventType("CASE_NOTE")
                 .eventData1(CASE_NOTE_JSON)
-        .build())).isEqualTo("GEN-OSE");
+                .build())).isEqualTo("GEN-OSE");
     }
 
     @Test
@@ -128,7 +129,7 @@ public class OffenderEventsTransformerTest {
     public void unkownEventTypesAreHandledAppropriately() {
         OffenderEventsTransformer transformer = new OffenderEventsTransformer(mock(TypesTransformer.class), mock(ObjectMapper.class));
 
-        assertThat(transformer.offenderEventOf((Xtag)null)).isNull();
+        assertThat(transformer.offenderEventOf((Xtag) null)).isNull();
         assertThat(transformer.offenderEventOf(Xtag.builder().build())).isNull();
         assertThat(transformer.offenderEventOf(Xtag.builder().eventType("meh").build())).isNotNull();
     }
