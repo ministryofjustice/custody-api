@@ -1,6 +1,7 @@
 package uk.gov.justice.digital.nomis.info;
 
 import io.restassured.RestAssured;
+import io.restassured.http.ContentType;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -28,11 +29,12 @@ public class PingEndpointIntTest {
 
     @Test
     public void canGetPingResponse() {
-        String pingResponse = given()
+        final var pingResponse = given()
                 .when()
                 .get("/ping")
                 .then()
                 .statusCode(HttpStatus.OK.value())
+                .contentType(ContentType.TEXT)
                 .extract()
                 .asString();
 
