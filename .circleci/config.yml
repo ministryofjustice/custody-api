@@ -1,82 +1,106 @@
-# Java Gradle CircleCI 2.0 configuration file
-#
-# Check https://circleci.com/docs/2.0/language-java/ for more details
-#
-version: 2
-jobs:
-  build:
+defaults: &defaults
+  working_directory: ~/app
+  environment:
+    JAVA_TOOL_OPTIONS: -Xmx1024m -XX:ParallelGCThreads=2 -XX:ConcGCThreads=2 -XX:ParallelGCThreads=2 -Djava.util.concurrent.ForkJoinPool.common.parallelism=2
+
+version: 2.1
+
+executors:
+  builder:
+    <<: *defaults
     docker:
-      # specify the version you desire here
-      - image: circleci/openjdk:11-jdk
-
-      # Specify service dependencies here if necessary
-      # CircleCI maintains a library of pre-built images
-      # documented at https://circleci.com/docs/2.0/circleci-images/
-      # - image: circleci/postgres:9.4
-
-    working_directory: ~/repo
-
+      - image: circleci/openjdk:11-jdk-browsers
     environment:
-      # Customize the JVM maximum heap limit
       JVM_OPTS: -Xmx3200m
       TERM: dumb
 
+  deployer:
+    <<: *defaults
+    docker:
+      - image: circleci/python:3
+
+commands:
+  app_version:
+    description: "Record the Application Version"
     steps:
       - run:
-          name: Generate Build version
-          command: |
-            echo "export BUILD_VERSION=$(date +%Y-%m-%d).$CIRCLE_BUILD_NUM" >> $BASH_ENV
+        command: |
+          APP_VERSION=$(unzip -p custody-api-*.jar BOOT-INF/classes/META-INF/build-info.properties | awk -F = '/build.version/ {print $2}')
 
+          # make up a good version name
+          TAG=[[ "${CIRCLE_BRANCH}" == "master" ]] && ${APP_VERSION}.${CIRCLE_BRANCH} || $APP_VERSION
+          echo $TAG > ./app_version.txt
+  build_publish:
+    description: "Build container and publish to docker hub"
+    steps:
+      - run:
+        command: |
+          DOCKER_IMAGE="mojdigitalstudio/custody-api"
+          APP_VERSION=$(cat ./app_version.txt)
+          docker build --rm=false . \
+             --tag "$DOCKER_IMAGE:$APP_VERSION" \
+             --label "maintainer=noms-studio-webops@digital.justice.gov.uk" \
+             --label "app.version=$APP_VERSION" \
+             --label "build.version=$APP_VERSION" \
+             --label "build.number=$CIRCLE_BUILD_NUM" \
+             --label "build.url=$CIRCLE_BUILD_URL" \
+             --label "build.gitref=$CIRCLE_SHA1"
+
+          if [[ "${CIRCLE_BRANCH}" == "master" ]]; then
+            # publish to docker hub as the tag
+            docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+            docker tag mojdigitalstudio/$DOCKER_IMAGE:$APP_VERSION $DOCKER_IMAGE:latest
+            docker push mojdigitalstudio/$DOCKER_IMAGE:$APP_VERSION
+            docker push mojdigitalstudio/$DOCKER_IMAGE:latest
+          fi
+
+jobs:
+  build:
+    executor: builder
+    steps:
       - checkout
-
-      # Download and cache dependencies
       - restore_cache:
-          keys:
-          - v1-dependencies-{{ checksum "build.gradle" }}
-          # fallback to using the latest cache if no exact match is found
-          - v1-dependencies-
-
-      - run: ./gradlew dependencies
-
+        keys:
+          - gradle-{{ checksum "build.gradle" }}
+          - gradle-
+      - run: ./gradlew build
+      - app_version
       - save_cache:
           paths:
-            - ~/.m2
-          key: v1-dependencies-{{ checksum "build.gradle" }}
-
-      # run tests!
-      - run: gradle test
-
+            - ~/.gradle
+          key: gradle-{{ checksum "build.gradle" }}
       - store_test_results:
           path: build/test-results
-
       - store_artifacts:
           path: build/reports/tests
+      - persist_to_workspace:
+          root: .
+          paths:
+            - build/libs
+            - build.gradle
+            - app_version.txt
 
-      # Assemble
-      - run: ./gradlew assemble
+  build_docker:
+    executor: deployer
+    steps:
+      - checkout
+      - attach_workspace:
+          at: ~/app
+      - setup_remote_docker:
+          docker_layer_caching: true
+      - build_publish
 
-      - store_artifacts:
-          path: build/libs
-
-      - setup_remote_docker
-
-      - deploy:
-          name: Push to Docker Hub
-          command: |
-            if [ "${CIRCLE_BRANCH}" == "master" ]; then
-              ./scripts/publishDockerImage.sh custody-api "${BUILD_VERSION}" "${CIRCLE_BUILD_NUM}" "${CIRCLE_BUILD_URL}" "${CIRCLE_SHA1}" "${DOCKER_EMAIL}" "${DOCKER_USERNAME}" "${DOCKER_PASSWORD}"
-            fi
-
-#      - deploy:
-#          name: Install elastic beanstalk CLI
-#          command: |
-#            if [ "${CIRCLE_BRANCH}" == "master" ]; then
-#              ./scripts/installElasticBeanstalk.sh
-#            fi
-#
-#      - deploy:
-#          name: Deploy to Elastic Beanstalk Staging
-#          command: |
-#            if [ "${CIRCLE_BRANCH}" == "master" ]; then
-#              ./scripts/deployElasticBeanstalk.sh "${BUILD_VERSION}"
-#            fi
+workflows:
+  version: 2
+  build-test-and-deploy:
+    jobs:
+      - build:
+          filters:
+            tags:
+              ignore: /.*/
+      - build_docker:
+          requires:
+            - build
+#          filters:
+#            branches:
+#              only: master
