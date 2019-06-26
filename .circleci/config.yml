@@ -28,9 +28,7 @@ commands:
             APP_VERSION=$(unzip -p build/libs/custody-api-*.jar BOOT-INF/classes/META-INF/build-info.properties | awk -F = '/build.version/ {print $2}')
 
             # make up a good version name
-            [[ "${CIRCLE_BRANCH}" == "master" ]] && echo "$APP_VERSION" || echo "${APP_VERSION}.${CIRCLE_BRANCH}" > ./app_version.txt
-
-            awk '{print "Setting app version to " $1}' ./app_version.txt
+            ([[ "${CIRCLE_BRANCH}" == "master" ]] && echo "$APP_VERSION" || echo "${APP_VERSION}.${CIRCLE_BRANCH}") | tee ./app_version.txt | awk '{print "Setting app version to " $1}'
 
   build_publish:
     description: "Build container and publish to docker hub"
