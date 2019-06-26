@@ -24,35 +24,36 @@ commands:
     description: "Record the Application Version"
     steps:
       - run:
-        command: |
-          APP_VERSION=$(unzip -p custody-api-*.jar BOOT-INF/classes/META-INF/build-info.properties | awk -F = '/build.version/ {print $2}')
+          command: |
+            APP_VERSION=$(unzip -p custody-api-*.jar BOOT-INF/classes/META-INF/build-info.properties | awk -F = '/build.version/ {print $2}')
 
-          # make up a good version name
-          TAG=[[ "${CIRCLE_BRANCH}" == "master" ]] && ${APP_VERSION}.${CIRCLE_BRANCH} || $APP_VERSION
-          echo $TAG > ./app_version.txt
+            # make up a good version name
+            TAG=[[ "${CIRCLE_BRANCH}" == "master" ]] && ${APP_VERSION}.${CIRCLE_BRANCH} || $APP_VERSION
+            echo $TAG > ./app_version.txt
+
   build_publish:
     description: "Build container and publish to docker hub"
     steps:
       - run:
-        command: |
-          DOCKER_IMAGE="mojdigitalstudio/custody-api"
-          APP_VERSION=$(cat ./app_version.txt)
-          docker build --rm=false . \
-             --tag "$DOCKER_IMAGE:$APP_VERSION" \
-             --label "maintainer=noms-studio-webops@digital.justice.gov.uk" \
-             --label "app.version=$APP_VERSION" \
-             --label "build.version=$APP_VERSION" \
-             --label "build.number=$CIRCLE_BUILD_NUM" \
-             --label "build.url=$CIRCLE_BUILD_URL" \
-             --label "build.gitref=$CIRCLE_SHA1"
+          command: |
+            DOCKER_IMAGE="mojdigitalstudio/custody-api"
+            APP_VERSION=$(cat ./app_version.txt)
+            docker build --rm=false . \
+               --tag "$DOCKER_IMAGE:$APP_VERSION" \
+               --label "maintainer=noms-studio-webops@digital.justice.gov.uk" \
+               --label "app.version=$APP_VERSION" \
+               --label "build.version=$APP_VERSION" \
+               --label "build.number=$CIRCLE_BUILD_NUM" \
+               --label "build.url=$CIRCLE_BUILD_URL" \
+               --label "build.gitref=$CIRCLE_SHA1"
 
-          if [[ "${CIRCLE_BRANCH}" == "master" ]]; then
-            # publish to docker hub as the tag
-            docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
-            docker tag mojdigitalstudio/$DOCKER_IMAGE:$APP_VERSION $DOCKER_IMAGE:latest
-            docker push mojdigitalstudio/$DOCKER_IMAGE:$APP_VERSION
-            docker push mojdigitalstudio/$DOCKER_IMAGE:latest
-          fi
+            if [[ "${CIRCLE_BRANCH}" == "master" ]]; then
+              # publish to docker hub as the tag
+              docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+              docker tag mojdigitalstudio/$DOCKER_IMAGE:$APP_VERSION $DOCKER_IMAGE:latest
+              docker push mojdigitalstudio/$DOCKER_IMAGE:$APP_VERSION
+              docker push mojdigitalstudio/$DOCKER_IMAGE:latest
+            fi
 
 jobs:
   build:
@@ -60,9 +61,9 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-        keys:
-          - gradle-{{ checksum "build.gradle" }}
-          - gradle-
+          keys:
+            - gradle-{{ checksum "build.gradle" }}
+            - gradle-
       - run: ./gradlew build
       - app_version
       - save_cache:
