@@ -25,11 +25,12 @@ commands:
     steps:
       - run:
           command: |
-            APP_VERSION=$(unzip -p custody-api-*.jar BOOT-INF/classes/META-INF/build-info.properties | awk -F = '/build.version/ {print $2}')
+            APP_VERSION=$(unzip -p build/libs/custody-api-*.jar BOOT-INF/classes/META-INF/build-info.properties | awk -F = '/build.version/ {print $2}')
 
             # make up a good version name
-            TAG=[[ "${CIRCLE_BRANCH}" == "master" ]] && ${APP_VERSION}.${CIRCLE_BRANCH} || $APP_VERSION
-            echo $TAG > ./app_version.txt
+            [[ "${CIRCLE_BRANCH}" == "master" ]] && echo "$APP_VERSION" || echo "${APP_VERSION}.${CIRCLE_BRANCH}" > ./app_version.txt
+
+            awk '{print "Setting app version to " $1}' ./app_version.txt
 
   build_publish:
     description: "Build container and publish to docker hub"
