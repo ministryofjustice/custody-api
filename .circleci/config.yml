@@ -49,9 +49,9 @@ commands:
             if [[ "${CIRCLE_BRANCH}" == "master" ]]; then
               # publish to docker hub as the tag
               docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
-              docker tag mojdigitalstudio/$DOCKER_IMAGE:$APP_VERSION $DOCKER_IMAGE:latest
-              docker push mojdigitalstudio/$DOCKER_IMAGE:$APP_VERSION
-              docker push mojdigitalstudio/$DOCKER_IMAGE:latest
+              docker tag $DOCKER_IMAGE:$APP_VERSION $DOCKER_IMAGE:latest
+              docker push $DOCKER_IMAGE:$APP_VERSION
+              docker push $DOCKER_IMAGE:latest
             fi
 
 jobs:
