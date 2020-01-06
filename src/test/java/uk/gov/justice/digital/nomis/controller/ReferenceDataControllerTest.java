@@ -1,11 +1,9 @@
 package uk.gov.justice.digital.nomis.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jayway.jsonpath.JsonPath;
 import io.restassured.RestAssured;
 import io.restassured.config.ObjectMapperConfig;
 import io.restassured.config.RestAssuredConfig;
-import net.minidev.json.JSONArray;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -13,16 +11,23 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.json.JsonContent;
 import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.util.Objects;
+
 import static io.restassured.RestAssured.given;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
+import static org.springframework.core.ResolvableType.forType;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @RunWith(SpringJUnit4ClassRunner.class)
 @ActiveProfiles("dev")
+@DirtiesContext
 public class ReferenceDataControllerTest {
 
     @LocalServerPort
@@ -44,15 +49,47 @@ public class ReferenceDataControllerTest {
     }
 
     @Test
-    public void canGetAgencyLocations() {
-        given()
+    public void canGetAgencyLocationsDefault() {
+        final var agencyLocations = given()
                 .when()
                 .auth().oauth2(validOauthToken)
                 .get("/agencyLocations")
                 .then()
                 .statusCode(200)
-                .body("page.totalElements", greaterThan(0));
+                .body("totalElements", greaterThan(0))
+                .extract().body().asString();
 
+
+        assertThatJsonFile(agencyLocations, "agency_locations.json");
+    }
+
+    @Test
+    public void canGetAgencyLocationsFirstPage() {
+        final var agencyLocations = given()
+                .when()
+                .auth().oauth2(validOauthToken)
+                .get("/agencyLocations?page=0&size=10")
+                .then()
+                .statusCode(200)
+                .body("totalElements", greaterThan(0))
+                .extract().body().asString();
+
+
+        assertThatJsonFile(agencyLocations, "agency_locations_page0.json");
+    }
+    @Test
+    public void canGetAgencyLocationsSecondPage() {
+        final var agencyLocations = given()
+                .when()
+                .auth().oauth2(validOauthToken)
+                .get("/agencyLocations?page=1&size=10")
+                .then()
+                .statusCode(200)
+                .body("totalElements", greaterThan(0))
+                .extract().body().asString();
+
+
+        assertThatJsonFile(agencyLocations, "agency_locations_page1.json");
     }
 
     @Test
@@ -64,75 +101,12 @@ public class ReferenceDataControllerTest {
                 .statusCode(401);
     }
 
-    @Test
-    public void canGetAgencyInternalLocations() {
-        given()
-                .when()
-                .auth().oauth2(validOauthToken)
-                .get("/agencyInternalLocations")
-                .then()
-                .statusCode(200)
-                .body("page.totalElements", greaterThan(0));
-
+    <T> void assertThatJsonFile(final String response, final String jsonFile) {
+        final var responseAsJson = getBodyAsJsonContent(response);
+        assertThat(responseAsJson).isEqualToJson(jsonFile);
     }
 
-    @Test
-    public void agencyInternalLocationsAreAuthorized() {
-        given()
-                .when()
-                .get("/agencyInternalLocations")
-                .then()
-                .statusCode(401);
+    private <T> JsonContent<T> getBodyAsJsonContent(final String response) {
+        return new JsonContent<T>(getClass(), forType(String.class), Objects.requireNonNull(response));
     }
-
-    @Test
-    public void embeddedHateoasLinksWorkForAgencyLocations() {
-        final var response = given()
-                .when()
-                .auth().oauth2(validOauthToken)
-                .queryParam("page", 1)
-                .queryParam("size", 1)
-                .get("/agencyLocations")
-                .then()
-                .statusCode(200)
-                .extract().asString();
-
-        final JSONArray hrefs = JsonPath.parse(response).read("_links.*.href");
-
-        hrefs.forEach(href -> given()
-                .when()
-                .auth().oauth2(validOauthToken)
-                .log()
-                .all()
-                .get(href.toString())
-                .then()
-                .statusCode(200));
-
-    }
-
-    @Test
-    public void embeddedHateoasLinksWorkForAgencyInternalLocations() {
-        final var response = given()
-                .when()
-                .auth().oauth2(validOauthToken)
-                .queryParam("page", 1)
-                .queryParam("size", 1)
-                .get("/agencyInternalLocations")
-                .then()
-                .statusCode(200)
-                .extract().asString();
-
-        final JSONArray hrefs = JsonPath.parse(response).read("_links.*.href");
-
-        hrefs.forEach(href -> given()
-                .when()
-                .auth().oauth2(validOauthToken)
-                .log()
-                .all()
-                .get(href.toString())
-                .then()
-                .statusCode(200));
-
-    }
-
 }

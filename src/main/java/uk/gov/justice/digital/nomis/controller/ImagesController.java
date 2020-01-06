@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 @RestController
-@Api( description = "Offender image resources", tags = "Offender Images")
+@Api(description = "Offender image resources", tags = "Offender Images")
 public class ImagesController {
 
     private final OffenderService offenderService;
@@ -34,57 +34,34 @@ public class ImagesController {
         this.imagesService = imagesService;
     }
 
-    @RequestMapping(path = "/offenders/offenderId/{offenderId}/images", method = RequestMethod.GET)
-    @ApiResponses({
-        @ApiResponse(code = 404, message = "Offender not found"),
-        @ApiResponse(code = 200, message = "OK")})
-    public ResponseEntity<List<OffenderImage>> getImageMetaDataByOffenderId(@PathVariable("offenderId") final Long offenderId) {
-
-        return offenderService.getOffenderByOffenderId(offenderId).
-            map(offender -> new ResponseEntity<>(imagesForOffender(offender), HttpStatus.OK))
-            .orElse(new ResponseEntity<>(NOT_FOUND));
-    }
-
     @RequestMapping(path = "/offenders/nomsId/{nomsId}/images", method = RequestMethod.GET)
     @ApiResponses({
-        @ApiResponse(code = 404, message = "Offender not found"),
-        @ApiResponse(code = 200, message = "OK")})
+            @ApiResponse(code = 404, message = "Offender not found"),
+            @ApiResponse(code = 200, message = "OK")})
     public ResponseEntity<List<OffenderImage>> getImageMetaDataByNomsId(@PathVariable("nomsId") final String nomsId) {
 
         return offenderService.getOffenderByNomsId(nomsId).
-            map(offender -> new ResponseEntity<>(imagesForOffender(offender), HttpStatus.OK))
-            .orElse(new ResponseEntity<>(NOT_FOUND));
-    }
-
-    @RequestMapping(path = "/offenders/offenderId/{offenderId}/images/{imageId}/thumbnail", method = RequestMethod.GET, produces = "image/jpeg")
-    @ApiResponses({
-        @ApiResponse(code = 404, message = "Offender or image not found"),
-        @ApiResponse(code = 200, message = "OK")})
-    public ResponseEntity<byte[]> getImageData(@PathVariable("offenderId") final Long offenderId, @PathVariable("imageId") final Long imageId) {
-
-         return offenderService.getOffenderByOffenderId(offenderId)
-            .flatMap(ignored -> imagesService.getImageForImageId(imageId))
-            .map(bytes -> new ResponseEntity<>(bytes, HttpStatus.OK))
-            .orElse(new ResponseEntity<>(NOT_FOUND));
+                map(offender -> new ResponseEntity<>(imagesForOffender(offender), HttpStatus.OK))
+                .orElse(new ResponseEntity<>(NOT_FOUND));
     }
 
     @RequestMapping(path = "/offenders/nomsId/{nomsId}/images/{imageId}/thumbnail", method = RequestMethod.GET, produces = "image/jpeg")
     @ApiResponses({
-        @ApiResponse(code = 404, message = "Offender or image not found"),
-        @ApiResponse(code = 200, message = "OK")})
+            @ApiResponse(code = 404, message = "Offender or image not found"),
+            @ApiResponse(code = 200, message = "OK")})
     public ResponseEntity<byte[]> getImageDataForNomsId(@PathVariable("nomsId") final String nomsId, @PathVariable("imageId") final Long imageId) {
 
-         return offenderService.getOffenderByNomsId(nomsId)
-            .flatMap(ignored -> imagesService.getImageForImageId(imageId))
-            .map(bytes -> new ResponseEntity<>(bytes, HttpStatus.OK))
-            .orElse(new ResponseEntity<>(NOT_FOUND));
+        return offenderService.getOffenderByNomsId(nomsId)
+                .flatMap(ignored -> imagesService.getImageForImageId(imageId))
+                .map(bytes -> new ResponseEntity<>(bytes, HttpStatus.OK))
+                .orElse(new ResponseEntity<>(NOT_FOUND));
     }
 
     private List<OffenderImage> imagesForOffender(final Offender offender) {
         return offender.getBookings().stream()
-            .map(booking -> imagesService.getImageMetaDataForBookingId(booking.getBookingId()))
+                .map(booking -> imagesService.getImageMetaDataForBookingId(booking.getBookingId()))
                 .flatMap(Collection::stream)
-            .sorted((image1, image2) -> image2.getCaptureDateTime().compareTo(image1.getCaptureDateTime()))
-            .collect(Collectors.toList());
+                .sorted((image1, image2) -> image2.getCaptureDateTime().compareTo(image1.getCaptureDateTime()))
+                .collect(Collectors.toList());
     }
 }

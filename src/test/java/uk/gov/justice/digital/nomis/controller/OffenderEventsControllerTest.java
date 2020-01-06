@@ -14,8 +14,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.json.JsonContent;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import uk.gov.justice.digital.nomis.api.OffenderEvent;
@@ -25,14 +27,16 @@ import uk.gov.justice.digital.nomis.service.XtagEventsService;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
+import java.util.Objects;
 
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.core.ResolvableType.forType;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @RunWith(SpringJUnit4ClassRunner.class)
 @ActiveProfiles("dev")
+@DirtiesContext
 public class OffenderEventsControllerTest {
 
     @MockBean
@@ -71,15 +75,9 @@ public class OffenderEventsControllerTest {
                 .statusCode(200)
                 .extract()
                 .body()
-                .as(OffenderEvent[].class);
+                .asString();
 
-        final var events = ImmutableList.<OffenderEvent>builder().add(offenderEvents).build();
-
-
-        assertThat(events).extracting("nomisEventType").contains("BOOK_UPD_OASYS");
-        assertThat(events).extracting("eventType").contains("KA-KS");
-        assertThat(events).extracting("offenderId").contains(-1001L, -1002L);
-
+        assertThatJsonFile(offenderEvents, "events.json");
     }
 
     @Test
@@ -199,35 +197,6 @@ public class OffenderEventsControllerTest {
 
     }
 
-    @Test
-    public void canAccessOffenderEventsForSpecificOffender() {
-        final var from = LocalDateTime.of(2018, 10, 29, 0, 0);
-        final var to = from.plusDays(1L);
-
-        final var filter = OffenderEventsFilter.builder().from(from).to(to).offenderId(Optional.of(-1001L)).build();
-        Mockito.when(xtagEventsService.findAll(ArgumentMatchers.eq(filter))).thenReturn(someXtagEvents(from));
-
-        final var offenderEvents = given()
-                .when()
-                .auth().oauth2(validOauthToken)
-                .queryParam("from", from.toString())
-                .queryParam("to", to.toString())
-                .get("/offenders/offenderId/-1001/events")
-                .then()
-                .statusCode(200)
-                .extract()
-                .body()
-                .as(OffenderEvent[].class);
-
-        final var events = ImmutableList.<OffenderEvent>builder().add(offenderEvents).build();
-
-        assertThat(events).extracting("rootOffenderId").containsOnly(-1001L);
-        assertThat(events).extracting("nomisEventType").contains("BOOK_UPD_OASYS");
-        assertThat(events).extracting("eventType").contains("KA-KS");
-
-
-    }
-
     private List<OffenderEvent> someXtagEvents(final LocalDateTime now) {
         return ImmutableList.of(
                 OffenderEvent.builder()
@@ -265,5 +234,14 @@ public class OffenderEventsControllerTest {
                         .offenderId(-1002L)
                         .rootOffenderId(-1002L)
                         .build());
+    }
+
+    <T> void assertThatJsonFile(final String response, final String jsonFile) {
+        final var responseAsJson = getBodyAsJsonContent(response);
+        assertThat(responseAsJson).isEqualToJson(jsonFile);
+    }
+
+    private <T> JsonContent<T> getBodyAsJsonContent(final String response) {
+        return new JsonContent<T>(getClass(), forType(String.class), Objects.requireNonNull(response));
     }
 }

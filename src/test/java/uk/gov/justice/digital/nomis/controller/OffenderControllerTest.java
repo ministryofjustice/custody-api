@@ -1,11 +1,9 @@
 package uk.gov.justice.digital.nomis.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jayway.jsonpath.JsonPath;
 import io.restassured.RestAssured;
 import io.restassured.config.ObjectMapperConfig;
 import io.restassured.config.RestAssuredConfig;
-import net.minidev.json.JSONArray;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -13,18 +11,23 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.json.JsonContent;
 import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import uk.gov.justice.digital.nomis.api.Offender;
+
+import java.util.Objects;
 
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.*;
+import static org.springframework.core.ResolvableType.forType;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @RunWith(SpringJUnit4ClassRunner.class)
 @ActiveProfiles("dev")
+@DirtiesContext
 public class OffenderControllerTest {
 
     @LocalServerPort
@@ -46,17 +49,6 @@ public class OffenderControllerTest {
     }
 
     @Test
-    public void canGetAllOffenders() {
-        given()
-                .when()
-                .auth().oauth2(validOauthToken)
-                .get("/offenders")
-                .then()
-                .statusCode(200)
-                .body("page.totalElements", greaterThan(0));
-    }
-
-    @Test
     public void canGetOffenderByOffenderId() {
         final var offender = given()
                 .when()
@@ -66,9 +58,9 @@ public class OffenderControllerTest {
                 .statusCode(200)
                 .extract()
                 .body()
-                .as(Offender.class);
+                .asString();
 
-        assertThat(offender).isNotNull();
+        assertThatJsonFile(offender, "offender.json");
     }
 
     @Test
@@ -100,40 +92,6 @@ public class OffenderControllerTest {
     }
 
     @Test
-    public void canGetOffenderByNomsId() {
-        final var offender = given()
-                .when()
-                .auth().oauth2(validOauthToken)
-                .get("/offenders/nomsId/A1234AA")
-                .then()
-                .statusCode(200)
-                .extract()
-                .body()
-                .as(Offender.class);
-
-        assertThat(offender).extracting("offenderId").containsOnly(-1001L);
-    }
-
-    @Test
-    public void getOffenderByNomsIdReturns404WhenOffenderNotFound() {
-        given()
-                .when()
-                .auth().oauth2(validOauthToken)
-                .get("/offenders/nomsId/Z666666ZZ")
-                .then()
-                .statusCode(404);
-    }
-
-    @Test
-    public void offenderByNomsIdIsAuthorized() {
-        given()
-                .when()
-                .get("/offenders/nomsId/A1234AA")
-                .then()
-                .statusCode(401);
-    }
-
-    @Test
     public void activeOffendersByPrisonIsAuthorized() {
         given()
                 .when()
@@ -150,9 +108,40 @@ public class OffenderControllerTest {
                 .get("/offenders/prison/MDI")
                 .then()
                 .statusCode(200)
-                .body("page.totalElements", greaterThan(0))
-                .body("_embedded.offenders[0].surname", equalTo("TRESCOTHICK"))
-                .body("_embedded.offenders.activeBooking.activeFlag", not(contains(is(false))));
+                .body("totalElements", greaterThan(0))
+                .body("content[0].surname", equalTo("TRESCOTHICK"))
+                .body("content.activeBooking.activeFlag", not(contains(is(false))));
+
+    }
+
+    @Test
+    public void getActiveOffendersByPrisonFirstPage() {
+        final var offenders = given()
+                .when()
+                .auth().oauth2(validOauthToken)
+                .get("/offenders/prison/SYI?page=0&size=2")
+                .then()
+                .statusCode(200)
+                .extract()
+                .body()
+                .asString();
+
+        assertThatJsonFile(offenders, "offenders_page0.json");
+    }
+
+    @Test
+    public void getActiveOffendersByPrisonSecondPage() {
+        final var offenders = given()
+                .when()
+                .auth().oauth2(validOauthToken)
+                .get("/offenders/prison/SYI?page=1&size=2")
+                .then()
+                .statusCode(200)
+                .extract()
+                .body()
+                .asString();
+
+        assertThatJsonFile(offenders, "offenders_page1.json");
     }
 
     @Test
@@ -165,55 +154,12 @@ public class OffenderControllerTest {
                 .statusCode(404);
     }
 
-    @Test
-    public void embeddedHateoasLinksWorkForOffenders() {
-        final var response = given()
-                .when()
-                .auth().oauth2(validOauthToken)
-                .queryParam("page", 1)
-                .queryParam("size", 1)
-                .get("/offenders")
-                .then()
-                .statusCode(200)
-                .extract().asString();
-
-        final JSONArray hrefs = JsonPath.parse(response).read("_links.*.href");
-
-        hrefs.forEach(href -> given()
-                .when()
-                .auth().oauth2(validOauthToken)
-                .log()
-                .all()
-                .get(href.toString())
-                .then()
-                .statusCode(200));
-
+    <T> void assertThatJsonFile(final String response, final String jsonFile) {
+        final var responseAsJson = getBodyAsJsonContent(response);
+        assertThat(responseAsJson).isEqualToJson(jsonFile);
     }
 
-    @Test
-    public void embeddedHateoasLinksWorkForOffenderActiveBookings() {
-        final var response = given()
-                .when()
-                .auth().oauth2(validOauthToken)
-                .queryParam("page", 1)
-                .queryParam("size", 1)
-                .get("/offenders/prison/MDI")
-                .then()
-                .statusCode(200)
-                .extract().asString();
-
-        final JSONArray hrefs = JsonPath.parse(response).read("_links.*.href");
-
-        hrefs.forEach(href -> given()
-                .when()
-                .auth().oauth2(validOauthToken)
-                .log()
-                .all()
-                .get(href.toString())
-                .then()
-                .statusCode(200));
-
+    private <T> JsonContent<T> getBodyAsJsonContent(final String response) {
+        return new JsonContent<T>(getClass(), forType(String.class), Objects.requireNonNull(response));
     }
-
-
 }

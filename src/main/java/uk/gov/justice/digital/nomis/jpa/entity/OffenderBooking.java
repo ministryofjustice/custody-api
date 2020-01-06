@@ -137,28 +137,8 @@ public class OffenderBooking {
 
     @OneToMany
     @BatchSize(size = 1000)
-    @JoinColumn(name = "OFFENDER_BOOK_ID")
-    private List<OffenderMilitaryRecord> offenderMilitaryRecords;
-
-    @OneToMany
-    @BatchSize(size = 1000)
-    @JoinColumn(name = "OFFENDER_BOOK_ID")
-    private List<OffenderCharge> offenderCharges;
-
-    @OneToMany
-    @BatchSize(size = 1000)
     @JoinColumn(name = "OFFENDER_BOOK_ID", referencedColumnName = "OFFENDER_BOOK_ID")
     private List<OffenderSentence> offenderSentences;
-
-    @OneToMany
-    @BatchSize(size = 1000)
-    @JoinColumn(name = "OFFENDER_BOOK_ID", referencedColumnName = "OFFENDER_BOOK_ID")
-    private List<OffenderAssessment> offenderAssessments;
-
-    @OneToMany
-    @BatchSize(size = 1000)
-    @JoinColumn(name = "OFFENDER_BOOK_ID", referencedColumnName = "OFFENDER_BOOK_ID")
-    private List<OffenderHealthProblem> offenderHealthProblems;
 
     @OneToMany
     @BatchSize(size = 1000)
@@ -177,68 +157,13 @@ public class OffenderBooking {
     @OneToMany
     @BatchSize(size = 1000)
     @JoinColumn(name = "OFFENDER_BOOK_ID", referencedColumnName = "OFFENDER_BOOK_ID")
-    private List<OffenderIdentifyingMarks> offenderIdentifyingMarks;
-
-    @OneToMany
-    @BatchSize(size = 1000)
-    @JoinColumn(name = "OFFENDER_BOOK_ID", referencedColumnName = "OFFENDER_BOOK_ID")
-    private List<OffenderPhysicalAttributes> offenderPhysicalAttributes;
-
-    @OneToMany
-    @BatchSize(size = 1000)
-    @JoinColumn(name = "OFFENDER_BOOK_ID", referencedColumnName = "OFFENDER_BOOK_ID")
     private List<OffenderProfileDetails> offenderProfileDetails;
-
-    @OneToMany
-    @BatchSize(size = 1000)
-    @JoinColumn(name = "OFFENDER_BOOK_ID", referencedColumnName = "OFFENDER_BOOK_ID")
-    private List<OffenderIepLevel> offenderIepLevels;
-
-    @OneToMany
-    @BatchSize(size = 1000)
-    @JoinColumn(name = "OFFENDER_BOOK_ID", referencedColumnName = "OFFENDER_BOOK_ID")
-    private List<OffenderEmployment> offenderEmployments;
-
-    @OneToMany
-    @BatchSize(size = 1000)
-    @JoinColumn(name = "OFFENDER_BOOK_ID", referencedColumnName = "OFFENDER_BOOK_ID")
-    private List<OffenderContactPerson> offenderContactPersons;
-
-    @OneToMany
-    @BatchSize(size = 1000)
-    @JoinColumn(name = "OFFENDER_BOOK_ID", referencedColumnName = "OFFENDER_BOOK_ID")
-    private List<CourtEvent> courtEvents;
-
-    @OneToMany
-    @BatchSize(size = 1000)
-    @JoinColumn(name = "OFFENDER_BOOK_ID", referencedColumnName = "OFFENDER_BOOK_ID")
-    private List<OffenderRehabDecision> offenderRehabDecisions;
 
     @OneToMany
     @BatchSize(size = 1000)
     @JoinColumn(name = "OFFENDER_BOOK_ID", referencedColumnName = "OFFENDER_BOOK_ID")
     @OrderBy(clause = "RETURN_DATE DESC, RETURN_TIME DESC")
     private List<OffenderIndSchedule> offenderIndSchedules;
-
-    @OneToMany
-    @BatchSize(size = 1000)
-    @JoinColumn(name = "OFFENDER_BOOK_ID", referencedColumnName = "OFFENDER_BOOK_ID")
-    private List<OffenderProgramProfile> offenderProgramProfiles;
-
-    @OneToMany
-    @BatchSize(size = 1000)
-    @JoinColumn(name = "OFFENDER_BOOK_ID", referencedColumnName = "OFFENDER_BOOK_ID")
-    private List<OffenderCourseAttendance> offenderCourseAttendances;
-
-    @OneToMany
-    @BatchSize(size = 1000)
-    @JoinColumn(name = "OFFENDER_BOOK_ID", referencedColumnName = "OFFENDER_BOOK_ID")
-    private List<OffenderExcludeActsSchds> offenderExcludeActsSchds;
-
-    @OneToMany
-    @BatchSize(size = 1000)
-    @JoinColumn(name = "OFFENDER_BOOK_ID", referencedColumnName = "OFFENDER_BOOK_ID")
-    private List<OffenderAlert> offenderAlerts;
 
     @OneToOne
     @JoinColumn(name = "AGY_LOC_ID", insertable = false, updatable = false)
